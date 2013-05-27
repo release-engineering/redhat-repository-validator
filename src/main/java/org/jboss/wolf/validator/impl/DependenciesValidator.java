@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 
+import javax.annotation.Resource;
 import javax.inject.Inject;
 
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -39,8 +40,8 @@ import org.slf4j.LoggerFactory;
 public class DependenciesValidator implements Validator {
 
     private static final Logger logger = LoggerFactory.getLogger(DependenciesValidator.class);
-    
-    @Inject
+
+    @Resource(name = "dependenciesValidatorFilter")
     private IOFileFilter fileFilter;
     @Inject
     private ModelReader modelReader;
@@ -54,7 +55,7 @@ public class DependenciesValidator implements Validator {
         logger.debug("start...");
         Collection<File> pomFiles = listPomFiles(ctx.getValidatedRepoDir(), fileFilter);
         for (File pomFile : pomFiles) {
-            logger.debug("validate: {}", pomFile);
+            logger.debug("validate `{}`", pomFile);
             validate(ctx, pomFile);
         }
     }
@@ -82,13 +83,13 @@ public class DependenciesValidator implements Validator {
         pomPath = removeStart(pomPath, "/");
         pomPath = removeEnd(pomPath, pomFile.getName());
         pomPath = removeEnd(pomPath, "/");
-    
+
         String version = substringAfterLast(pomPath, "/");
         pomPath = substringBeforeLast(pomPath, "/");
         String artifactId = substringAfterLast(pomPath, "/");
         pomPath = substringBeforeLast(pomPath, "/");
         String groupId = pomPath.replace("/", ".");
-    
+
         return new DefaultArtifact(groupId, artifactId, "pom", version);
     }
 
@@ -116,21 +117,21 @@ public class DependenciesValidator implements Validator {
 
     private boolean resolveArchive(ValidatorContext ctx, File pomFile, Artifact pomArtifact, Model model) {
         if (!model.getPackaging().equals("pom")) {
-            
+
             ArtifactTypeRegistry artifactTypeRegistry = repositorySystemSession.getArtifactTypeRegistry();
             ArtifactType artifactType = artifactTypeRegistry.get(model.getPackaging());
-            
+
             Artifact archiveArtifact = new DefaultArtifact(
                     pomArtifact.getGroupId(),
                     pomArtifact.getArtifactId(),
                     artifactType.getClassifier(),
                     artifactType.getExtension(),
                     pomArtifact.getVersion());
-            
+
             ArtifactRequest archiveRequest = new ArtifactRequest();
             archiveRequest.setArtifact(archiveArtifact);
             archiveRequest.setRepositories(ctx.getRemoteRepos());
-            
+
             try {
                 repositorySystem.resolveArtifact(repositorySystemSession, archiveRequest);
             } catch (ArtifactResolutionException e) {
@@ -145,7 +146,7 @@ public class DependenciesValidator implements Validator {
         CollectRequest collectRequest = new CollectRequest();
         collectRequest.setRoot(new Dependency(pomArtifact, JavaScopes.COMPILE));
         collectRequest.setRepositories(ctx.getRemoteRepos());
-        
+
         DependencyFilter dependencyFilter = DependencyFilterUtils.classpathFilter(JavaScopes.COMPILE);
         DependencyRequest dependencyRequest = new DependencyRequest(collectRequest, dependencyFilter);
 
@@ -155,6 +156,7 @@ public class DependenciesValidator implements Validator {
             ctx.addException(pomFile, e);
             return false;
         }
+        
         try {
             repositorySystem.resolveDependencies(repositorySystemSession, dependencyRequest);
         } catch (DependencyResolutionException e) {

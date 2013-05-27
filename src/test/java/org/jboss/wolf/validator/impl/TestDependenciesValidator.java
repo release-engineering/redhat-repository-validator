@@ -10,6 +10,8 @@ import static org.jboss.wolf.validator.impl.TestUtil.toArtifactFile;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
@@ -19,10 +21,24 @@ import org.apache.maven.model.Profile;
 import org.eclipse.aether.collection.DependencyCollectionException;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
 import org.junit.Test;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ContextConfiguration;
 
 import com.google.common.io.Files;
 
+@ContextConfiguration
 public class TestDependenciesValidator extends AbstractTest {
+    
+    @Configuration
+    public static class TestDependenciesConfiguration {
+
+        @Bean
+        public IOFileFilter unmanagedVersionValidatorFilter() {
+            return FileFilterUtils.falseFileFilter();
+        }
+
+    }
     
     @Test
     public void shouldResolvePom() {

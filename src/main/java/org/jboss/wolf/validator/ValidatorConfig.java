@@ -1,7 +1,11 @@
 package org.jboss.wolf.validator;
 
+import java.util.Properties;
+
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.maven.model.building.DefaultModelBuildingRequest;
+import org.apache.maven.model.building.ModelBuildingRequest;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -16,7 +20,9 @@ import org.eclipse.aether.util.graph.selector.ScopeDependencySelector;
 import org.jboss.wolf.validator.impl.DelegatingValidator;
 import org.jboss.wolf.validator.impl.DependenciesValidator;
 import org.jboss.wolf.validator.impl.ModelValidator;
+import org.jboss.wolf.validator.impl.UnmanagedVersionValidator;
 import org.jboss.wolf.validator.impl.aether.DepthOneOptionalDependencySelector;
+import org.jboss.wolf.validator.impl.aether.LocalRepositoryModelResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
@@ -37,21 +43,47 @@ public class ValidatorConfig {
     }
 
     @Bean
-    @Primary
-    public Validator validator() {
-        return new DelegatingValidator(
-                dependenciesValidator(), 
-                modelValidator());
+    public Validator unmanagedVersionValidator() {
+        return new UnmanagedVersionValidator();
     }
 
     @Bean
-    public IOFileFilter fileFilter() {
+    public IOFileFilter defaultFilter() {
         return FileFilterUtils.trueFileFilter();
     }
-    
+
+    @Bean
+    public IOFileFilter dependenciesValidatorFilter() {
+        return defaultFilter();
+    }
+
+    @Bean
+    public IOFileFilter modelValidatorFilter() {
+        return defaultFilter();
+    }
+
+    @Bean
+    public IOFileFilter unmanagedVersionValidatorFilter() {
+        return defaultFilter();
+    }
+
+    @Bean
+    @Primary
+    public Validator validator() {
+        return new DelegatingValidator(
+                dependenciesValidator(),
+                modelValidator(),
+                unmanagedVersionValidator());
+    }
+
     @Bean
     public LocalRepository localRepository() {
         return new LocalRepository("target/repos/local-repo");
+    }
+
+    @Bean
+    public LocalRepositoryModelResolver localRepositoryModelResolver() {
+        return new LocalRepositoryModelResolver();
     }
 
     @Bean
@@ -69,7 +101,7 @@ public class ValidatorConfig {
         session.setArtifactTypeRegistry(artifactTypeRegistry());
         return session;
     }
-    
+
     @Bean
     public ArtifactTypeRegistry artifactTypeRegistry() {
         DefaultArtifactTypeRegistry registry = new DefaultArtifactTypeRegistry();
@@ -87,6 +119,24 @@ public class ValidatorConfig {
         registry.add(new DefaultArtifactType("par", "par", "", "java", false, true));
         registry.add(new DefaultArtifactType("bundle", "jar", "", "java"));
         return registry;
-    }    
+    }
+
+    @Bean
+    public ModelBuildingRequest modelBuildingRequestTemplate(RepositorySystemSession repositorySystemSession) {
+        Properties userProperties = new Properties();
+        userProperties.putAll(repositorySystemSession.getUserProperties());
+
+        Properties systemProperties = new Properties();
+        systemProperties.putAll(repositorySystemSession.getSystemProperties());
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setProcessPlugins(true);
+        request.setLocationTracking(true);
+        request.setModelResolver(localRepositoryModelResolver());
+        request.setUserProperties(userProperties);
+        request.setSystemProperties(systemProperties);
+
+        return request;
+    }
 
 }

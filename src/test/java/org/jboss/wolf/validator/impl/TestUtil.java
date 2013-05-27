@@ -90,6 +90,11 @@ public class TestUtil {
             return this;
         }
         
+        public PomBuilder property(String key, String value) {
+            model.addProperty(key, value);
+            return this;
+        }
+        
         public PomBuilder dependency(Model m) {
             return dependency(TestUtil.dependency().to(m).build());
         }
@@ -104,9 +109,12 @@ public class TestUtil {
         }
         
         public PomBuilder dependencyManagement(Dependency d) {
-            DependencyManagement dm = new DependencyManagement();
+            DependencyManagement dm = model.getDependencyManagement();
+            if (dm == null) {
+                dm = new DependencyManagement();
+                model.setDependencyManagement(dm);
+            }
             dm.addDependency(d);
-            model.setDependencyManagement(dm);
             return this;
         }
         

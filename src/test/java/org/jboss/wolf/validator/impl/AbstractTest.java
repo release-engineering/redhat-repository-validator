@@ -117,11 +117,11 @@ public abstract class AbstractTest {
     }
 
     @Configuration
-    public static class TestValidatorConfig extends ValidatorConfig {
+    public static class TestConfiguration extends ValidatorConfig {
 
         @Bean
         @Override
-        public IOFileFilter fileFilter() {
+        public IOFileFilter defaultFilter() {
             return new IOFileFilter() {
                 @Override
                 public boolean accept(File file) {
@@ -136,5 +136,5 @@ public abstract class AbstractTest {
         }
 
     }
-
+    
 }

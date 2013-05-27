@@ -36,7 +36,6 @@
     <bean id="internalWagonProvider" class="org.jboss.wolf.validator.impl.aether.InternalWagonProvider" />
     <bean id="internalWagonConfigurator"  class="org.jboss.wolf.validator.impl.aether.InternalWagonConfigurator" />
     <bean id="internalRepositoryListener" class="org.jboss.wolf.validator.impl.aether.InternalRepositoryListener" />
-    <bean id="localRepositoryModelResolver" class="org.jboss.wolf.validator.impl.aether.LocalRepositoryModelResolver" />
     <util:constant id="loggerFactory" static-field="org.eclipse.aether.spi.log.NullLoggerFactory.INSTANCE" />
 
 </beans>
