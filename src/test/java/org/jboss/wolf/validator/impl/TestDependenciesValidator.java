@@ -10,7 +10,6 @@ import static org.jboss.wolf.validator.impl.TestUtil.toArtifactFile;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Build;
@@ -31,11 +30,11 @@ import com.google.common.io.Files;
 public class TestDependenciesValidator extends AbstractTest {
     
     @Configuration
-    public static class TestDependenciesConfiguration {
+    public static class TestConfiguration {
 
         @Bean
-        public IOFileFilter unmanagedVersionValidatorFilter() {
-            return FileFilterUtils.falseFileFilter();
+        public IOFileFilter dependenciesValidatorFilter() {
+            return new TestFileFilter();
         }
 
     }

@@ -11,6 +11,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Model;
@@ -122,19 +123,22 @@ public abstract class AbstractTest {
         @Bean
         @Override
         public IOFileFilter defaultFilter() {
-            return new IOFileFilter() {
-                @Override
-                public boolean accept(File file) {
-                    return fileFilter != null ? fileFilter.accept(file) : true;
-                }
-
-                @Override
-                public boolean accept(File dir, String name) {
-                    return fileFilter != null ? fileFilter.accept(dir, name) : true;
-                }
-            };
+            return FileFilterUtils.falseFileFilter();
         }
 
+    }
+
+    public static class TestFileFilter implements IOFileFilter {
+
+        @Override
+        public boolean accept(File file) {
+            return fileFilter != null ? fileFilter.accept(file) : true;
+        }
+
+        @Override
+        public boolean accept(File dir, String name) {
+            return fileFilter != null ? fileFilter.accept(dir, name) : true;
+        }
     }
     
 }

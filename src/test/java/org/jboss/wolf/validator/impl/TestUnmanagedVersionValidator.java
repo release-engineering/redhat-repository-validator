@@ -3,10 +3,30 @@ package org.jboss.wolf.validator.impl;
 import static org.jboss.wolf.validator.impl.TestUtil.dependency;
 import static org.jboss.wolf.validator.impl.TestUtil.pom;
 
+import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.maven.model.Model;
 import org.junit.Test;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.ContextConfiguration;
 
+@ContextConfiguration
 public class TestUnmanagedVersionValidator extends AbstractTest {
+    
+    @Configuration
+    public static class TestConfiguration {
+
+        @Bean
+        public IOFileFilter modelValidatorFilter() {
+            return new TestFileFilter();
+        }
+        
+        @Bean
+        public IOFileFilter unmanagedVersionValidatorFilter() {
+            return new TestFileFilter();
+        }
+
+    }
 
     @Test
     public void shouldFindManagedVersions() {

@@ -38,7 +38,7 @@ public class ValidatorContext {
     }
 
     public void addException(File pomFile, Exception e) {
-        logger.info("for `{}` register exception `{}`", pomFile, e.getMessage());
+        logger.debug("for `{}` register exception `{}`", pomFile, e.getMessage());
 
         List<Exception> exceptionList = exceptions.get(pomFile);
         if (exceptionList == null) {

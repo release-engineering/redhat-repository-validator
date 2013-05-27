@@ -2,6 +2,11 @@ package org.jboss.wolf.validator.impl;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -12,6 +17,7 @@ import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
+import org.eclipse.aether.util.ChecksumUtils;
 
 public class TestUtil {
     
@@ -246,6 +252,7 @@ public class TestUtil {
                 File srcFile = new File("target/test-classes/empty.jar");
                 File destFile = toArtifactFile(repoDir, pomModel);
                 FileUtils.copyFile(srcFile, destFile);
+                createChecksums(destFile);
             }
             
             if (originalText != null && demagedText != null) {
@@ -254,7 +261,29 @@ public class TestUtil {
                 FileUtils.writeStringToFile(pomFile, pomText);
             }
             
+            createChecksums(pomFile);            
         } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    public static void createChecksums(File file) {
+        try {
+            Map<String, String> checksumAlgos = new HashMap<String, String>();
+            checksumAlgos.put("SHA-1", ".sha1");
+            checksumAlgos.put("MD5", ".md5");
+
+            Map<String, Object> checksumResults = ChecksumUtils.calc(file, checksumAlgos.keySet());
+            for (Entry<String, Object> checksumEntry : checksumResults.entrySet()) {
+                String checksumType = checksumEntry.getKey();
+                Object checksumValue = checksumEntry.getValue();
+
+                File checksumFile = new File(file.getPath() + checksumAlgos.get(checksumType));
+                OutputStreamWriter checksumWriter = new OutputStreamWriter(new FileOutputStream(checksumFile), "US-ASCII");
+                checksumWriter.write(checksumValue.toString());
+                checksumWriter.close();
+            }
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

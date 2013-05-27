@@ -17,6 +17,7 @@ import org.eclipse.aether.util.artifact.DefaultArtifactTypeRegistry;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
 import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
 import org.eclipse.aether.util.graph.selector.ScopeDependencySelector;
+import org.jboss.wolf.validator.impl.ChecksumValidator;
 import org.jboss.wolf.validator.impl.DelegatingValidator;
 import org.jboss.wolf.validator.impl.DependenciesValidator;
 import org.jboss.wolf.validator.impl.ModelValidator;
@@ -38,23 +39,13 @@ public class ValidatorConfig {
     }
 
     @Bean
-    public Validator modelValidator() {
-        return new ModelValidator();
-    }
-
-    @Bean
-    public Validator unmanagedVersionValidator() {
-        return new UnmanagedVersionValidator();
-    }
-
-    @Bean
-    public IOFileFilter defaultFilter() {
-        return FileFilterUtils.trueFileFilter();
-    }
-
-    @Bean
     public IOFileFilter dependenciesValidatorFilter() {
         return defaultFilter();
+    }
+
+    @Bean
+    public Validator modelValidator() {
+        return new ModelValidator();
     }
 
     @Bean
@@ -63,7 +54,22 @@ public class ValidatorConfig {
     }
 
     @Bean
+    public Validator unmanagedVersionValidator() {
+        return new UnmanagedVersionValidator();
+    }
+
+    @Bean
     public IOFileFilter unmanagedVersionValidatorFilter() {
+        return defaultFilter();
+    }
+
+    @Bean
+    public Validator checksumValidator() {
+        return new ChecksumValidator();
+    }
+
+    @Bean
+    public IOFileFilter checksumValidatorFilter() {
         return defaultFilter();
     }
 
@@ -73,7 +79,13 @@ public class ValidatorConfig {
         return new DelegatingValidator(
                 dependenciesValidator(),
                 modelValidator(),
-                unmanagedVersionValidator());
+                unmanagedVersionValidator(),
+                checksumValidator());
+    }
+
+    @Bean
+    public IOFileFilter defaultFilter() {
+        return FileFilterUtils.trueFileFilter();
     }
 
     @Bean
