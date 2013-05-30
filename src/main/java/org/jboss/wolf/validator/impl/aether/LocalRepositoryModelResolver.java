@@ -50,7 +50,7 @@ public class LocalRepositoryModelResolver implements ModelResolver {
 
     @Override
     public void addRepository(Repository repository) throws InvalidRepositoryException {
-        throw new UnsupportedOperationException();
+        // noop
     }
 
 }
