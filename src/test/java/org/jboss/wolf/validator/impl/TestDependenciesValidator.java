@@ -71,6 +71,18 @@ public class TestDependenciesValidator extends AbstractTest {
         assertLocalRepoContains(fooApi);
         assertLocalRepoContains(fooParent);
     }
+    
+    @Test
+    public void shouldResolveParentFromCentral() {
+        Model jbossParent = pom().artifactId("jboss-parent").groupId("org.jboss").version("6").packaging("pom").build();
+        Model fooApi = pom().artifactId("foo-api").parent(jbossParent).create(repoFooDir);
+
+        validator.validate(ctx);
+
+        assertSuccess();
+        assertLocalRepoContains(fooApi);
+        assertLocalRepoContains(jbossParent);
+    }
 
     @Test
     public void shouldResolveGrandParent() {

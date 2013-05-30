@@ -37,7 +37,8 @@ public abstract class AbstractTest {
     
     protected final RemoteRepository remoteRepoFoo = new RemoteRepository.Builder("foo", "default", repoFooDir.toURI().toString()).build();
     protected final RemoteRepository remoteRepoBar = new RemoteRepository.Builder("bar", "default", repoBarDir.toURI().toString()).build();
-    protected final RemoteRepository[] remoteRepos = new RemoteRepository[] { remoteRepoFoo, remoteRepoBar };
+    protected final RemoteRepository remoteRepoCentral = new RemoteRepository.Builder("central", "default", "http://repo1.maven.org/maven2/").build();
+    protected final RemoteRepository[] remoteRepos = new RemoteRepository[] { remoteRepoFoo, remoteRepoBar, remoteRepoCentral };
     
     @Inject
     protected Validator validator;
