@@ -1,6 +1,6 @@
 package org.jboss.wolf.validator.impl;
 
-import static org.jboss.wolf.validator.impl.Util.listPomFiles;
+import static org.jboss.wolf.validator.impl.ValidatorSupport.listPomFiles;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -26,11 +26,11 @@ import org.jboss.wolf.validator.ValidatorContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UnmanagedVersionValidator implements Validator {
+public class BomUnmanagedVersionValidator implements Validator {
 
-    private static final Logger logger = LoggerFactory.getLogger(UnmanagedVersionValidator.class);
+    private static final Logger logger = LoggerFactory.getLogger(BomUnmanagedVersionValidator.class);
 
-    @Resource(name = "unmanagedVersionValidatorFilter")
+    @Resource(name = "bomUnmanagedVersionValidatorFilter")
     private IOFileFilter fileFilter;
     @Inject
     private ModelBuilder modelBuilder;
@@ -72,7 +72,7 @@ public class UnmanagedVersionValidator implements Validator {
         for (Model project : projects) {
             Model bom = findBom(boms, project);
             if( bom == null ) {
-                ctx.addException(project.getPomFile(), new UnmanagedVersionException(project));
+                ctx.addException(project.getPomFile(), new BomUnmanagedVersionException(project));
             } else {
                 logger.debug("project `{}` managed in bom `{}`", project, bom);
             }

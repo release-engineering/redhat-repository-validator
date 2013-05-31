@@ -1,6 +1,6 @@
 package org.jboss.wolf.validator.impl;
 
-import static org.jboss.wolf.validator.impl.Util.listPomFiles;
+import static org.jboss.wolf.validator.impl.ValidatorSupport.listPomFiles;
 
 import java.io.File;
 import java.util.Collection;

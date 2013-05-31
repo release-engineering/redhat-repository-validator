@@ -3,6 +3,7 @@ package org.jboss.wolf.validator.impl;
 import static org.jboss.wolf.validator.impl.TestUtil.dependency;
 import static org.jboss.wolf.validator.impl.TestUtil.pom;
 
+import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.maven.model.Model;
 import org.junit.Test;
@@ -11,19 +12,19 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 
 @ContextConfiguration
-public class TestUnmanagedVersionValidator extends AbstractTest {
+public class TestBomUnmanagedVersionValidator extends AbstractTest {
     
     @Configuration
     public static class TestConfiguration {
 
         @Bean
         public IOFileFilter modelValidatorFilter() {
-            return new TestFileFilter();
+            return FileFilterUtils.trueFileFilter();
         }
         
         @Bean
-        public IOFileFilter unmanagedVersionValidatorFilter() {
-            return new TestFileFilter();
+        public IOFileFilter bomUnmanagedVersionValidatorFilter() {
+            return FileFilterUtils.trueFileFilter();
         }
 
     }
@@ -33,7 +34,8 @@ public class TestUnmanagedVersionValidator extends AbstractTest {
         Model fooApi = pom().artifactId("foo-api").create(repoFooDir);
         Model fooImpl = pom().artifactId("foo-impl").create(repoFooDir);
 
-        pom().artifactId("foo-bom").packaging("pom").
+        pom().artifactId("foo-bom").
+                packaging("pom").
                 dependencyManagement(fooApi).
                 dependencyManagement(fooImpl).
                 create(repoFooDir);
@@ -48,7 +50,8 @@ public class TestUnmanagedVersionValidator extends AbstractTest {
         Model fooApi = pom().artifactId("foo-api").create(repoFooDir);
         Model fooImpl = pom().artifactId("foo-impl").create(repoFooDir);
 
-        pom().artifactId("foo-bom").packaging("pom").
+        pom().artifactId("foo-bom").
+                packaging("pom").
                 property("version.foo", "1.0").
                 dependencyManagement(dependency().to(fooApi).version("${version.foo}").build()).
                 dependencyManagement(dependency().to(fooImpl).version("${version.foo}").build()).
@@ -65,14 +68,15 @@ public class TestUnmanagedVersionValidator extends AbstractTest {
         Model fooImpl = pom().artifactId("foo-impl").create(repoFooDir);
         pom().artifactId("foo-impl").version("2.0").create(repoFooDir);
 
-        pom().artifactId("foo-bom").packaging("pom").
+        pom().artifactId("foo-bom").
+                packaging("pom").
                 dependencyManagement(fooApi).
                 dependencyManagement(fooImpl).
                 create(repoFooDir);
 
         validator.validate(ctx);
 
-        assertExpectedException(UnmanagedVersionException.class, "project com.acme:foo-impl:jar:2.0 is unmanaged");
+        assertExpectedException(BomUnmanagedVersionException.class, "project com.acme:foo-impl:jar:2.0 is unmanaged");
     }
     
 }

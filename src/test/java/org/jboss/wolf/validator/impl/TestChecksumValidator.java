@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.junit.Test;
 import org.springframework.context.annotation.Bean;
@@ -21,7 +22,7 @@ public class TestChecksumValidator extends AbstractTest {
 
         @Bean
         public IOFileFilter checksumValidatorFilter() {
-            return new TestFileFilter();
+            return FileFilterUtils.trueFileFilter();
         }
 
     }

@@ -4,7 +4,7 @@ import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.apache.commons.lang3.StringUtils.removeStart;
 import static org.apache.commons.lang3.StringUtils.substringAfterLast;
 import static org.apache.commons.lang3.StringUtils.substringBeforeLast;
-import static org.jboss.wolf.validator.impl.Util.listPomFiles;
+import static org.jboss.wolf.validator.impl.ValidatorSupport.listPomFiles;
 
 import java.io.File;
 import java.io.IOException;

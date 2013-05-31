@@ -17,11 +17,14 @@ import org.eclipse.aether.util.artifact.DefaultArtifactTypeRegistry;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
 import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
 import org.eclipse.aether.util.graph.selector.ScopeDependencySelector;
+import org.jboss.wolf.validator.impl.BomAmbiguousVersionValidator;
+import org.jboss.wolf.validator.impl.BomDependencyNotFoundValidator;
 import org.jboss.wolf.validator.impl.ChecksumValidator;
 import org.jboss.wolf.validator.impl.DelegatingValidator;
 import org.jboss.wolf.validator.impl.DependenciesValidator;
 import org.jboss.wolf.validator.impl.ModelValidator;
-import org.jboss.wolf.validator.impl.UnmanagedVersionValidator;
+import org.jboss.wolf.validator.impl.BomUnmanagedVersionValidator;
+import org.jboss.wolf.validator.impl.ValidatorSupport;
 import org.jboss.wolf.validator.impl.aether.DepthOneOptionalDependencySelector;
 import org.jboss.wolf.validator.impl.aether.LocalRepositoryModelResolver;
 import org.springframework.context.annotation.Bean;
@@ -54,16 +57,6 @@ public class ValidatorConfig {
     }
 
     @Bean
-    public Validator unmanagedVersionValidator() {
-        return new UnmanagedVersionValidator();
-    }
-
-    @Bean
-    public IOFileFilter unmanagedVersionValidatorFilter() {
-        return defaultFilter();
-    }
-
-    @Bean
     public Validator checksumValidator() {
         return new ChecksumValidator();
     }
@@ -74,13 +67,50 @@ public class ValidatorConfig {
     }
 
     @Bean
+    public Validator bomAmbiguousVersionValidator() {
+        return new BomAmbiguousVersionValidator();
+    }
+
+    @Bean
+    public IOFileFilter bomAmbiguousVersionValidatorFilter() {
+        return defaultFilter();
+    }
+
+    @Bean
+    public Validator bomDependencyNotFoundValidator() {
+        return new BomDependencyNotFoundValidator();
+    }
+
+    @Bean
+    public IOFileFilter bomDependencyNotFoundValidatorFilter() {
+        return defaultFilter();
+    }
+
+    @Bean
+    public Validator bomUnmanagedVersionValidator() {
+        return new BomUnmanagedVersionValidator();
+    }
+
+    @Bean
+    public IOFileFilter bomUnmanagedVersionValidatorFilter() {
+        return defaultFilter();
+    }
+
+    @Bean
     @Primary
     public Validator validator() {
         return new DelegatingValidator(
                 dependenciesValidator(),
                 modelValidator(),
-                unmanagedVersionValidator(),
-                checksumValidator());
+                checksumValidator(),
+                bomDependencyNotFoundValidator(),
+                bomAmbiguousVersionValidator(),
+                bomUnmanagedVersionValidator());
+    }
+
+    @Bean
+    public ValidatorSupport validatorSupport() {
+        return new ValidatorSupport();
     }
 
     @Bean
