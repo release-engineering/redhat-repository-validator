@@ -16,7 +16,6 @@ import javax.inject.Inject;
 
 import org.apache.commons.io.filefilter.AbstractFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.FileModelSource;
@@ -41,6 +40,8 @@ public class ValidatorSupport {
     private ModelBuildingRequest modelBuildingRequestTemplate;
     @Inject
     private ArtifactTypeRegistry artifactTypeRegistry;
+    @Inject
+    private BomFilter bomFilter;
     
     public static Collection<File> listPomFiles(File dir, IOFileFilter filter) {
         Collection<File> pomFiles = listFiles(dir, and(filter, suffixFileFilter(".pom")), trueFileFilter());
@@ -62,11 +63,8 @@ public class ValidatorSupport {
         Collection<File> pomFiles = listPomFiles(ctx.getValidatedRepoDir(), and(fileFilter, filterFilesWithExceptions));
         for (File pomFile : pomFiles) {
             Model model = buildModel(pomFile);
-            if (model.getPackaging().equals("pom")) { // TODO better bom detection
-                DependencyManagement depMng = model.getDependencyManagement();
-                if (depMng != null && depMng.getDependencies() != null && !depMng.getDependencies().isEmpty()) {
-                    boms.add(model);
-                }
+            if (bomFilter.isBom(model)) {
+                boms.add(model);
             }
         }
         return boms;

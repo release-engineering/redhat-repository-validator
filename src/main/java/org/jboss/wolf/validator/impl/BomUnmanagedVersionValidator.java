@@ -13,7 +13,6 @@ import javax.inject.Inject;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.maven.model.Dependency;
-import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.FileModelSource;
@@ -36,6 +35,8 @@ public class BomUnmanagedVersionValidator implements Validator {
     private ModelBuilder modelBuilder;
     @Inject
     private ModelBuildingRequest modelBuildingRequestTemplate;
+    @Inject
+    private BomFilter bomFilter;
 
     @Override
     public void validate(ValidatorContext ctx) {
@@ -58,8 +59,7 @@ public class BomUnmanagedVersionValidator implements Validator {
 
             Model model = buildModel(pomFile);
             if (model.getPackaging().equals("pom")) {
-                DependencyManagement depMng = model.getDependencyManagement();
-                if (depMng != null && depMng.getDependencies() != null && !depMng.getDependencies().isEmpty()) {
+                if (bomFilter.isBom(model)) {
                     boms.add(model);
                 }
             } else {

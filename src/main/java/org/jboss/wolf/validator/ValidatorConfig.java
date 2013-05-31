@@ -1,8 +1,13 @@
 package org.jboss.wolf.validator;
 
+import static org.apache.commons.io.IOCase.INSENSITIVE;
+import static org.apache.commons.io.filefilter.FileFilterUtils.and;
+import static org.apache.commons.io.filefilter.FileFilterUtils.nameFileFilter;
+import static org.apache.commons.io.filefilter.FileFilterUtils.notFileFilter;
+import static org.apache.commons.io.filefilter.FileFilterUtils.trueFileFilter;
+
 import java.util.Properties;
 
-import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
@@ -19,11 +24,13 @@ import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
 import org.eclipse.aether.util.graph.selector.ScopeDependencySelector;
 import org.jboss.wolf.validator.impl.BomAmbiguousVersionValidator;
 import org.jboss.wolf.validator.impl.BomDependencyNotFoundValidator;
+import org.jboss.wolf.validator.impl.BomFilter;
+import org.jboss.wolf.validator.impl.BomFilterSimple;
+import org.jboss.wolf.validator.impl.BomUnmanagedVersionValidator;
 import org.jboss.wolf.validator.impl.ChecksumValidator;
 import org.jboss.wolf.validator.impl.DelegatingValidator;
 import org.jboss.wolf.validator.impl.DependenciesValidator;
 import org.jboss.wolf.validator.impl.ModelValidator;
-import org.jboss.wolf.validator.impl.BomUnmanagedVersionValidator;
 import org.jboss.wolf.validator.impl.ValidatorSupport;
 import org.jboss.wolf.validator.impl.aether.DepthOneOptionalDependencySelector;
 import org.jboss.wolf.validator.impl.aether.LocalRepositoryModelResolver;
@@ -63,7 +70,11 @@ public class ValidatorConfig {
 
     @Bean
     public IOFileFilter checksumValidatorFilter() {
-        return defaultFilter();
+        return and(
+                defaultFilter(), 
+                notFileFilter(nameFileFilter("example-settings.xml", INSENSITIVE)),
+                notFileFilter(nameFileFilter("readme.txt", INSENSITIVE)),
+                notFileFilter(nameFileFilter("readme.md", INSENSITIVE)));
     }
 
     @Bean
@@ -112,10 +123,15 @@ public class ValidatorConfig {
     public ValidatorSupport validatorSupport() {
         return new ValidatorSupport();
     }
+    
+    @Bean
+    public BomFilter bomFilter() {
+        return new BomFilterSimple();
+    }
 
     @Bean
     public IOFileFilter defaultFilter() {
-        return FileFilterUtils.trueFileFilter();
+        return trueFileFilter();
     }
 
     @Bean

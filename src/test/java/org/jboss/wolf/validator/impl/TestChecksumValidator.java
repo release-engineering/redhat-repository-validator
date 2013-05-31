@@ -1,5 +1,9 @@
 package org.jboss.wolf.validator.impl;
 
+import static org.apache.commons.io.IOCase.INSENSITIVE;
+import static org.apache.commons.io.filefilter.FileFilterUtils.and;
+import static org.apache.commons.io.filefilter.FileFilterUtils.nameFileFilter;
+import static org.apache.commons.io.filefilter.FileFilterUtils.notFileFilter;
 import static org.jboss.wolf.validator.impl.TestUtil.pom;
 import static org.junit.Assert.assertTrue;
 
@@ -7,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.junit.Test;
 import org.springframework.context.annotation.Bean;
@@ -22,7 +25,10 @@ public class TestChecksumValidator extends AbstractTest {
 
         @Bean
         public IOFileFilter checksumValidatorFilter() {
-            return FileFilterUtils.trueFileFilter();
+            return and(
+                    notFileFilter(nameFileFilter("example-settings.xml", INSENSITIVE)),
+                    notFileFilter(nameFileFilter("readme.txt", INSENSITIVE)),
+                    notFileFilter(nameFileFilter("readme.md", INSENSITIVE)));
         }
 
     }
@@ -76,6 +82,16 @@ public class TestChecksumValidator extends AbstractTest {
 
         validator.validate(ctx);
         assertExpectedException(ChecksumNotMatchException.class, "foo-1.0.jar");
+    }
+    
+    @Test
+    public void shouldIgnoreReadmeAndExampleSettings() throws IOException {
+        FileUtils.touch(new File(repoFooDir, "example-settings.xml"));
+        FileUtils.touch(new File(repoFooDir, "readme.txt"));
+        FileUtils.touch(new File(repoFooDir, "readme.md"));
+        
+        validator.validate(ctx);
+        assertSuccess();
     }
 
 }

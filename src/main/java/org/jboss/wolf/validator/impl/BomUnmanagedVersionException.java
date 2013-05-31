@@ -6,15 +6,15 @@ public class BomUnmanagedVersionException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    private final Model project;
+    private final Model model;
 
-    public BomUnmanagedVersionException(Model project) {
-        super("Project " + project + " is unmanaged, its version is not managed in BOMs.");
-        this.project = project;
+    public BomUnmanagedVersionException(Model model) {
+        super("Artifact " + model + " is unmanaged, its version is not managed in BOMs.");
+        this.model = model;
     }
 
-    public Model getProject() {
-        return project;
+    public Model getModel() {
+        return model;
     }
 
 }

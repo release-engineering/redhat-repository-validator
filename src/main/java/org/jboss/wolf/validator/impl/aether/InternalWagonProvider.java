@@ -9,7 +9,7 @@ public class InternalWagonProvider implements WagonProvider {
 
     @Override
     public Wagon lookup(String roleHint) throws Exception {
-        if ("http".equals(roleHint)) {
+        if ("http".equals(roleHint) || "https".equals(roleHint)) {
             return new LightweightHttpWagon();
         } else if ("file".equals(roleHint)) {
             return new FileWagon();
