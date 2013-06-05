@@ -75,28 +75,22 @@ public class TestValidatorRunner {
     }
     
     @Test
-    public void shouldOverrideLocalRepository() throws Throwable {
-        try {
-            URL configFile = getClass().getClassLoader().getResource(
-                    "org/jboss/wolf/validator/TestValidatorRunner-overrideLocalRepository.xml");
+    public void shouldOverrideLocalRepository() {
+        URL configFile = getClass().getResource("/TestValidatorRunner-overrideLocalRepository.xml");
 
-            validatorRunner = new ValidatorRunner() {
-                @Override
-                protected void runValidation(ApplicationContext ctx) {
-                    LocalRepository localRepository = ctx.getBean("localRepository", LocalRepository.class);
-                    RepositorySystemSession repositorySystemSession = ctx.getBean("repositorySystemSession", RepositorySystemSession.class);
+        validatorRunner = new ValidatorRunner() {
+            @Override
+            protected void runValidation(ApplicationContext ctx) {
+                LocalRepository localRepository = ctx.getBean("localRepository", LocalRepository.class);
+                RepositorySystemSession repositorySystemSession = ctx.getBean("repositorySystemSession", RepositorySystemSession.class);
 
-                    assertNotNull(localRepository);
-                    assertNotNull(repositorySystemSession);
-                    assertEquals("/foo-local-repo", localRepository.getBasedir().getPath());
-                    assertEquals(repositorySystemSession.getLocalRepository().getBasedir().getPath(), localRepository.getBasedir().getPath());
-                }
-            };
-            validatorRunner.run("-c", configFile.getFile());
-        } catch (Throwable e) {
-            e.printStackTrace();
-            throw e;
-        }
+                assertNotNull(localRepository);
+                assertNotNull(repositorySystemSession);
+                assertEquals("/foo-local-repo", localRepository.getBasedir().getPath());
+                assertEquals(repositorySystemSession.getLocalRepository().getBasedir().getPath(), localRepository.getBasedir().getPath());
+            }
+        };
+        validatorRunner.run("-c", configFile.getFile());
     }
 
     private void assertOutputContaints(String s) {
