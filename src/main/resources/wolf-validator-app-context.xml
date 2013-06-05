@@ -38,4 +38,7 @@
     <bean id="internalRepositoryListener" class="org.jboss.wolf.validator.impl.aether.InternalRepositoryListener" />
     <util:constant id="loggerFactory" static-field="org.eclipse.aether.spi.log.NullLoggerFactory.INSTANCE" />
 
+    <context:annotation-config />
+    <bean id="validatorConfig" class="org.jboss.wolf.validator.ValidatorConfig" />
+
 </beans>

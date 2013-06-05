@@ -1,5 +1,6 @@
 package org.jboss.wolf.validator.impl;
 
+import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 import static org.jboss.wolf.validator.impl.TestUtil.containsExceptionMessage;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -23,6 +24,8 @@ import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportResource;
+import org.springframework.context.annotation.Scope;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -30,27 +33,27 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration
 public abstract class AbstractTest {
     
-    protected final File reposDir = new File("target/repos");
-    protected final File repoLocalDir = new File(reposDir, "local-repo");
-    protected final File repoFooDir = new File(reposDir, "remote-repo-foo");
-    protected final File repoBarDir = new File(reposDir, "remote-repo-bar");
+    protected static final File reposDir = new File("target/repos");
+    protected static final File repoLocalDir = new File(reposDir, "local-repo");
+    protected static final File repoFooDir = new File(reposDir, "remote-repo-foo");
+    protected static final File repoBarDir = new File(reposDir, "remote-repo-bar");
     
-    protected final RemoteRepository remoteRepoFoo = new RemoteRepository.Builder("foo", "default", repoFooDir.toURI().toString()).build();
-    protected final RemoteRepository remoteRepoBar = new RemoteRepository.Builder("bar", "default", repoBarDir.toURI().toString()).build();
-    protected final RemoteRepository remoteRepoCentral = new RemoteRepository.Builder("central", "default", "http://repo1.maven.org/maven2/").build();
-    protected final RemoteRepository[] remoteRepos = new RemoteRepository[] { remoteRepoFoo, remoteRepoBar, remoteRepoCentral };
+    protected static final RemoteRepository remoteRepoFoo = new RemoteRepository.Builder("foo", "default", repoFooDir.toURI().toString()).build();
+    protected static final RemoteRepository remoteRepoBar = new RemoteRepository.Builder("bar", "default", repoBarDir.toURI().toString()).build();
+    protected static final RemoteRepository remoteRepoCentral = new RemoteRepository.Builder("central", "default", "http://repo1.maven.org/maven2/").build();
+    protected static final RemoteRepository[] remoteRepos = new RemoteRepository[] { remoteRepoFoo, remoteRepoBar, remoteRepoCentral };
+    
+    protected static IOFileFilter fileFilter;
     
     @Inject
     protected Validator validator;
-    
+    @Inject
     protected ValidatorContext ctx;
-    protected static IOFileFilter fileFilter;
 
     @Before
     public void init() {
         initRepositories();
         fileFilter = null;
-        ctx = new ValidatorContext(repoFooDir, remoteRepos);
     }
 
     private void initRepositories() {
@@ -119,12 +122,20 @@ public abstract class AbstractTest {
     }
 
     @Configuration
+    @ImportResource("wolf-validator-app-context.xml")
     public static class TestConfiguration extends ValidatorConfig {
 
         @Bean
         @Override
         public IOFileFilter defaultFilter() {
             return FileFilterUtils.falseFileFilter();
+        }
+        
+        @Bean
+        @Scope(SCOPE_PROTOTYPE)
+        @Override
+        public ValidatorContext validatorContext() {
+            return new ValidatorContext(repoFooDir, remoteRepos);            
         }
 
     }

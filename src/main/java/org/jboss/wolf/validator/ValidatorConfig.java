@@ -5,7 +5,9 @@ import static org.apache.commons.io.filefilter.FileFilterUtils.and;
 import static org.apache.commons.io.filefilter.FileFilterUtils.nameFileFilter;
 import static org.apache.commons.io.filefilter.FileFilterUtils.notFileFilter;
 import static org.apache.commons.io.filefilter.FileFilterUtils.trueFileFilter;
+import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
+import java.io.File;
 import java.util.Properties;
 
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -18,6 +20,7 @@ import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 import org.eclipse.aether.artifact.DefaultArtifactType;
 import org.eclipse.aether.collection.DependencySelector;
 import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.util.artifact.DefaultArtifactTypeRegistry;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
 import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
@@ -36,11 +39,10 @@ import org.jboss.wolf.validator.impl.aether.DepthOneOptionalDependencySelector;
 import org.jboss.wolf.validator.impl.aether.LocalRepositoryModelResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Scope;
 
 @Configuration
-@ImportResource("aether-config.xml")
 public class ValidatorConfig {
 
     @Bean
@@ -117,6 +119,15 @@ public class ValidatorConfig {
                 bomDependencyNotFoundValidator(),
                 bomAmbiguousVersionValidator(),
                 bomUnmanagedVersionValidator());
+    }
+    
+    @Bean
+    @Scope(SCOPE_PROTOTYPE)
+    public ValidatorContext validatorContext() {
+        // TODO polish
+        RemoteRepository remoteRepoCentral = new RemoteRepository.Builder("central", "default", "http://repo1.maven.org/maven2/").build();
+        File validatedRepoDir = new File("repository"); 
+        return new ValidatorContext(validatedRepoDir, new RemoteRepository[]{remoteRepoCentral});
     }
 
     @Bean
