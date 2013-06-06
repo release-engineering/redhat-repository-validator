@@ -25,7 +25,12 @@ public class ValidatorRunner {
     private static final Logger logger = LoggerFactory.getLogger(ValidatorRunner.class);
 
     public static void main(String[] args) {
-        new ValidatorRunner().run(args);
+        logger.debug("start");
+        try {
+            new ValidatorRunner().run(args);
+        } finally {
+            logger.debug("stop");
+        }
     }
 
     private final Option validatedRepositoryOption = createOption("vr", "validated-repository", "validate given repository", "dir");
@@ -41,7 +46,7 @@ public class ValidatorRunner {
         options.addOption(remoteRepositoryOption);
         options.addOption(configOption);
         options.addOption(helpOption);
-
+        
         try {
             CommandLineParser parser = new BasicParser();
             CommandLine line = parser.parse(options, arguments);
@@ -90,7 +95,7 @@ public class ValidatorRunner {
 
         String userConfigFile = line.getOptionValue(configOption.getOpt());
         if (userConfigFile == null) {
-            File defaultUserConfig = new File("wolf-validator.xml");
+            File defaultUserConfig = new File("wolf-validator-config.xml");
             if (defaultUserConfig.exists() && defaultUserConfig.isFile()) {
                 userConfigFile = defaultUserConfig.getAbsolutePath();
             }

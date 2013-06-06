@@ -1,0 +1,1 @@
+java -Dlogback.configurationFile=wolf-validator-logback.xml -jar wolf-validator.jar "$@"
