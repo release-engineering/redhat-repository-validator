@@ -8,9 +8,13 @@ import static org.apache.commons.io.filefilter.FileFilterUtils.trueFileFilter;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -37,6 +41,9 @@ import org.jboss.wolf.validator.impl.ModelValidator;
 import org.jboss.wolf.validator.impl.ValidatorSupport;
 import org.jboss.wolf.validator.impl.aether.DepthOneOptionalDependencySelector;
 import org.jboss.wolf.validator.impl.aether.LocalRepositoryModelResolver;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -44,6 +51,89 @@ import org.springframework.context.annotation.Scope;
 
 @Configuration
 public class ValidatorConfig {
+    
+    @Autowired
+    private BeanFactory beanFactory;
+    
+    @Value("#{systemProperties['validatedRepository']}")
+    private String validatedRepository;
+
+    @Value("#{systemProperties['localRepository']}")
+    private String localRepository;
+
+    @Value("#{systemProperties['remoteRepositories']?.split(';')}")
+    private String[] remoteRepositories;
+
+    @Bean
+    @Primary
+    public Validator validator() {
+        return new DelegatingValidator(
+                dependenciesValidator(),
+                modelValidator(),
+                checksumValidator(),
+                bomDependencyNotFoundValidator(),
+                bomAmbiguousVersionValidator(),
+                bomUnmanagedVersionValidator());
+    }
+
+    @Bean
+    public RemoteRepository centralRemoteRepository() {
+        RemoteRepository remoteRepositoryCentral = new RemoteRepository.Builder("central", "default", "http://repo1.maven.org/maven2/").build();
+        return remoteRepositoryCentral;
+    }
+
+    @Bean
+    public List<RemoteRepository> effectiveRemoteRepositories() {
+        List<RemoteRepository> repositories = new ArrayList<RemoteRepository>();
+        repositories.addAll(remoteRepositoriesFromArguments());
+        repositories.addAll(remoteRepositoriesFromConfiguration());
+        repositories.add(centralRemoteRepository());
+        return Collections.unmodifiableList(repositories);
+    }
+    
+    private List<RemoteRepository> remoteRepositoriesFromArguments() {
+        List<RemoteRepository> repositories = new ArrayList<RemoteRepository>();
+        if (remoteRepositories != null) {
+            for (int i = 0; i < remoteRepositories.length; i++) {
+                String remoteRepository = remoteRepositories[i];
+                if (StringUtils.isNotEmpty(remoteRepository)) {
+                    repositories.add(new RemoteRepository.Builder("remote" + i, "default", remoteRepository).build());
+                }
+            }
+        }
+        return repositories;
+    }
+    
+    private List<RemoteRepository> remoteRepositoriesFromConfiguration() {
+        List<RemoteRepository> repositories = new ArrayList<RemoteRepository>();
+        if (beanFactory.containsBean("remoteRepositories")) {
+            @SuppressWarnings("unchecked")
+            List<RemoteRepository> customRemoteRepositories = beanFactory.getBean("remoteRepositories", List.class);
+            repositories.addAll(customRemoteRepositories);
+        }
+        return repositories;
+    }
+    
+    @Bean
+    @Scope(SCOPE_PROTOTYPE)
+    public ValidatorContext validatorContext() {
+        return new ValidatorContext(new File(validatedRepository), effectiveRemoteRepositories());
+    }
+
+    @Bean
+    public ValidatorSupport validatorSupport() {
+        return new ValidatorSupport();
+    }
+
+    @Bean
+    public BomFilter bomFilter() {
+        return new BomFilterSimple();
+    }
+
+    @Bean
+    public IOFileFilter defaultFilter() {
+        return trueFileFilter();
+    }
 
     @Bean
     public Validator dependenciesValidator() {
@@ -110,44 +200,8 @@ public class ValidatorConfig {
     }
 
     @Bean
-    @Primary
-    public Validator validator() {
-        return new DelegatingValidator(
-                dependenciesValidator(),
-                modelValidator(),
-                checksumValidator(),
-                bomDependencyNotFoundValidator(),
-                bomAmbiguousVersionValidator(),
-                bomUnmanagedVersionValidator());
-    }
-    
-    @Bean
-    @Scope(SCOPE_PROTOTYPE)
-    public ValidatorContext validatorContext() {
-        // TODO polish
-        RemoteRepository remoteRepoCentral = new RemoteRepository.Builder("central", "default", "http://repo1.maven.org/maven2/").build();
-        File validatedRepoDir = new File("repository"); 
-        return new ValidatorContext(validatedRepoDir, new RemoteRepository[]{remoteRepoCentral});
-    }
-
-    @Bean
-    public ValidatorSupport validatorSupport() {
-        return new ValidatorSupport();
-    }
-    
-    @Bean
-    public BomFilter bomFilter() {
-        return new BomFilterSimple();
-    }
-
-    @Bean
-    public IOFileFilter defaultFilter() {
-        return trueFileFilter();
-    }
-
-    @Bean
     public LocalRepository localRepository() {
-        return new LocalRepository("target/repos/local-repo");
+        return new LocalRepository(localRepository);
     }
 
     @Bean

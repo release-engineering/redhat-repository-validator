@@ -2,7 +2,6 @@ package org.jboss.wolf.validator;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -16,21 +15,21 @@ public class ValidatorContext {
 
     private static final Logger logger = LoggerFactory.getLogger(ValidatorContext.class);
 
-    private final File validatedRepoDir;
-    private final List<RemoteRepository> remoteRepos;
+    private final File validatedRepository;
+    private final List<RemoteRepository> remoteRepositories;
     private final Map<File, List<Exception>> exceptions = new HashMap<File, List<Exception>>();
 
-    public ValidatorContext(File validatedRepoDir, RemoteRepository[] remoteRepos) {
-        this.validatedRepoDir = validatedRepoDir;
-        this.remoteRepos = Collections.unmodifiableList(Arrays.asList(remoteRepos));
+    public ValidatorContext(File validatedRepository, List<RemoteRepository> remoteRepositories) {
+        this.validatedRepository = validatedRepository;
+        this.remoteRepositories = Collections.unmodifiableList(new ArrayList<RemoteRepository>(remoteRepositories));
     }
 
-    public File getValidatedRepoDir() {
-        return validatedRepoDir;
+    public File getValidatedRepository() {
+        return validatedRepository;
     }
 
-    public List<RemoteRepository> getRemoteRepos() {
-        return remoteRepos;
+    public List<RemoteRepository> getRemoteRepositories() {
+        return remoteRepositories;
     }
 
     public boolean isSuccess() {

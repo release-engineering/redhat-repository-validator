@@ -53,7 +53,7 @@ public class DependenciesValidator implements Validator {
     @Override
     public void validate(ValidatorContext ctx) {
         logger.debug("start...");
-        Collection<File> pomFiles = listPomFiles(ctx.getValidatedRepoDir(), fileFilter);
+        Collection<File> pomFiles = listPomFiles(ctx.getValidatedRepository(), fileFilter);
         for (File pomFile : pomFiles) {
             logger.debug("validate `{}`", pomFile);
             validate(ctx, pomFile);
@@ -61,7 +61,7 @@ public class DependenciesValidator implements Validator {
     }
 
     private void validate(ValidatorContext ctx, File pomFile) {
-        Artifact pomArtifact = parsePomArtifact(ctx.getValidatedRepoDir(), pomFile);
+        Artifact pomArtifact = parsePomArtifact(ctx.getValidatedRepository(), pomFile);
         Model pomModel = parsePomModel(ctx, pomFile);
         if (pomModel == null) {
             return;
@@ -105,7 +105,7 @@ public class DependenciesValidator implements Validator {
     private boolean resolvePom(ValidatorContext ctx, File pomFile, Artifact pomArtifact) {
         ArtifactRequest pomRequest = new ArtifactRequest();
         pomRequest.setArtifact(pomArtifact);
-        pomRequest.setRepositories(ctx.getRemoteRepos());
+        pomRequest.setRepositories(ctx.getRemoteRepositories());
         try {
             repositorySystem.resolveArtifact(repositorySystemSession, pomRequest);
         } catch (ArtifactResolutionException e) {
@@ -130,7 +130,7 @@ public class DependenciesValidator implements Validator {
 
             ArtifactRequest archiveRequest = new ArtifactRequest();
             archiveRequest.setArtifact(archiveArtifact);
-            archiveRequest.setRepositories(ctx.getRemoteRepos());
+            archiveRequest.setRepositories(ctx.getRemoteRepositories());
 
             try {
                 repositorySystem.resolveArtifact(repositorySystemSession, archiveRequest);
@@ -145,7 +145,7 @@ public class DependenciesValidator implements Validator {
     private boolean resolveDependencies(ValidatorContext ctx, File pomFile, Artifact pomArtifact) {
         CollectRequest collectRequest = new CollectRequest();
         collectRequest.setRoot(new Dependency(pomArtifact, JavaScopes.COMPILE));
-        collectRequest.setRepositories(ctx.getRemoteRepos());
+        collectRequest.setRepositories(ctx.getRemoteRepositories());
 
         DependencyFilter dependencyFilter = DependencyFilterUtils.classpathFilter(JavaScopes.COMPILE);
         DependencyRequest dependencyRequest = new DependencyRequest(collectRequest, dependencyFilter);

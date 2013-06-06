@@ -60,7 +60,7 @@ public class ValidatorSupport {
         };
         
         List<Model> boms = new ArrayList<Model>();
-        Collection<File> pomFiles = listPomFiles(ctx.getValidatedRepoDir(), and(fileFilter, filterFilesWithExceptions));
+        Collection<File> pomFiles = listPomFiles(ctx.getValidatedRepository(), and(fileFilter, filterFilesWithExceptions));
         for (File pomFile : pomFiles) {
             Model model = buildModel(pomFile);
             if (bomFilter.isBom(model)) {

@@ -33,7 +33,7 @@ public class ModelValidator implements Validator {
     @Override
     public void validate(ValidatorContext ctx) {
         logger.debug("start...");
-        Collection<File> pomFiles = listPomFiles(ctx.getValidatedRepoDir(), fileFilter);
+        Collection<File> pomFiles = listPomFiles(ctx.getValidatedRepository(), fileFilter);
         for (File pomFile : pomFiles) {
             if (!ctx.getExceptions(pomFile).isEmpty()) {
                 logger.debug("skipping `{}`, because already contains exceptions", pomFile);

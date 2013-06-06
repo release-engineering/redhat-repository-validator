@@ -57,7 +57,7 @@ public class BomDependencyNotFoundValidator implements Validator {
         CollectRequest collectRequest = new CollectRequest(
                 bomDependency,
                 Collections.singletonList(dependency),
-                ctx.getRemoteRepos());
+                ctx.getRemoteRepositories());
 
         DependencyRequest dependencyRequest = new DependencyRequest(
                 collectRequest,

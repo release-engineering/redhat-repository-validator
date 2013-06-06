@@ -50,7 +50,7 @@ public class BomUnmanagedVersionValidator implements Validator {
     }
 
     private void collectBomsAndProjects(ValidatorContext ctx, List<Model> boms, List<Model> projects) {
-        Collection<File> pomFiles = listPomFiles(ctx.getValidatedRepoDir(), fileFilter);
+        Collection<File> pomFiles = listPomFiles(ctx.getValidatedRepository(), fileFilter);
         for (File pomFile : pomFiles) {
             if (!ctx.getExceptions(pomFile).isEmpty()) {
                 logger.debug("skipping `{}`, because already contains exceptions", pomFile);

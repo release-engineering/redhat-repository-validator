@@ -1,5 +1,6 @@
 package org.jboss.wolf.validator;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,9 +9,9 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -27,27 +28,27 @@ public class ValidatorRunner {
         new ValidatorRunner().run(args);
     }
 
-    @SuppressWarnings("static-access")
+    private final Option validatedRepositoryOption = createOption("vr", "validated-repository", "validate given repository", "dir");
+    private final Option localRepositoryOption = createOption("lr", "local-repository", "use given local repository", "dir");
+    private final Option remoteRepositoryOption = createOption("rr", "remote-repository", "use given remote repository", "url");
+    private final Option configOption = createOption("c", "config", "use given configuration file", "file");
+    private final Option helpOption = createOption("h", "help", "print help and exit", null);
+
     public void run(String... arguments) {
-        Option help = new Option("h", "help", false, "print help and exit");
-
-        Option config = OptionBuilder.withArgName("file")
-                .hasArg()
-                .withDescription("use given configuration file")
-                .withLongOpt("config")
-                .create("c");
-
         Options options = new Options();
-        options.addOption(help);
-        options.addOption(config);
+        options.addOption(validatedRepositoryOption);
+        options.addOption(localRepositoryOption);
+        options.addOption(remoteRepositoryOption);
+        options.addOption(configOption);
+        options.addOption(helpOption);
+
         try {
             CommandLineParser parser = new BasicParser();
             CommandLine line = parser.parse(options, arguments);
 
-            if (line.hasOption("h")) {
+            if (line.hasOption(helpOption.getOpt())) {
                 runHelp(options);
-            }
-            else {
+            } else {
                 runValidation(line);
             }
         } catch (ParseException e) {
@@ -78,10 +79,21 @@ public class ValidatorRunner {
         validator.validate(validatorContext);
     }
 
-    protected ApplicationContext createApplicationContext(CommandLine line) {
-        String userConfigFile = line.getOptionValue("c");
+    private ApplicationContext createApplicationContext(CommandLine line) {
+        String validatedRepo = line.getOptionValue(validatedRepositoryOption.getOpt(), "workspace/validated-repository");
+        String localRepo = line.getOptionValue(localRepositoryOption.getOpt(), "workspace/local-repository");
+        String[] remoteRepos = line.getOptionValues(remoteRepositoryOption.getOpt());
+
+        System.setProperty("validatedRepository", validatedRepo);
+        System.setProperty("localRepository", localRepo);
+        System.setProperty("remoteRepositories", StringUtils.defaultString(StringUtils.join(remoteRepos, ';')));
+
+        String userConfigFile = line.getOptionValue(configOption.getOpt());
         if (userConfigFile == null) {
-            // TODO default location
+            File defaultUserConfig = new File("wolf-validator.xml");
+            if (defaultUserConfig.exists() && defaultUserConfig.isFile()) {
+                userConfigFile = defaultUserConfig.getAbsolutePath();
+            }
         }
 
         List<Resource> resources = new ArrayList<Resource>();
@@ -92,6 +104,13 @@ public class ValidatorRunner {
 
         GenericXmlApplicationContext appCtx = new GenericXmlApplicationContext(resources.toArray(new Resource[] {}));
         return appCtx;
+    }
+
+    private Option createOption(String opt, String longOpt, String description, String argName) {
+        Option option = new Option(opt, argName != null, description);
+        option.setLongOpt(longOpt);
+        option.setArgName(argName);
+        return option;
     }
 
 }

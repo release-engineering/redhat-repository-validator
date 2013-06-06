@@ -1,12 +1,13 @@
 package org.jboss.wolf.validator.impl;
 
-import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 import static org.jboss.wolf.validator.impl.TestUtil.containsExceptionMessage;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -16,6 +17,7 @@ import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Model;
+import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.jboss.wolf.validator.Validator;
 import org.jboss.wolf.validator.ValidatorConfig;
@@ -41,7 +43,7 @@ public abstract class AbstractTest {
     protected static final RemoteRepository remoteRepoFoo = new RemoteRepository.Builder("foo", "default", repoFooDir.toURI().toString()).build();
     protected static final RemoteRepository remoteRepoBar = new RemoteRepository.Builder("bar", "default", repoBarDir.toURI().toString()).build();
     protected static final RemoteRepository remoteRepoCentral = new RemoteRepository.Builder("central", "default", "http://repo1.maven.org/maven2/").build();
-    protected static final RemoteRepository[] remoteRepos = new RemoteRepository[] { remoteRepoFoo, remoteRepoBar, remoteRepoCentral };
+    protected static final List<RemoteRepository> remoteRepos = Arrays.asList(remoteRepoFoo, remoteRepoBar, remoteRepoCentral);
     
     protected static IOFileFilter fileFilter;
     
@@ -136,6 +138,12 @@ public abstract class AbstractTest {
         @Override
         public ValidatorContext validatorContext() {
             return new ValidatorContext(repoFooDir, remoteRepos);            
+        }
+        
+        @Bean
+        @Override
+        public LocalRepository localRepository() {
+            return new LocalRepository(repoLocalDir);
         }
 
     }

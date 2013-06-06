@@ -70,7 +70,7 @@ public class ChecksumValidator implements Validator {
 
     private Collection<File> findFiles(ValidatorContext ctx) {
         IOFileFilter filterChecksumFiles = notFileFilter(new SuffixFileFilter(new ArrayList<String>(checksumAlgorithms.values())));
-        Collection<File> files = listFiles(ctx.getValidatedRepoDir(), and(fileFilter, filterChecksumFiles), trueFileFilter());
+        Collection<File> files = listFiles(ctx.getValidatedRepository(), and(fileFilter, filterChecksumFiles), trueFileFilter());
         return files;
     }
 

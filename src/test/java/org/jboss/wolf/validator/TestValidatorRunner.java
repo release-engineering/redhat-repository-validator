@@ -1,16 +1,16 @@
 package org.jboss.wolf.validator;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.net.URL;
+import java.util.List;
 
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,22 +75,51 @@ public class TestValidatorRunner {
     }
     
     @Test
-    public void shouldOverrideLocalRepository() {
-        URL configFile = getClass().getResource("/TestValidatorRunner-overrideLocalRepository.xml");
-
-        validatorRunner = new ValidatorRunner() {
-            @Override
-            protected void runValidation(ApplicationContext ctx) {
-                LocalRepository localRepository = ctx.getBean("localRepository", LocalRepository.class);
-                RepositorySystemSession repositorySystemSession = ctx.getBean("repositorySystemSession", RepositorySystemSession.class);
-
-                assertNotNull(localRepository);
-                assertNotNull(repositorySystemSession);
-                assertEquals("/foo-local-repo", localRepository.getBasedir().getPath());
-                assertEquals(repositorySystemSession.getLocalRepository().getBasedir().getPath(), localRepository.getBasedir().getPath());
-            }
-        };
-        validatorRunner.run("-c", configFile.getFile());
+    public void shouldUseDefaultValidatedRepository() {
+        validatorRunner = new AssertValidatedRepositoryRunner("workspace/validated-repository");
+        validatorRunner.run();
+    }
+    
+    @Test
+    public void shouldUseValidatedRepositoryFromArguments() {
+        validatorRunner = new AssertValidatedRepositoryRunner("foo-repo");
+        validatorRunner.run("-vr", "foo-repo");
+    }
+    
+    @Test
+    public void shouldUseDefaultLocalRepository() {
+        validatorRunner = new AssertLocalRepositoryRunner("workspace/local-repository");
+        validatorRunner.run();
+    }
+    
+    @Test
+    public void shouldUseLocalRepositoryFromArguments() {
+        validatorRunner = new AssertLocalRepositoryRunner("foo-local-repo");
+        validatorRunner.run("-lr", "foo-local-repo");
+    }
+    
+    @Test
+    public void shouldUseLocalRepositoryFromConfiguration() {
+        validatorRunner = new AssertLocalRepositoryRunner("/foo-local-repo");
+        validatorRunner.run("-c", getClass().getResource("/TestValidatorRunner-localRepository.xml").getFile());
+    }
+    
+    @Test
+    public void shouldUseDefaultRemoteRepositories() {
+        validatorRunner = new AssertRemoteRepositoryRunner("http://repo1.maven.org/maven2/");
+        validatorRunner.run();
+    }
+    
+    @Test
+    public void shouldUseRemoteRepositoriesFromArguments() {
+        validatorRunner = new AssertRemoteRepositoryRunner("file://foo", "file://bar", "http://repo1.maven.org/maven2/");
+        validatorRunner.run("-rr", "file://foo", "-rr", "file://bar");
+    }
+    
+    @Test
+    public void shouldUseRemoteRepositoriesFromConfiguration() {
+        validatorRunner = new AssertRemoteRepositoryRunner("file://foo", "http://bar.com", "http://repo1.maven.org/maven2/");
+        validatorRunner.run("--config", getClass().getResource("/TestValidatorRunner-remoteRepositories.xml").getFile());
     }
 
     private void assertOutputContaints(String s) {
@@ -99,5 +128,59 @@ public class TestValidatorRunner {
             fail("System output should contains " + s + ", but has content:\n" + systemOut);
         }
     }
+    
+    private static class AssertValidatedRepositoryRunner extends ValidatorRunner {
+        
+        private final String expectedValidatedRepository;
+
+        private AssertValidatedRepositoryRunner(String expectedValidatedRepository) {
+            this.expectedValidatedRepository = expectedValidatedRepository;
+        }
+        
+        @Override
+        protected void runValidation(ApplicationContext ctx) {
+            ValidatorContext validatorContext = ctx.getBean(ValidatorContext.class);
+            assertEquals(expectedValidatedRepository, validatorContext.getValidatedRepository().getPath());
+        }        
+        
+    }    
+    
+    private static class AssertLocalRepositoryRunner extends ValidatorRunner {
+        
+        private final String expectedLocalRepository;
+
+        private AssertLocalRepositoryRunner(String expectedLocalRepository) {
+            this.expectedLocalRepository = expectedLocalRepository;
+        }
+        
+        @Override
+        protected void runValidation(ApplicationContext ctx) {
+            LocalRepository localRepository = ctx.getBean(LocalRepository.class);
+            RepositorySystemSession repositorySystemSession = ctx.getBean(RepositorySystemSession.class);
+            assertEquals(expectedLocalRepository, localRepository.getBasedir().getPath());
+            assertEquals(repositorySystemSession.getLocalRepository().getBasedir().getAbsolutePath(), localRepository.getBasedir().getAbsolutePath());
+        }        
+        
+    }
+    
+    private static class AssertRemoteRepositoryRunner extends ValidatorRunner {
+
+        private final String[] expectedRemoteRepositories;
+
+        private AssertRemoteRepositoryRunner(String... expectedRemoteRepositories) {
+            this.expectedRemoteRepositories = expectedRemoteRepositories;
+        }
+
+        @Override
+        protected void runValidation(ApplicationContext ctx) {
+            ValidatorContext validatorContext = ctx.getBean(ValidatorContext.class);
+            List<RemoteRepository> remoteRepositories = validatorContext.getRemoteRepositories();
+            assertEquals(expectedRemoteRepositories.length, remoteRepositories.size());
+            for (int i = 0; i < expectedRemoteRepositories.length; i++) {
+                assertEquals(expectedRemoteRepositories[i], remoteRepositories.get(i).getUrl());
+            }
+        }
+
+    }    
 
 }
