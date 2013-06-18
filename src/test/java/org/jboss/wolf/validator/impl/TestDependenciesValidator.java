@@ -17,7 +17,6 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Profile;
-import org.eclipse.aether.collection.DependencyCollectionException;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
 import org.junit.Test;
 import org.springframework.context.annotation.Bean;
@@ -340,7 +339,7 @@ public class TestDependenciesValidator extends AbstractTest {
         fileFilter = notFileFilter(nameFileFilter("foo-api-1.0.pom"));
         validator.validate(ctx);
 
-        assertExpectedException(ArtifactNotFoundException.class, "Could not find artifact com.acme:foo-api:pom:1.0");
+        assertExpectedException(ArtifactNotFoundException.class, "Could not find artifact com.acme:foo-api:jar:1.0");
     }
 
     @Test
@@ -352,8 +351,7 @@ public class TestDependenciesValidator extends AbstractTest {
         fileFilter = notFileFilter(nameFileFilter("foo-api-1.0.pom"));
         validator.validate(ctx);
 
-        assertExpectedException(ArtifactNotFoundException.class, "Could not find artifact com.acme:bar-api:pom:1.0");
-        assertExpectedException(DependencyCollectionException.class, "Failed to collect dependencies at com.acme:foo-impl:pom:1.0 -> com.acme:foo-api:jar:1.0 -> com.acme:bar-api:jar:1.0");
+        assertExpectedException(ArtifactNotFoundException.class, "Could not find artifact com.acme:bar-api:jar:1.0");
     }
 
     @Test
@@ -363,18 +361,7 @@ public class TestDependenciesValidator extends AbstractTest {
 
         validator.validate(ctx);
 
-        assertExpectedException(ArtifactNotFoundException.class, "Could not find artifact commons-lang:commons-lang:pom:999");
-        assertExpectedException(DependencyCollectionException.class, "Failed to collect dependencies at com.acme:foo:pom:1.0 -> commons-lang:commons-lang:jar:999");
-    }
-
-    @Test
-    public void shouldFindMissingDependencyWithScopeRuntime() {
-        Model bar = pom().artifactId("bar-runtime").build();
-        pom().artifactId("foo").dependency(dependency().to(bar).scope("runtime").build()).create(repoFooDir);
-
-        validator.validate(ctx);
-
-        assertExpectedException(ArtifactNotFoundException.class, "Could not find artifact com.acme:bar-runtime:pom:1.0");
+        assertExpectedException(ArtifactNotFoundException.class, "Could not find artifact commons-lang:commons-lang:jar:999");
     }
 
     @Test
@@ -413,7 +400,7 @@ public class TestDependenciesValidator extends AbstractTest {
         fileFilter = notFileFilter(nameFileFilter("foo-parent-1.0.pom"));
         validator.validate(ctx);
 
-        assertExpectedException(ArtifactNotFoundException.class, "Could not find artifact com.acme:bar:pom:1.0");
+        assertExpectedException(ArtifactNotFoundException.class, "Could not find artifact com.acme:bar:jar:1.0");
     }
 
     @Test
@@ -451,7 +438,7 @@ public class TestDependenciesValidator extends AbstractTest {
         fileFilter = notFileFilter(nameFileFilter("foo-bom-1.0.pom"));
         validator.validate(ctx);
 
-        assertExpectedException(ArtifactNotFoundException.class, "Could not find artifact com.acme:bar:pom:1.0");
+        assertExpectedException(ArtifactNotFoundException.class, "Could not find artifact com.acme:bar:jar:1.0");
     }
     
     @Test
@@ -472,7 +459,7 @@ public class TestDependenciesValidator extends AbstractTest {
 
         validator.validate(ctx);
 
-        assertExpectedException(ArtifactNotFoundException.class, "Could not find artifact com.acme:bar:pom:1.0");
+        assertExpectedException(ArtifactNotFoundException.class, "Could not find artifact com.acme:bar:jar:1.0");
     }
 
     @Test
@@ -489,6 +476,16 @@ public class TestDependenciesValidator extends AbstractTest {
     public void shouldIgnoreDependencyWithScopeProvided() {
         Model bar = pom().artifactId("bar-provided").build();
         pom().artifactId("foo").dependency(dependency().to(bar).scope("provided").build()).create(repoFooDir);
+
+        validator.validate(ctx);
+
+        assertSuccess();
+    }
+    
+    @Test
+    public void shouldIgnoreDependencyWithScopeRuntime() {
+        Model bar = pom().artifactId("bar-runtime").build();
+        pom().artifactId("foo").dependency(dependency().to(bar).scope("runtime").build()).create(repoFooDir);
 
         validator.validate(ctx);
 
@@ -557,6 +554,24 @@ public class TestDependenciesValidator extends AbstractTest {
 
         validator.validate(ctx);
 
+        assertSuccess();
+    }
+    
+    @Test
+    public void shouldIgnoreDeeperDependency() {
+        Model baz = pom().artifactId("baz").create(repoBarDir);
+        
+        Model bar = pom().artifactId("bar")
+                .dependency(dependency().to(baz).version("999").build())
+                .create(repoBarDir);
+        
+        pom().artifactId("foo")
+                .dependency(bar)
+                .dependency(baz)
+                .create(repoFooDir);
+        
+        validator.validate(ctx);
+        
         assertSuccess();
     }
 

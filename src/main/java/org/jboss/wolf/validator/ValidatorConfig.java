@@ -22,13 +22,21 @@ import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 import org.eclipse.aether.artifact.DefaultArtifactType;
+import org.eclipse.aether.collection.DependencyGraphTransformer;
 import org.eclipse.aether.collection.DependencySelector;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.util.artifact.DefaultArtifactTypeRegistry;
+import org.eclipse.aether.util.graph.manager.ClassicDependencyManager;
 import org.eclipse.aether.util.graph.selector.AndDependencySelector;
 import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
 import org.eclipse.aether.util.graph.selector.ScopeDependencySelector;
+import org.eclipse.aether.util.graph.transformer.ConflictResolver;
+import org.eclipse.aether.util.graph.transformer.JavaScopeDeriver;
+import org.eclipse.aether.util.graph.transformer.JavaScopeSelector;
+import org.eclipse.aether.util.graph.transformer.NearestVersionSelector;
+import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
+import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 import org.jboss.wolf.validator.impl.BomAmbiguousVersionValidator;
 import org.jboss.wolf.validator.impl.BomDependencyNotFoundValidator;
 import org.jboss.wolf.validator.impl.BomFilter;
@@ -211,17 +219,29 @@ public class ValidatorConfig {
 
     @Bean
     public RepositorySystemSession repositorySystemSession(RepositorySystem repositorySystem) {
-        DependencySelector dependencySelector = new AndDependencySelector(
+        // see MavenRepositorySystemUtils.newSession()
+
+        DependencySelector selector = new AndDependencySelector(
                 new ScopeDependencySelector("test", "provided"),
                 new DepthOneOptionalDependencySelector(),
                 new ExclusionDependencySelector());
 
-        DefaultRepositorySystemSession session = new DefaultRepositorySystemSession(); // MavenRepositorySystemUtils.newSession()
-        session.setDependencySelector(dependencySelector);
+        DependencyGraphTransformer transformer = new ConflictResolver(
+                new NearestVersionSelector(), 
+                new JavaScopeSelector(),
+                new SimpleOptionalitySelector(), 
+                new JavaScopeDeriver());
+        
+        DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
         session.setLocalRepositoryManager(repositorySystem.newLocalRepositoryManager(session, localRepository()));
         session.setSystemProperties(System.getProperties());
         session.setConfigProperties(System.getProperties());
         session.setArtifactTypeRegistry(artifactTypeRegistry());
+        session.setDependencyManager(new ClassicDependencyManager());
+        session.setArtifactDescriptorPolicy(new SimpleArtifactDescriptorPolicy(true, true));
+        session.setDependencySelector(selector);
+        session.setDependencyGraphTransformer(transformer);
+
         return session;
     }
 
