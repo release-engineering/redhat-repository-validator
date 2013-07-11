@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 
 @ContextConfiguration
-public class AbstractReporterTest extends AbstractTest {
+public abstract class AbstractReporterTest extends AbstractTest {
 
     @Inject
     protected Reporter reporter;
