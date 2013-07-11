@@ -4,8 +4,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.aether.repository.RemoteRepository;
 import org.slf4j.Logger;
@@ -18,6 +20,7 @@ public class ValidatorContext {
     private final File validatedRepository;
     private final List<RemoteRepository> remoteRepositories;
     private final Map<File, List<Exception>> exceptions = new HashMap<File, List<Exception>>();
+    private final Set<Exception> processedExceptions = new HashSet<Exception>();
 
     public ValidatorContext(File validatedRepository, List<RemoteRepository> remoteRepositories) {
         this.validatedRepository = validatedRepository;
@@ -33,7 +36,7 @@ public class ValidatorContext {
     }
 
     public boolean isSuccess() {
-        return getExceptions().isEmpty();
+        return exceptions.isEmpty();
     }
 
     public void addException(File pomFile, Exception e) {
@@ -45,6 +48,10 @@ public class ValidatorContext {
             exceptions.put(pomFile, exceptionList);
         }
         exceptionList.add(e);
+    }
+    
+    public void addProcessedException(Exception e) {
+        processedExceptions.add(e);
     }
 
     public List<Exception> getExceptions() {
@@ -79,6 +86,16 @@ public class ValidatorContext {
             }
         }
         return Collections.unmodifiableList(result);
+    }
+
+    public List<Exception> getUnprocessedExceptions() {
+        List<Exception> unprocessedExceptions = new ArrayList<Exception>();
+        for (Exception exception : getExceptions()) {
+            if (!processedExceptions.contains(exception)) {
+                unprocessedExceptions.add(exception);
+            }
+        }
+        return Collections.unmodifiableList(unprocessedExceptions);
     }
 
 }

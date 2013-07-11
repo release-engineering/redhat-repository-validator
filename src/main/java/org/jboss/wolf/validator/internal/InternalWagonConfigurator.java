@@ -1,4 +1,4 @@
-package org.jboss.wolf.validator.impl.aether;
+package org.jboss.wolf.validator.internal;
 
 import org.apache.maven.wagon.Wagon;
 import org.eclipse.aether.connector.wagon.WagonConfigurator;

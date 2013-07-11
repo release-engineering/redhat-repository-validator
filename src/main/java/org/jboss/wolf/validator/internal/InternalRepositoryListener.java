@@ -1,4 +1,4 @@
-package org.jboss.wolf.validator.impl.aether;
+package org.jboss.wolf.validator.internal;
 
 import org.eclipse.aether.AbstractRepositoryListener;
 

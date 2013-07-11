@@ -79,9 +79,13 @@ public class ValidatorRunner {
     }
 
     protected void runValidation(ApplicationContext appCtx) {
-        ValidatorContext validatorContext = appCtx.getBean(ValidatorContext.class);
+        ValidatorContext ctx = appCtx.getBean(ValidatorContext.class);
+
         Validator validator = appCtx.getBean(Validator.class);
-        validator.validate(validatorContext);
+        validator.validate(ctx);
+
+        Reporter reporter = appCtx.getBean(Reporter.class);
+        reporter.report(ctx);
     }
 
     private ApplicationContext createApplicationContext(CommandLine line) {

@@ -33,9 +33,9 @@
     <bean id="enhancedLocalRepositoryManagerFactory" class="org.eclipse.aether.internal.impl.EnhancedLocalRepositoryManagerFactory" />
     <bean id="modelReader" class="org.apache.maven.model.io.DefaultModelReader" />
     <bean id="repositoryConnectorFactory" class="org.eclipse.aether.connector.wagon.WagonRepositoryConnectorFactory" />
-    <bean id="internalWagonProvider" class="org.jboss.wolf.validator.impl.aether.InternalWagonProvider" />
-    <bean id="internalWagonConfigurator"  class="org.jboss.wolf.validator.impl.aether.InternalWagonConfigurator" />
-    <bean id="internalRepositoryListener" class="org.jboss.wolf.validator.impl.aether.InternalRepositoryListener" />
+    <bean id="internalWagonProvider" class="org.jboss.wolf.validator.internal.InternalWagonProvider" />
+    <bean id="internalWagonConfigurator"  class="org.jboss.wolf.validator.internal.InternalWagonConfigurator" />
+    <bean id="internalRepositoryListener" class="org.jboss.wolf.validator.internal.InternalRepositoryListener" />
     <util:constant id="loggerFactory" static-field="org.eclipse.aether.spi.log.NullLoggerFactory.INSTANCE" />
 
     <context:annotation-config />

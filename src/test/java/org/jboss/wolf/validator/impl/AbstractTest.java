@@ -53,7 +53,7 @@ public abstract class AbstractTest {
     protected ValidatorContext ctx;
 
     @Before
-    public void init() {
+    public final void init() {
         initRepositories();
         fileFilter = null;
     }

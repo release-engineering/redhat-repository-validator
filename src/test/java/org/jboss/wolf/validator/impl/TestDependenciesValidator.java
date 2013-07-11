@@ -336,7 +336,6 @@ public class TestDependenciesValidator extends AbstractTest {
         Model fooApi = pom().artifactId("foo-api").build();
         pom().artifactId("foo-impl").dependency(fooApi).create(repoFooDir);
 
-        fileFilter = notFileFilter(nameFileFilter("foo-api-1.0.pom"));
         validator.validate(ctx);
 
         assertExpectedException(ArtifactNotFoundException.class, "Could not find artifact com.acme:foo-api:jar:1.0");

@@ -8,6 +8,7 @@ import static org.apache.commons.io.filefilter.FileFilterUtils.trueFileFilter;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
 import java.io.File;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -47,8 +48,12 @@ import org.jboss.wolf.validator.impl.DelegatingValidator;
 import org.jboss.wolf.validator.impl.DependenciesValidator;
 import org.jboss.wolf.validator.impl.ModelValidator;
 import org.jboss.wolf.validator.impl.ValidatorSupport;
-import org.jboss.wolf.validator.impl.aether.DepthOneOptionalDependencySelector;
-import org.jboss.wolf.validator.impl.aether.LocalRepositoryModelResolver;
+import org.jboss.wolf.validator.internal.DepthOneOptionalDependencySelector;
+import org.jboss.wolf.validator.internal.LocalRepositoryModelResolver;
+import org.jboss.wolf.validator.reporter.DelegatingReporter;
+import org.jboss.wolf.validator.reporter.SimpleChecksumReporter;
+import org.jboss.wolf.validator.reporter.SimpleDependencyNotFoundReporter;
+import org.jboss.wolf.validator.reporter.SimpleUnprocessedExceptionsReporter;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -78,10 +83,10 @@ public class ValidatorConfig {
         return new DelegatingValidator(
                 dependenciesValidator(),
                 modelValidator(),
-                checksumValidator(),
                 bomDependencyNotFoundValidator(),
                 bomAmbiguousVersionValidator(),
-                bomUnmanagedVersionValidator());
+                bomUnmanagedVersionValidator(),
+                checksumValidator());
     }
 
     @Bean
@@ -205,6 +210,35 @@ public class ValidatorConfig {
     @Bean
     public IOFileFilter bomUnmanagedVersionValidatorFilter() {
         return defaultFilter();
+    }
+    
+    @Bean
+    @Primary
+    public Reporter reporter() {
+        return new DelegatingReporter(
+                simpleDependencyNotFoundReporter(),
+                simpleChecksumReporter(),
+                simpleUnprocessedExceptionsReporter());
+    }
+
+    @Bean
+    public Reporter simpleDependencyNotFoundReporter() {
+        return new SimpleDependencyNotFoundReporter(defaultReporterStream());
+    }
+
+    @Bean
+    public Reporter simpleChecksumReporter() {
+        return new SimpleChecksumReporter(defaultReporterStream());
+    }
+
+    @Bean
+    public Reporter simpleUnprocessedExceptionsReporter() {
+        return new SimpleUnprocessedExceptionsReporter(defaultReporterStream());
+    }
+
+    @Bean
+    public PrintStream defaultReporterStream() {
+        return System.out;
     }
 
     @Bean
