@@ -9,8 +9,16 @@
         </encoder>
     </appender>
 
+    <appender name="file" class="ch.qos.logback.core.FileAppender">
+        <file>workspace/log.txt</file>
+        <encoder>
+            <pattern>%date %-5level %logger{0} %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <root level="debug">
         <appender-ref ref="stdout" />
+        <appender-ref ref="file" />
     </root>
 
 </configuration>
