@@ -80,6 +80,9 @@ public class ValidatorRunner {
 
     protected void runValidation(ApplicationContext appCtx) {
         ValidatorContext ctx = appCtx.getBean(ValidatorContext.class);
+        
+        ValidatorInitializer initializer = appCtx.getBean(ValidatorInitializer.class);
+        initializer.initialize(ctx);
 
         Validator validator = appCtx.getBean(Validator.class);
         validator.validate(ctx);

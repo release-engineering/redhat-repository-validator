@@ -68,15 +68,20 @@ public class ValidatorConfig {
     @Autowired
     private BeanFactory beanFactory;
     
-    @Value("#{systemProperties['validatedRepository']}")
+    @Value("#{systemProperties['validatedRepository']?:'workspace/validated-repository'}")
     private String validatedRepository;
 
-    @Value("#{systemProperties['localRepository']}")
+    @Value("#{systemProperties['localRepository']?:'workspace/local-repository'}")
     private String localRepository;
 
     @Value("#{systemProperties['remoteRepositories']?.split(';')}")
     private String[] remoteRepositories;
-
+    
+    @Bean
+    public ValidatorInitializer validatorInitializer() {
+        return new ValidatorInitializer();
+    }
+    
     @Bean
     @Primary
     public Validator validator() {
