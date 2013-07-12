@@ -4,6 +4,23 @@
     <groupId>org.jboss</groupId>
     <artifactId>wolf-validator</artifactId>
     <version>0.1-SNAPSHOT</version>
+    <description>Wolf-validator is a tool used to validate the internal consistency of a maven artifact repository.</description>
+
+    <developers>
+        <developer>
+            <id>thradec</id>
+            <name>Tomas Hradec</name>
+            <email>thradec@redhat.com</email>
+            <organization>Red Hat</organization>
+            <organizationUrl>http://www.redhat.com/</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <url>http://github.com/thradec/wolf-validator</url>
+        <connection>scm:git:http://github.com/thradec/wolf-validator.git</connection>
+        <developerConnection>scm:git:git@github.com:thradec/wolf-validator.git</developerConnection>
+    </scm>
 
     <properties>
         <maven.compiler.source>1.6</maven.compiler.source>

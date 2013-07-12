@@ -25,18 +25,13 @@ public class ValidatorRunner {
     private static final Logger logger = LoggerFactory.getLogger(ValidatorRunner.class);
 
     public static void main(String[] args) {
-        logger.debug("start");
-        try {
-            new ValidatorRunner().run(args);
-        } finally {
-            logger.debug("stop");
-        }
+        new ValidatorRunner().run(args);
     }
 
-    private final Option validatedRepositoryOption = createOption("vr", "validated-repository", "validate given repository", "dir");
-    private final Option localRepositoryOption = createOption("lr", "local-repository", "use given local repository", "dir");
-    private final Option remoteRepositoryOption = createOption("rr", "remote-repository", "use given remote repository", "url");
-    private final Option configOption = createOption("c", "config", "use given configuration file", "file");
+    private final Option validatedRepositoryOption = createOption("vr", "validated-repository", "validate given repository, \ndefault value is `workspace/validated-repository`", "dir");
+    private final Option localRepositoryOption = createOption("lr", "local-repository", "use given local repository, \ndefault value is `workspace/local-repository`", "dir");
+    private final Option remoteRepositoryOption = createOption("rr", "remote-repository", "use given remote repository, \ndefault remote repository is only maven central", "url");
+    private final Option configOption = createOption("c", "config", "use given configuration file, \ndefault value is `wolf-validator-config.xml`", "file");
     private final Option helpOption = createOption("h", "help", "print help and exit", null);
 
     public void run(String... arguments) {
@@ -70,7 +65,18 @@ public class ValidatorRunner {
 
     protected void runHelp(Options options) {
         HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp("wolf-validator", options);
+        formatter.setSyntaxPrefix("Usage: ");
+        formatter.setWidth(120);
+        formatter.setLeftPadding(4);
+        
+        String header = "Wolf-validator is a tool used to validate the internal consistency of a maven artifact repository.\n";
+        String footer = "Example: \n"
+                + "    to run against a given validated repository directory, use: \n"
+                + "    $ wolf-validator -vr ~/myrepository";
+        
+        System.out.println(header);
+        formatter.printHelp("wolf-validator", options, true);
+        System.out.println(footer);
     }
 
     protected void runValidation(CommandLine line) {
