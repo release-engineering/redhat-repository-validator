@@ -3,4 +3,25 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd">
 
+<!-- LOCAL REPOSITORY -->
+<!--
+    <bean id="localRepository" class="org.eclipse.aether.repository.LocalRepository">
+        <constructor-arg value="TODO-local-repository-path" />
+    </bean>
+-->
+
+<!-- REMOTE REPOSITORY WITH AUTHENTICATION -->
+<!--
+    <util:list id="remoteRepositories">
+        <bean factory-bean="myRepository" factory-method="build" />
+    </util:list>
+    <bean id="myRepository" class="org.eclipse.aether.repository.RemoteRepository.Builder">
+        <constructor-arg name="id" value="my" />
+        <constructor-arg name="type" value="default" />
+        <constructor-arg name="url" value="TODO-remote-repository-url" />
+        <property name="authentication" value="#{myAuthentication.addUsername('TODO-username').addPassword('TODO-password').build()}" />
+    </bean>
+    <bean id="myAuthentication" class="org.eclipse.aether.util.repository.AuthenticationBuilder" />
+-->
+
 </beans>
