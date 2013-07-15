@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.apache.commons.io.filefilter.AbstractFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -32,6 +33,7 @@ import org.eclipse.aether.artifact.DefaultArtifactType;
 import org.eclipse.aether.graph.Exclusion;
 import org.jboss.wolf.validator.ValidatorContext;
 
+@Named
 public class ValidatorSupport {
 
     @Inject

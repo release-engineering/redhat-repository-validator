@@ -10,8 +10,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 
-import javax.annotation.Resource;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.maven.model.Model;
@@ -36,12 +36,15 @@ import org.jboss.wolf.validator.Validator;
 import org.jboss.wolf.validator.ValidatorContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.Order;
 
+@Named
+@Order(100)
 public class DependenciesValidator implements Validator {
 
     private static final Logger logger = LoggerFactory.getLogger(DependenciesValidator.class);
 
-    @Resource(name = "dependenciesValidatorFilter")
+    @Inject @Named("dependenciesValidatorFilter")
     private IOFileFilter fileFilter;
     @Inject
     private ModelReader modelReader;

@@ -5,17 +5,18 @@ import static org.jboss.wolf.validator.internal.Utils.sortExceptions;
 import java.io.PrintStream;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.commons.lang3.StringUtils;
 import org.jboss.wolf.validator.Reporter;
 import org.jboss.wolf.validator.ValidatorContext;
 
+@Named
 public class SimpleUnprocessedExceptionsReporter implements Reporter {
     
-    private final PrintStream out;
-
-    public SimpleUnprocessedExceptionsReporter(PrintStream out) {
-        this.out = out;
-    }
+    @Inject @Named("unprocessedExceptionsReporterStream")
+    private PrintStream out;
 
     @Override
     public void report(ValidatorContext ctx) {

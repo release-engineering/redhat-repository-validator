@@ -15,7 +15,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
-import org.springframework.context.ApplicationContext;
 
 public class TestValidatorRunner {
 
@@ -138,8 +137,8 @@ public class TestValidatorRunner {
         }
         
         @Override
-        protected void runValidation(ApplicationContext ctx) {
-            ValidatorContext validatorContext = ctx.getBean(ValidatorContext.class);
+        protected void runValidation() {
+            ValidatorContext validatorContext = appCtx.getBean(ValidatorContext.class);
             assertEquals(expectedValidatedRepository, validatorContext.getValidatedRepository().getPath());
         }        
         
@@ -154,9 +153,9 @@ public class TestValidatorRunner {
         }
         
         @Override
-        protected void runValidation(ApplicationContext ctx) {
-            LocalRepository localRepository = ctx.getBean(LocalRepository.class);
-            RepositorySystemSession repositorySystemSession = ctx.getBean(RepositorySystemSession.class);
+        protected void runValidation() {
+            LocalRepository localRepository = appCtx.getBean(LocalRepository.class);
+            RepositorySystemSession repositorySystemSession = appCtx.getBean(RepositorySystemSession.class);
             assertEquals(expectedLocalRepository, localRepository.getBasedir().getPath());
             assertEquals(repositorySystemSession.getLocalRepository().getBasedir().getAbsolutePath(), localRepository.getBasedir().getAbsolutePath());
         }        
@@ -172,8 +171,8 @@ public class TestValidatorRunner {
         }
 
         @Override
-        protected void runValidation(ApplicationContext ctx) {
-            ValidatorContext validatorContext = ctx.getBean(ValidatorContext.class);
+        protected void runValidation() {
+            ValidatorContext validatorContext = appCtx.getBean(ValidatorContext.class);
             List<RemoteRepository> remoteRepositories = validatorContext.getRemoteRepositories();
             assertEquals(expectedRemoteRepositories.length, remoteRepositories.size());
             for (int i = 0; i < expectedRemoteRepositories.length; i++) {

@@ -6,6 +6,7 @@ import static org.apache.commons.io.filefilter.FileFilterUtils.nameFileFilter;
 import static org.apache.commons.io.filefilter.FileFilterUtils.notFileFilter;
 import static org.apache.commons.io.filefilter.FileFilterUtils.trueFileFilter;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
+import static org.springframework.core.annotation.AnnotationAwareOrderComparator.sort;
 
 import java.io.File;
 import java.io.PrintStream;
@@ -13,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+
+import javax.inject.Named;
 
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.lang3.StringUtils;
@@ -38,31 +41,24 @@ import org.eclipse.aether.util.graph.transformer.JavaScopeSelector;
 import org.eclipse.aether.util.graph.transformer.NearestVersionSelector;
 import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
-import org.jboss.wolf.validator.impl.BomAmbiguousVersionValidator;
-import org.jboss.wolf.validator.impl.BomDependencyNotFoundValidator;
 import org.jboss.wolf.validator.impl.BomFilter;
 import org.jboss.wolf.validator.impl.BomFilterSimple;
-import org.jboss.wolf.validator.impl.BomUnmanagedVersionValidator;
-import org.jboss.wolf.validator.impl.ChecksumValidator;
-import org.jboss.wolf.validator.impl.DelegatingValidator;
-import org.jboss.wolf.validator.impl.DependenciesValidator;
-import org.jboss.wolf.validator.impl.ModelValidator;
-import org.jboss.wolf.validator.impl.ValidatorSupport;
 import org.jboss.wolf.validator.internal.DepthOneOptionalDependencySelector;
 import org.jboss.wolf.validator.internal.LocalRepositoryModelResolver;
-import org.jboss.wolf.validator.reporter.DelegatingReporter;
-import org.jboss.wolf.validator.reporter.SimpleChecksumReporter;
-import org.jboss.wolf.validator.reporter.SimpleDependencyNotFoundReporter;
-import org.jboss.wolf.validator.reporter.SimpleUnprocessedExceptionsReporter;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
 
 @Configuration
+@ComponentScan(
+        useDefaultFilters = false, 
+        includeFilters = @Filter(value = Named.class))
 public class ValidatorConfig {
     
     @Autowired
@@ -78,20 +74,31 @@ public class ValidatorConfig {
     private String[] remoteRepositories;
     
     @Bean
-    public ValidatorInitializer validatorInitializer() {
-        return new ValidatorInitializer();
+    @Primary
+    public Validator validator(final Validator[] validators) {
+        sort(validators);
+        return new Validator() {
+            @Override
+            public void validate(ValidatorContext ctx) {
+                for (Validator validator : validators) {
+                    validator.validate(ctx);
+                }
+            }
+        };
     }
     
     @Bean
     @Primary
-    public Validator validator() {
-        return new DelegatingValidator(
-                dependenciesValidator(),
-                modelValidator(),
-                bomDependencyNotFoundValidator(),
-                bomAmbiguousVersionValidator(),
-                bomUnmanagedVersionValidator(),
-                checksumValidator());
+    public Reporter reporter(final Reporter[] reporters) {
+        sort(reporters);
+        return new Reporter() {
+            @Override
+            public void report(ValidatorContext ctx) {
+                for (Reporter reporter : reporters) {
+                    reporter.report(ctx);
+                }
+            }
+        };
     }
 
     @Bean
@@ -139,11 +146,6 @@ public class ValidatorConfig {
     }
 
     @Bean
-    public ValidatorSupport validatorSupport() {
-        return new ValidatorSupport();
-    }
-
-    @Bean
     public BomFilter bomFilter() {
         return new BomFilterSimple();
     }
@@ -154,28 +156,13 @@ public class ValidatorConfig {
     }
 
     @Bean
-    public Validator dependenciesValidator() {
-        return new DependenciesValidator();
-    }
-
-    @Bean
     public IOFileFilter dependenciesValidatorFilter() {
         return defaultFilter();
     }
-
-    @Bean
-    public Validator modelValidator() {
-        return new ModelValidator();
-    }
-
+    
     @Bean
     public IOFileFilter modelValidatorFilter() {
         return defaultFilter();
-    }
-
-    @Bean
-    public Validator checksumValidator() {
-        return new ChecksumValidator();
     }
 
     @Bean
@@ -188,18 +175,8 @@ public class ValidatorConfig {
     }
 
     @Bean
-    public Validator bomAmbiguousVersionValidator() {
-        return new BomAmbiguousVersionValidator();
-    }
-
-    @Bean
     public IOFileFilter bomAmbiguousVersionValidatorFilter() {
         return defaultFilter();
-    }
-
-    @Bean
-    public Validator bomDependencyNotFoundValidator() {
-        return new BomDependencyNotFoundValidator();
     }
 
     @Bean
@@ -208,37 +185,13 @@ public class ValidatorConfig {
     }
 
     @Bean
-    public Validator bomUnmanagedVersionValidator() {
-        return new BomUnmanagedVersionValidator();
-    }
-
-    @Bean
     public IOFileFilter bomUnmanagedVersionValidatorFilter() {
         return defaultFilter();
     }
-    
-    @Bean
-    @Primary
-    public Reporter reporter() {
-        return new DelegatingReporter(
-                simpleDependencyNotFoundReporter(),
-                simpleChecksumReporter(),
-                simpleUnprocessedExceptionsReporter());
-    }
 
     @Bean
-    public Reporter simpleDependencyNotFoundReporter() {
-        return new SimpleDependencyNotFoundReporter(defaultReporterStream());
-    }
-
-    @Bean
-    public Reporter simpleChecksumReporter() {
-        return new SimpleChecksumReporter(defaultReporterStream());
-    }
-
-    @Bean
-    public Reporter simpleUnprocessedExceptionsReporter() {
-        return new SimpleUnprocessedExceptionsReporter(defaultReporterStream());
+    public PrintStream dependencyNotFoundReporterStream() {
+        return defaultReporterStream();
     }
 
     @Bean
@@ -247,13 +200,18 @@ public class ValidatorConfig {
     }
 
     @Bean
-    public LocalRepository localRepository() {
-        return new LocalRepository(localRepository);
+    public PrintStream checksumReporterStream() {
+        return defaultReporterStream();
     }
 
     @Bean
-    public LocalRepositoryModelResolver localRepositoryModelResolver() {
-        return new LocalRepositoryModelResolver();
+    public PrintStream unprocessedExceptionsReporterStream() {
+        return defaultReporterStream();
+    }
+
+    @Bean
+    public LocalRepository localRepository() {
+        return new LocalRepository(localRepository);
     }
 
     @Bean
@@ -304,7 +262,7 @@ public class ValidatorConfig {
     }
 
     @Bean
-    public ModelBuildingRequest modelBuildingRequestTemplate(RepositorySystemSession repositorySystemSession) {
+    public ModelBuildingRequest modelBuildingRequestTemplate(RepositorySystemSession repositorySystemSession, LocalRepositoryModelResolver localRepositoryModelResolver) {
         Properties userProperties = new Properties();
         userProperties.putAll(repositorySystemSession.getUserProperties());
 
@@ -314,7 +272,7 @@ public class ValidatorConfig {
         DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
         request.setProcessPlugins(true);
         request.setLocationTracking(true);
-        request.setModelResolver(localRepositoryModelResolver());
+        request.setModelResolver(localRepositoryModelResolver);
         request.setUserProperties(userProperties);
         request.setSystemProperties(systemProperties);
 

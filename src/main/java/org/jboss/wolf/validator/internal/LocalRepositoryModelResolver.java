@@ -3,6 +3,7 @@ package org.jboss.wolf.validator.internal;
 import java.io.File;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.FileModelSource;
@@ -13,6 +14,7 @@ import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.LocalRepository;
 
+@Named
 public class LocalRepositoryModelResolver implements ModelResolver {
 
     @Inject

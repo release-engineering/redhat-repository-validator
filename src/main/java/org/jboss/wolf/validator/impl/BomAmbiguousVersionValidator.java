@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.annotation.Resource;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -19,11 +19,12 @@ import org.jboss.wolf.validator.ValidatorContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Named
 public class BomAmbiguousVersionValidator implements Validator {
 
     private static final Logger logger = LoggerFactory.getLogger(BomAmbiguousVersionValidator.class);
 
-    @Resource(name = "bomAmbiguousVersionValidatorFilter")
+    @Inject @Named("bomAmbiguousVersionValidatorFilter")
     private IOFileFilter fileFilter;
     @Inject
     private ValidatorSupport validatorSupport;

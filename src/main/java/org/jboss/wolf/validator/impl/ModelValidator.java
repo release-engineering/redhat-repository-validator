@@ -5,8 +5,8 @@ import static org.jboss.wolf.validator.impl.ValidatorSupport.listPomFiles;
 import java.io.File;
 import java.util.Collection;
 
-import javax.annotation.Resource;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
@@ -18,12 +18,15 @@ import org.jboss.wolf.validator.Validator;
 import org.jboss.wolf.validator.ValidatorContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.Order;
 
+@Named
+@Order(200)
 public class ModelValidator implements Validator {
 
     private static final Logger logger = LoggerFactory.getLogger(ModelValidator.class);
 
-    @Resource(name = "modelValidatorFilter")
+    @Inject @Named("modelValidatorFilter")
     private IOFileFilter fileFilter;
     @Inject
     private ModelBuilder modelBuilder;

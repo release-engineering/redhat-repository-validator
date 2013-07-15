@@ -42,7 +42,7 @@ public abstract class AbstractReporterTest extends AbstractTest {
         }
 
     }
-
+    
     protected void assertReportContains(String pattern) {
         String report = out.toString();
         if (!report.contains(pattern)) {

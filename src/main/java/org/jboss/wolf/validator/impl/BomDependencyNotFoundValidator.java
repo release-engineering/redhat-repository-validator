@@ -3,8 +3,8 @@ package org.jboss.wolf.validator.impl;
 import java.util.Collections;
 import java.util.List;
 
-import javax.annotation.Resource;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.maven.model.Model;
@@ -23,11 +23,12 @@ import org.jboss.wolf.validator.ValidatorContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Named
 public class BomDependencyNotFoundValidator implements Validator {
 
     private static final Logger logger = LoggerFactory.getLogger(BomDependencyNotFoundValidator.class);
 
-    @Resource(name = "bomDependencyNotFoundValidatorFilter")
+    @Inject @Named("bomDependencyNotFoundValidatorFilter")
     private IOFileFilter fileFilter;
     @Inject
     private RepositorySystem repositorySystem;

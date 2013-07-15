@@ -5,6 +5,9 @@ import static org.jboss.wolf.validator.internal.Utils.sortArtifacts;
 import java.io.PrintStream;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.collection.DependencyCollectionException;
@@ -13,18 +16,18 @@ import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.jboss.wolf.validator.Reporter;
 import org.jboss.wolf.validator.ValidatorContext;
+import org.springframework.core.annotation.Order;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 
+@Named
+@Order(100)
 public class SimpleDependencyNotFoundReporter implements Reporter {
     
-    private final PrintStream out;
+    @Inject @Named("dependencyNotFoundReporterStream")
+    private PrintStream out;
 
-    public SimpleDependencyNotFoundReporter(PrintStream out) {
-        this.out = out;
-    }
-    
     @Override
     public void report(ValidatorContext ctx) {
         ListMultimap<Artifact, Artifact> artifactNotFoundMap = ArrayListMultimap.create();

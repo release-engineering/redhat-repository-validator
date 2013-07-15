@@ -69,7 +69,7 @@ public abstract class AbstractTest {
             throw new RuntimeException(e);
         }
     }
-
+    
     protected void assertSuccess() {
         if (!ctx.isSuccess()) {
             logExceptions(ctx);

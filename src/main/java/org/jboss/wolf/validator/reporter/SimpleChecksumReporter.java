@@ -5,18 +5,21 @@ import java.io.PrintStream;
 import java.net.URI;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.jboss.wolf.validator.Reporter;
 import org.jboss.wolf.validator.ValidatorContext;
 import org.jboss.wolf.validator.impl.ChecksumNotExistException;
 import org.jboss.wolf.validator.impl.ChecksumNotMatchException;
+import org.springframework.core.annotation.Order;
 
+@Named
+@Order(200)
 public class SimpleChecksumReporter implements Reporter {
 
-    private final PrintStream out;
-
-    public SimpleChecksumReporter(PrintStream out) {
-        this.out = out;
-    }
+    @Inject @Named("checksumReporterStream")
+    private PrintStream out;
 
     @Override
     public void report(ValidatorContext ctx) {

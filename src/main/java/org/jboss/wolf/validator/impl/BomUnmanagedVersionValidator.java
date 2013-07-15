@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.annotation.Resource;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.lang3.ObjectUtils;
@@ -25,11 +25,12 @@ import org.jboss.wolf.validator.ValidatorContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Named
 public class BomUnmanagedVersionValidator implements Validator {
 
     private static final Logger logger = LoggerFactory.getLogger(BomUnmanagedVersionValidator.class);
 
-    @Resource(name = "bomUnmanagedVersionValidatorFilter")
+    @Inject @Named("bomUnmanagedVersionValidatorFilter")
     private IOFileFilter fileFilter;
     @Inject
     private ModelBuilder modelBuilder;

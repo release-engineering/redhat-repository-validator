@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -14,6 +16,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
@@ -33,6 +36,17 @@ public class ValidatorRunner {
     private final Option remoteRepositoryOption = createOption("rr", "remote-repository", "use given remote repository, \ndefault remote repository is only maven central", "url");
     private final Option configOption = createOption("c", "config", "use given configuration file, \ndefault value is `wolf-validator-config.xml`", "file");
     private final Option helpOption = createOption("h", "help", "print help and exit", null);
+    
+    protected ApplicationContext appCtx;
+    
+    @Inject
+    protected ValidatorInitializer initializer;
+    @Inject
+    protected ValidatorContext context;
+    @Inject
+    protected Validator validator;
+    @Inject
+    protected Reporter reporter;
 
     public void run(String... arguments) {
         Options options = new Options();
@@ -49,7 +63,8 @@ public class ValidatorRunner {
             if (line.hasOption(helpOption.getOpt())) {
                 runHelp(options);
             } else {
-                runValidation(line);
+                initApplicationContext(line);
+                runValidation();
             }
         } catch (ParseException e) {
             logger.warn("{}\n", e.getMessage());
@@ -79,25 +94,13 @@ public class ValidatorRunner {
         System.out.println(footer);
     }
 
-    protected void runValidation(CommandLine line) {
-        ApplicationContext appCtx = createApplicationContext(line);
-        runValidation(appCtx);
+    protected void runValidation() {
+        initializer.initialize(context);
+        validator.validate(context);
+        reporter.report(context);
     }
 
-    protected void runValidation(ApplicationContext appCtx) {
-        ValidatorContext ctx = appCtx.getBean(ValidatorContext.class);
-        
-        ValidatorInitializer initializer = appCtx.getBean(ValidatorInitializer.class);
-        initializer.initialize(ctx);
-
-        Validator validator = appCtx.getBean(Validator.class);
-        validator.validate(ctx);
-
-        Reporter reporter = appCtx.getBean(Reporter.class);
-        reporter.report(ctx);
-    }
-
-    private ApplicationContext createApplicationContext(CommandLine line) {
+    private void initApplicationContext(CommandLine line) {
         String validatedRepo = line.getOptionValue(validatedRepositoryOption.getOpt(), "workspace/validated-repository");
         String localRepo = line.getOptionValue(localRepositoryOption.getOpt(), "workspace/local-repository");
         String[] remoteRepos = line.getOptionValues(remoteRepositoryOption.getOpt());
@@ -120,8 +123,10 @@ public class ValidatorRunner {
             resources.add(new FileSystemResource(userConfigFile));
         }
 
-        GenericXmlApplicationContext appCtx = new GenericXmlApplicationContext(resources.toArray(new Resource[] {}));
-        return appCtx;
+        appCtx = new GenericXmlApplicationContext(resources.toArray(new Resource[] {}));
+        
+        AutowireCapableBeanFactory autowireCapableBeanFactory = appCtx.getAutowireCapableBeanFactory();
+        autowireCapableBeanFactory.autowireBean(this);
     }
 
     private Option createOption(String opt, String longOpt, String description, String argName) {

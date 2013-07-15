@@ -14,7 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.annotation.Resource;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
@@ -24,6 +25,7 @@ import org.jboss.wolf.validator.ValidatorContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Named
 public class ChecksumValidator implements Validator {
 
     private static final Logger logger = LoggerFactory.getLogger(ChecksumValidator.class);
@@ -34,7 +36,7 @@ public class ChecksumValidator implements Validator {
         checksumAlgorithms.put("SHA-1", ".sha1");
     }
 
-    @Resource(name = "checksumValidatorFilter")
+    @Inject @Named("checksumValidatorFilter")
     private IOFileFilter fileFilter;
 
     @Override

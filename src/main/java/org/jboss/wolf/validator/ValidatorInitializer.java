@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.aether.repository.LocalRepository;
@@ -12,6 +13,7 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Named
 public class ValidatorInitializer {
 
     private static final Logger logger = LoggerFactory.getLogger(ValidatorInitializer.class);
