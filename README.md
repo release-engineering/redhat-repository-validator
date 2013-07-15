@@ -12,7 +12,7 @@ Building
 
 - prerequisites Java, Maven and Git
 - clone project from github `$ git clone git@github.com:thradec/wolf-validator.git`
-- go into the newly created wolf-validator directory `$ cd wolf-validator`
+- go into the newly created directory `$ cd wolf-validator`
 - and run maven build `$ mvn clean package`
 - executable distribution is available in `target/wolf-validator-$VERSION` directory or zip file
 
