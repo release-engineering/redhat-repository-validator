@@ -1,6 +1,7 @@
 package org.jboss.wolf.validator;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -15,6 +16,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
+import org.springframework.core.annotation.Order;
 
 public class TestValidatorRunner {
 
@@ -120,6 +122,33 @@ public class TestValidatorRunner {
         validatorRunner = new AssertRemoteRepositoryRunner("file://foo", "http://bar.com", "http://repo1.maven.org/maven2/");
         validatorRunner.run("--config", getClass().getResource("/TestValidatorRunner-remoteRepositories.xml").getFile());
     }
+    
+    @Test
+    public void shouldUseStubValidatorExclusively() {
+        validatorRunner = new ValidatorRunner() {
+            @Override
+            protected void runValidation() {
+                assertTrue(validator instanceof StubValidator);
+            };
+        };
+        validatorRunner.run("--config", getClass().getResource("/TestValidatorRunner-stubValidatorExclusively.xml").getFile());
+    }
+    
+    @Test
+    public void shouldUseStubValidatorAdditionally() {
+        validatorRunner = new ValidatorRunner() {
+            @Override
+            protected void runValidation() {
+                try {
+                    validator.validate(context);
+                    fail();
+                } catch (RuntimeException e) {
+                    assertTrue(e.getMessage().equals("stubValidator"));
+                }
+            };
+        };
+        validatorRunner.run("--config", getClass().getResource("/TestValidatorRunner-stubValidatorAdditionally.xml").getFile());
+    }
 
     private void assertOutputContaints(String s) {
         String systemOut = systemOutBuffer.toString();
@@ -140,9 +169,9 @@ public class TestValidatorRunner {
         protected void runValidation() {
             ValidatorContext validatorContext = appCtx.getBean(ValidatorContext.class);
             assertEquals(expectedValidatedRepository, validatorContext.getValidatedRepository().getPath());
-        }        
+        }
         
-    }    
+    }
     
     private static class AssertLocalRepositoryRunner extends ValidatorRunner {
         
@@ -178,6 +207,16 @@ public class TestValidatorRunner {
             for (int i = 0; i < expectedRemoteRepositories.length; i++) {
                 assertEquals(expectedRemoteRepositories[i], remoteRepositories.get(i).getUrl());
             }
+        }
+
+    }
+    
+    @Order(1)
+    public static class StubValidator implements Validator {
+
+        @Override
+        public void validate(ValidatorContext ctx) {
+            throw new RuntimeException("stubValidator");
         }
 
     }
