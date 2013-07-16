@@ -3,7 +3,7 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean id="checksumReporterStream" class="java.io.PrintStream">
-        <constructor-arg value="target/chechsum-report.txt" />
+        <constructor-arg value="target/checksum-report.txt" />
     </bean>
 
 </beans>
