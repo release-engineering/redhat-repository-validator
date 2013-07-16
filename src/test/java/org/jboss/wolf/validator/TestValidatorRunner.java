@@ -4,14 +4,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.jboss.wolf.validator.impl.checksum.ChecksumNotExistException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -151,6 +154,30 @@ public class TestValidatorRunner {
             };
         };
         validatorRunner.run("--config", getClass().getResource("/TestValidatorRunner-stubValidatorAdditionally.xml").getFile());
+    }
+    
+    @Test
+    public void shouldRedirectChechsumReportToFile() throws IOException {
+        final File fooFile = new File("foo");
+        final File reportFile = new File("target/checksum-report.txt");
+
+        FileUtils.deleteQuietly(reportFile);
+
+        validatorRunner = new ValidatorRunner() {
+            @Override
+            protected void runValidation() {
+                context.addException(fooFile, new ChecksumNotExistException(fooFile, "SHA-1"));
+                reporter.report(context);
+            };
+        };
+        validatorRunner.run("--config", getClass().getResource("/TestValidatorRunner-checksumReporterStream.xml").getFile());
+
+        assertTrue(reportFile.exists());
+        assertTrue(reportFile.isFile());
+
+        String reportContent = FileUtils.readFileToString(reportFile);
+        assertTrue(reportContent.contains("CHECKSUM REPORT"));
+        assertTrue(reportContent.contains("Found 1 missing checksums"));
     }
 
     private void assertOutputContaints(String s) {
