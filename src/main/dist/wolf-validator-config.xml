@@ -10,18 +10,33 @@
     </bean>
 -->
 
+
 <!-- REMOTE REPOSITORY WITH AUTHENTICATION -->
 <!--
     <util:list id="remoteRepositories">
-        <bean factory-bean="myRepository" factory-method="build" />
+        <bean factory-bean="fooRepository" factory-method="build" />
     </util:list>
-    <bean id="myRepository" class="org.eclipse.aether.repository.RemoteRepository.Builder">
-        <constructor-arg name="id" value="my" />
+    <bean id="fooRepository" class="org.eclipse.aether.repository.RemoteRepository.Builder">
+        <constructor-arg name="id" value="fooRepository" />
         <constructor-arg name="type" value="default" />
         <constructor-arg name="url" value="TODO-remote-repository-url" />
-        <property name="authentication" value="#{myAuthentication.addUsername('TODO-username').addPassword('TODO-password').build()}" />
+        <property name="authentication" value="#{fooAuthentication.addUsername('TODO-username').addPassword('TODO-password').build()}" />
     </bean>
-    <bean id="myAuthentication" class="org.eclipse.aether.util.repository.AuthenticationBuilder" />
+    <bean id="fooAuthentication" class="org.eclipse.aether.util.repository.AuthenticationBuilder" />
 -->
+
+
+<!-- CUSTOM VALIDATOR -->
+<!-- 
+    <bean id="fooValidator" class="foo.FooValidator" />
+ -->
+
+
+<!-- REPORT TO FILE -->
+<!--  
+     <bean id="defaultReporterStream" class="java.io.PrintStream">
+        <constructor-arg name="fileName" value="workspace/report.txt" />
+    </bean>
+  -->
 
 </beans>
