@@ -1,4 +1,4 @@
-package org.jboss.wolf.validator.impl;
+package org.jboss.wolf.validator.impl.bom;
 
 import java.io.File;
 

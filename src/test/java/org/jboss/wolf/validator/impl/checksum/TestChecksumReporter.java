@@ -1,4 +1,4 @@
-package org.jboss.wolf.validator.reporter;
+package org.jboss.wolf.validator.impl.checksum;
 
 import static org.jboss.wolf.validator.impl.TestUtil.pom;
 
@@ -6,9 +6,10 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
+import org.jboss.wolf.validator.impl.AbstractReporterTest;
 import org.junit.Test;
 
-public class TestSimpleChecksumReporter extends AbstractReporterTest {
+public class TestChecksumReporter extends AbstractReporterTest {
 
     private final File fooDir = new File(repoFooDir, "com/acme/foo/1.0");
 

@@ -1,4 +1,4 @@
-package org.jboss.wolf.validator.reporter;
+package org.jboss.wolf.validator.impl.checksum;
 
 import java.io.File;
 import java.io.PrintStream;
@@ -10,13 +10,11 @@ import javax.inject.Named;
 
 import org.jboss.wolf.validator.Reporter;
 import org.jboss.wolf.validator.ValidatorContext;
-import org.jboss.wolf.validator.impl.ChecksumNotExistException;
-import org.jboss.wolf.validator.impl.ChecksumNotMatchException;
 import org.springframework.core.annotation.Order;
 
 @Named
 @Order(200)
-public class SimpleChecksumReporter implements Reporter {
+public class ChecksumReporter implements Reporter {
 
     @Inject @Named("checksumReporterStream")
     private PrintStream out;

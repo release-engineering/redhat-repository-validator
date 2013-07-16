@@ -1,11 +1,11 @@
-package org.jboss.wolf.validator.reporter;
+package org.jboss.wolf.validator.impl;
 
 import static org.jboss.wolf.validator.impl.TestUtil.pom;
 
 import org.apache.maven.model.Model;
 import org.junit.Test;
 
-public class TestSimpleDependencyNotFoundReporter extends AbstractReporterTest {
+public class TestDependencyNotFoundReporter extends AbstractReporterTest {
 
     @Test
     public void shouldReportMissingDependencies() {

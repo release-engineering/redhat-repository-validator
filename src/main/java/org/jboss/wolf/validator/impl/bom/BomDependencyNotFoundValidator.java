@@ -1,4 +1,4 @@
-package org.jboss.wolf.validator.impl;
+package org.jboss.wolf.validator.impl.bom;
 
 import java.util.Collections;
 import java.util.List;
@@ -20,6 +20,7 @@ import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.util.filter.DependencyFilterUtils;
 import org.jboss.wolf.validator.Validator;
 import org.jboss.wolf.validator.ValidatorContext;
+import org.jboss.wolf.validator.internal.ValidatorSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

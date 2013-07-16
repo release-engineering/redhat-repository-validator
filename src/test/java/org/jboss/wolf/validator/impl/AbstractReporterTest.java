@@ -1,4 +1,4 @@
-package org.jboss.wolf.validator.reporter;
+package org.jboss.wolf.validator.impl;
 
 import static org.junit.Assert.fail;
 
@@ -10,7 +10,6 @@ import javax.inject.Inject;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.jboss.wolf.validator.Reporter;
-import org.jboss.wolf.validator.impl.AbstractTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;

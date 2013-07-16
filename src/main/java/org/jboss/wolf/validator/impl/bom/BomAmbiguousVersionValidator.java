@@ -1,4 +1,4 @@
-package org.jboss.wolf.validator.impl;
+package org.jboss.wolf.validator.impl.bom;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,6 +16,7 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.jboss.wolf.validator.Validator;
 import org.jboss.wolf.validator.ValidatorContext;
+import org.jboss.wolf.validator.internal.ValidatorSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,4 +1,4 @@
-package org.jboss.wolf.validator.impl;
+package org.jboss.wolf.validator.impl.bom;
 
 import static org.jboss.wolf.validator.impl.TestUtil.dependency;
 import static org.jboss.wolf.validator.impl.TestUtil.pom;
@@ -6,6 +6,8 @@ import static org.jboss.wolf.validator.impl.TestUtil.pom;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.maven.model.Model;
+import org.jboss.wolf.validator.impl.AbstractTest;
+import org.jboss.wolf.validator.impl.bom.BomAmbiguousVersionException;
 import org.junit.Test;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

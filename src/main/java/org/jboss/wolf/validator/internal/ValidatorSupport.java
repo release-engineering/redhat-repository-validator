@@ -1,4 +1,4 @@
-package org.jboss.wolf.validator.impl;
+package org.jboss.wolf.validator.internal;
 
 import static org.apache.commons.io.FileUtils.listFiles;
 import static org.apache.commons.io.filefilter.FileFilterUtils.and;
@@ -32,6 +32,7 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.artifact.DefaultArtifactType;
 import org.eclipse.aether.graph.Exclusion;
 import org.jboss.wolf.validator.ValidatorContext;
+import org.jboss.wolf.validator.impl.bom.BomFilter;
 
 @Named
 public class ValidatorSupport {

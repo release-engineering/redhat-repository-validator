@@ -41,8 +41,8 @@ import org.eclipse.aether.util.graph.transformer.JavaScopeSelector;
 import org.eclipse.aether.util.graph.transformer.NearestVersionSelector;
 import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
-import org.jboss.wolf.validator.impl.BomFilter;
-import org.jboss.wolf.validator.impl.BomFilterSimple;
+import org.jboss.wolf.validator.impl.bom.BomFilter;
+import org.jboss.wolf.validator.impl.bom.BomFilterSimple;
 import org.jboss.wolf.validator.internal.DepthOneOptionalDependencySelector;
 import org.jboss.wolf.validator.internal.LocalRepositoryModelResolver;
 import org.springframework.beans.factory.BeanFactory;
@@ -190,13 +190,13 @@ public class ValidatorConfig {
     }
 
     @Bean
-    public PrintStream dependencyNotFoundReporterStream() {
-        return defaultReporterStream();
-    }
-
-    @Bean
     public PrintStream defaultReporterStream() {
         return System.out;
+    }
+    
+    @Bean
+    public PrintStream dependencyNotFoundReporterStream() {
+        return defaultReporterStream();
     }
 
     @Bean

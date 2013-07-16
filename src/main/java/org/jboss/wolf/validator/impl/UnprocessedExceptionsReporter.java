@@ -1,4 +1,4 @@
-package org.jboss.wolf.validator.reporter;
+package org.jboss.wolf.validator.impl;
 
 import static org.jboss.wolf.validator.internal.Utils.sortExceptions;
 
@@ -13,7 +13,7 @@ import org.jboss.wolf.validator.Reporter;
 import org.jboss.wolf.validator.ValidatorContext;
 
 @Named
-public class SimpleUnprocessedExceptionsReporter implements Reporter {
+public class UnprocessedExceptionsReporter implements Reporter {
     
     @Inject @Named("unprocessedExceptionsReporterStream")
     private PrintStream out;

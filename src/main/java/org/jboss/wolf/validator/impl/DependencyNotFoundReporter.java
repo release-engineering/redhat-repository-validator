@@ -1,4 +1,4 @@
-package org.jboss.wolf.validator.reporter;
+package org.jboss.wolf.validator.impl;
 
 import static org.jboss.wolf.validator.internal.Utils.sortArtifacts;
 
@@ -23,7 +23,7 @@ import com.google.common.collect.ListMultimap;
 
 @Named
 @Order(100)
-public class SimpleDependencyNotFoundReporter implements Reporter {
+public class DependencyNotFoundReporter implements Reporter {
     
     @Inject @Named("dependencyNotFoundReporterStream")
     private PrintStream out;

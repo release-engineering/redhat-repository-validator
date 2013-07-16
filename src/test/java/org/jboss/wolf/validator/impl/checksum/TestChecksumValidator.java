@@ -1,4 +1,4 @@
-package org.jboss.wolf.validator.impl;
+package org.jboss.wolf.validator.impl.checksum;
 
 import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static org.apache.commons.io.filefilter.FileFilterUtils.and;
@@ -12,6 +12,9 @@ import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
+import org.jboss.wolf.validator.impl.AbstractTest;
+import org.jboss.wolf.validator.impl.checksum.ChecksumNotExistException;
+import org.jboss.wolf.validator.impl.checksum.ChecksumNotMatchException;
 import org.junit.Test;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,4 +1,4 @@
-package org.jboss.wolf.validator.impl;
+package org.jboss.wolf.validator.impl.bom;
 
 import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 
