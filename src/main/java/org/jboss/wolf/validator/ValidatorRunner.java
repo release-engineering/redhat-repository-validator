@@ -105,9 +105,9 @@ public class ValidatorRunner {
         String localRepo = line.getOptionValue(localRepositoryOption.getOpt(), "workspace/local-repository");
         String[] remoteRepos = line.getOptionValues(remoteRepositoryOption.getOpt());
 
-        System.setProperty("validatedRepository", validatedRepo);
-        System.setProperty("localRepository", localRepo);
-        System.setProperty("remoteRepositories", StringUtils.defaultString(StringUtils.join(remoteRepos, ';')));
+        System.setProperty("wolf-validatedRepository", validatedRepo);
+        System.setProperty("wolf-localRepository", localRepo);
+        System.setProperty("wolf-remoteRepositories", StringUtils.defaultString(StringUtils.join(remoteRepos, ';')));
 
         String userConfigFile = line.getOptionValue(configOption.getOpt());
         if (userConfigFile == null) {

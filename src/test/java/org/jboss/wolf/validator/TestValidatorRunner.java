@@ -43,6 +43,9 @@ public class TestValidatorRunner {
     @After
     public void dispose() {
         System.setOut(systemOutOriginal);
+        System.clearProperty("wolf-validatedRepository");
+        System.clearProperty("wolf-localRepository");
+        System.clearProperty("wolf-remoteRepositories");
     }
 
     @Test

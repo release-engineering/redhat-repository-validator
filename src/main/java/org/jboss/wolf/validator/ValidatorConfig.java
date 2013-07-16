@@ -64,13 +64,13 @@ public class ValidatorConfig {
     @Autowired
     private BeanFactory beanFactory;
     
-    @Value("#{systemProperties['validatedRepository']?:'workspace/validated-repository'}")
+    @Value("#{systemProperties['wolf-validatedRepository']?:'workspace/validated-repository'}")
     private String validatedRepository;
 
-    @Value("#{systemProperties['localRepository']?:'workspace/local-repository'}")
+    @Value("#{systemProperties['wolf-localRepository']?:'workspace/local-repository'}")
     private String localRepository;
 
-    @Value("#{systemProperties['remoteRepositories']?.split(';')}")
+    @Value("#{systemProperties['wolf-remoteRepositories']?.split(';')}")
     private String[] remoteRepositories;
     
     @Bean
