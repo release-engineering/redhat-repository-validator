@@ -36,10 +36,14 @@ public class VersionPatternValidator implements Validator {
     public void validate(ValidatorContext ctx) {
         List<Model> models = validatorSupport.resolveEffectiveModels(ctx, fileFilter);
         for (Model model : models) {
-            if (!pattern.matcher(model.getVersion()).matches()) {
-                Exception e = new VersionPatternException(model.getId(), pattern.pattern());
-                ctx.addException(model.getPomFile(), e);
-            }
+            validateVersionPattern(ctx, model);
+        }
+    }
+
+    private void validateVersionPattern(ValidatorContext ctx, Model model) {
+        if (!pattern.matcher(model.getVersion()).matches()) {
+            Exception e = new VersionPatternException(model.getId(), pattern.pattern());
+            ctx.addException(model.getPomFile(), e);
         }
     }
 

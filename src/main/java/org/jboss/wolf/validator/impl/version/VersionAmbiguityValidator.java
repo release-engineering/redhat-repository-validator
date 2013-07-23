@@ -28,13 +28,20 @@ public class VersionAmbiguityValidator implements Validator {
         ListMultimap<String, File> ga2filesMap = ArrayListMultimap.create();
         ListMultimap<String, String> ga2versionsMap = ArrayListMultimap.create();
 
+        collectVersions(ctx, ga2filesMap, ga2versionsMap);
+        validateAmbiguity(ctx, ga2filesMap, ga2versionsMap);
+    }
+
+    private void collectVersions(ValidatorContext ctx, ListMultimap<String, File> ga2filesMap, ListMultimap<String, String> ga2versionsMap) {
         List<Model> models = validatorSupport.resolveEffectiveModels(ctx, fileFilter);
         for (Model model : models) {
             String ga = model.getGroupId() + ":" + model.getArtifactId();
             ga2filesMap.put(ga, model.getPomFile());
             ga2versionsMap.put(ga, model.getVersion());
         }
+    }
 
+    private void validateAmbiguity(ValidatorContext ctx, ListMultimap<String, File> ga2filesMap, ListMultimap<String, String> ga2versionsMap) {
         for (String ga : ga2versionsMap.keySet()) {
             List<String> versions = ga2versionsMap.get(ga);
             if (versions.size() > 1) {
