@@ -188,6 +188,11 @@ public class ValidatorConfig {
     public IOFileFilter bomUnmanagedVersionValidatorFilter() {
         return defaultFilter();
     }
+    
+    @Bean
+    public IOFileFilter versionPatternValidatorFilter() {
+        return defaultFilter();
+    }
 
     @Bean
     public PrintStream defaultReporterStream() {

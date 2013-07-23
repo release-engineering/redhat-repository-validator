@@ -37,13 +37,17 @@ public class BomDependencyNotFoundValidator implements Validator {
     private RepositorySystemSession repositorySystemSession;
     @Inject
     private ValidatorSupport validatorSupport;
+    @Inject
+    private BomFilter bomFilter;
 
     @Override
     public void validate(ValidatorContext ctx) {
         logger.debug("start...");
-        List<Model> boms = validatorSupport.findBoms(ctx, fileFilter);
-        for (Model bom : boms) {
-            validateBomDependencies(ctx, bom);
+        List<Model> models = validatorSupport.resolveEffectiveModels(ctx, fileFilter);
+        for (Model model : models) {
+            if( bomFilter.isBom(model) ) {
+                validateBomDependencies(ctx, model);
+            }
         }
     }
 

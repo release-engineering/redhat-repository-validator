@@ -15,7 +15,6 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.io.filefilter.AbstractFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
@@ -32,7 +31,6 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.artifact.DefaultArtifactType;
 import org.eclipse.aether.graph.Exclusion;
 import org.jboss.wolf.validator.ValidatorContext;
-import org.jboss.wolf.validator.impl.bom.BomFilter;
 
 @Named
 public class ValidatorSupport {
@@ -43,46 +41,28 @@ public class ValidatorSupport {
     private ModelBuildingRequest modelBuildingRequestTemplate;
     @Inject
     private ArtifactTypeRegistry artifactTypeRegistry;
-    @Inject
-    private BomFilter bomFilter;
     
     public static Collection<File> listPomFiles(File dir, IOFileFilter filter) {
         Collection<File> pomFiles = listFiles(dir, and(filter, suffixFileFilter(".pom")), trueFileFilter());
         return pomFiles;
     }
 
-    public List<Model> findBoms(final ValidatorContext ctx, IOFileFilter fileFilter) {
-        IOFileFilter filterFilesWithExceptions = new AbstractFileFilter() {
-            @Override
-            public boolean accept(File file) {
-                if (!ctx.getExceptions(file).isEmpty()) {
-                    return false;
-                }
-                return true;
-            }
-        };
-        
-        List<Model> boms = new ArrayList<Model>();
-        Collection<File> pomFiles = listPomFiles(ctx.getValidatedRepository(), and(fileFilter, filterFilesWithExceptions));
-        for (File pomFile : pomFiles) {
-            Model model = buildModel(pomFile);
-            if (bomFilter.isBom(model)) {
-                boms.add(model);
+    public List<Model> resolveEffectiveModels(final ValidatorContext ctx, IOFileFilter fileFilter) {
+        List<Model> models = new ArrayList<Model>();
+        for (File pomFile : listPomFiles(ctx.getValidatedRepository(), fileFilter)) {
+            DefaultModelBuildingRequest request = new DefaultModelBuildingRequest(modelBuildingRequestTemplate);
+            request.setPomFile(pomFile);
+            request.setModelSource(new FileModelSource(pomFile));
+            try {
+                ModelBuildingResult result = modelBuilder.build(request);
+                Model model = result.getEffectiveModel();
+                models.add(model);
+            } catch (ModelBuildingException e) {
+                // this pom file will not be present in result, 
+                // it is not possible to build effective model
             }
         }
-        return boms;
-    }
-
-    private Model buildModel(File pomFile) {
-        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest(modelBuildingRequestTemplate);
-        request.setPomFile(pomFile);
-        request.setModelSource(new FileModelSource(pomFile));
-        try {
-            ModelBuildingResult result = modelBuilder.build(request);
-            return result.getEffectiveModel();
-        } catch (ModelBuildingException e) {
-            throw new RuntimeException(e);
-        }
+        return models;
     }
     
     // copy from DefaultArtifactDescriptorReader
