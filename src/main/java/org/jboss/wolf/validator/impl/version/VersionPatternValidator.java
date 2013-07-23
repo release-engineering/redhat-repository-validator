@@ -37,7 +37,7 @@ public class VersionPatternValidator implements Validator {
         List<Model> models = validatorSupport.resolveEffectiveModels(ctx, fileFilter);
         for (Model model : models) {
             if (!pattern.matcher(model.getVersion()).matches()) {
-                Exception e = new VersionPatternException(model.getPomFile(), model.getVersion(), pattern.pattern());
+                Exception e = new VersionPatternException(model.getId(), pattern.pattern());
                 ctx.addException(model.getPomFile(), e);
             }
         }
