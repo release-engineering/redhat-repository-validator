@@ -51,6 +51,9 @@ Validators
 - `BomDependencyNotFoundValidator` try to resolve all artifacts defined in dependency management
 - `BomUnmanagedVersionValidator` try to find artifacts which are not defined in any bom files
 - `BomAmbiguousVersionValidator` try to find artifacts which version is defined ambiguous in bom files
+- `VersionAmiguityValidator` try to find artifacts, which have multiple versions in repository
+- `VersionOverlapValidator` try to find artifacts, which overlap with others remote repositories
+- `VersionPatternValidator` try to find artifacts, which version doesn't match regex pattern (eg. -redhat-x postfix)
 
 
 How to
