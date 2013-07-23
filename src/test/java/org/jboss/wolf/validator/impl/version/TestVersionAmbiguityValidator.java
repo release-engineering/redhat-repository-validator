@@ -31,7 +31,7 @@ public class TestVersionAmbiguityValidator extends AbstractTest {
 
         validator.validate(ctx);
 
-        assertExpectedException(VersionAmbiguityException.class, "Artifact com.acme:foo has multiple versions 1.3, 1.2, 1.1");
+        assertExpectedException(VersionAmbiguityException.class, "Artifact com.acme:foo has multiple versions: 1.1, 1.2, 1.3");
     }
 
 }
