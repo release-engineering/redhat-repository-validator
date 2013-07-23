@@ -193,6 +193,11 @@ public class ValidatorConfig {
     public IOFileFilter versionPatternValidatorFilter() {
         return defaultFilter();
     }
+    
+    @Bean
+    public IOFileFilter versionAmbiguityValidatorFilter() {
+        return defaultFilter();
+    }
 
     @Bean
     public PrintStream defaultReporterStream() {
