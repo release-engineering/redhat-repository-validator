@@ -190,15 +190,20 @@ public class ValidatorConfig {
     }
     
     @Bean
-    public IOFileFilter versionPatternValidatorFilter() {
+    public IOFileFilter versionAmbiguityValidatorFilter() {
         return defaultFilter();
     }
     
     @Bean
-    public IOFileFilter versionAmbiguityValidatorFilter() {
+    public IOFileFilter versionOverlapValidatorFilter() {
         return defaultFilter();
     }
-
+    
+    @Bean
+    public IOFileFilter versionPatternValidatorFilter() {
+        return defaultFilter();
+    }
+    
     @Bean
     public PrintStream defaultReporterStream() {
         return System.out;

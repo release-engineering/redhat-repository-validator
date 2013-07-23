@@ -39,11 +39,13 @@ public abstract class AbstractTest {
     protected static final File repoLocalDir = new File(reposDir, "local-repo");
     protected static final File repoFooDir = new File(reposDir, "remote-repo-foo");
     protected static final File repoBarDir = new File(reposDir, "remote-repo-bar");
+    protected static final File repoBazDir = new File(reposDir, "remote-repo-baz");
     
     protected static final RemoteRepository remoteRepoFoo = new RemoteRepository.Builder("foo", "default", repoFooDir.toURI().toString()).build();
     protected static final RemoteRepository remoteRepoBar = new RemoteRepository.Builder("bar", "default", repoBarDir.toURI().toString()).build();
+    protected static final RemoteRepository remoteRepoBaz = new RemoteRepository.Builder("baz", "default", repoBazDir.toURI().toString()).build();
     protected static final RemoteRepository remoteRepoCentral = new RemoteRepository.Builder("central", "default", "http://repo1.maven.org/maven2/").build();
-    protected static final List<RemoteRepository> remoteRepos = Arrays.asList(remoteRepoFoo, remoteRepoBar, remoteRepoCentral);
+    protected static final List<RemoteRepository> remoteRepos = Arrays.asList(remoteRepoFoo, remoteRepoBar, remoteRepoBaz, remoteRepoCentral);
     
     protected static IOFileFilter fileFilter;
     
@@ -65,6 +67,7 @@ public abstract class AbstractTest {
             FileUtils.forceMkdir(repoLocalDir);
             FileUtils.forceMkdir(repoFooDir);
             FileUtils.forceMkdir(repoBarDir);
+            FileUtils.forceMkdir(repoBazDir);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
