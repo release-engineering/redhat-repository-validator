@@ -190,6 +190,11 @@ public class ValidatorConfig {
     }
     
     @Bean
+    public IOFileFilter jarSignatureValidatorFilter() {
+        return defaultFilter();
+    }
+    
+    @Bean
     public IOFileFilter versionAmbiguityValidatorFilter() {
         return defaultFilter();
     }
