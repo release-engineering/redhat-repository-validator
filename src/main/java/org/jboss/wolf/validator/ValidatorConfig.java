@@ -109,7 +109,10 @@ public class ValidatorConfig {
 
     @Bean
     public List<RemoteRepository> effectiveRemoteRepositories() {
+        RemoteRepository validatedRemoteRepository = new RemoteRepository.Builder("validated", "default", new File(validatedRepository).toURI().toString()).build();
+        
         List<RemoteRepository> repositories = new ArrayList<RemoteRepository>();
+        repositories.add(validatedRemoteRepository);
         repositories.addAll(remoteRepositoriesFromArguments());
         repositories.addAll(remoteRepositoriesFromConfiguration());
         repositories.add(centralRemoteRepository());

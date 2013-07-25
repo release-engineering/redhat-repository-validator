@@ -232,10 +232,13 @@ public class TestValidatorRunner {
         @Override
         protected void runValidation() {
             ValidatorContext validatorContext = appCtx.getBean(ValidatorContext.class);
+            File validatedRepository = validatorContext.getValidatedRepository();
             List<RemoteRepository> remoteRepositories = validatorContext.getRemoteRepositories();
-            assertEquals(expectedRemoteRepositories.length, remoteRepositories.size());
-            for (int i = 0; i < expectedRemoteRepositories.length; i++) {
-                assertEquals(expectedRemoteRepositories[i], remoteRepositories.get(i).getUrl());
+            
+            assertEquals(validatedRepository.toURI().toString(), remoteRepositories.get(0).getUrl());
+            assertEquals(expectedRemoteRepositories.length+1, remoteRepositories.size());
+            for (int i = 1; i < expectedRemoteRepositories.length; i++) {
+                assertEquals(expectedRemoteRepositories[i-1], remoteRepositories.get(i).getUrl());
             }
         }
 
