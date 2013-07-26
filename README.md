@@ -49,6 +49,7 @@ Validators
 - `ModelValidator` make sure that all pom files are "loadable" (maven can load it's model with strick validation level)
 - `ChecksumValidator` validate checksums for all repository artifacts (by default  readme and example settings.xml are excluded from this rule)
 - `JarSignatureValidator` validate that all jar files are signed/unsigned
+- `SuspiciousFileValidator` try to find suspicious files in repository (eg. jar without pom, checksum without source file, empty directory, etc...)
 - `BomDependencyNotFoundValidator` try to resolve all artifacts defined in dependency management
 - `BomUnmanagedVersionValidator` try to find artifacts which are not defined in any bom files
 - `BomAmbiguousVersionValidator` try to find artifacts which version is defined ambiguous in bom files

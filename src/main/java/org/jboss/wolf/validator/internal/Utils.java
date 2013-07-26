@@ -1,5 +1,7 @@
 package org.jboss.wolf.validator.internal;
 
+import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -9,8 +11,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.aether.artifact.Artifact;
+import org.jboss.wolf.validator.ValidatorContext;
 
 public class Utils {
+    
+    public static File relativize(ValidatorContext ctx, File file) {
+        URI relativePath = ctx.getValidatedRepository().toURI().relativize(file.toURI());
+        return new File(relativePath.toString());
+    }
     
     public static List<Artifact> sortArtifacts(Collection<Artifact> artifacts) {
         ArrayList<Artifact> result = new ArrayList<Artifact>(artifacts);

@@ -1,8 +1,8 @@
 package org.jboss.wolf.validator.impl.checksum;
 
-import java.io.File;
+import static org.jboss.wolf.validator.internal.Utils.relativize;
+
 import java.io.PrintStream;
-import java.net.URI;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -48,11 +48,6 @@ public class ChecksumReporter implements Reporter {
 
         out.println();
         out.flush();
-    }
-
-    private String relativize(ValidatorContext ctx, File file) {
-        URI relativePath = ctx.getValidatedRepository().toURI().relativize(file.toURI());
-        return relativePath.toString();
     }
 
 }

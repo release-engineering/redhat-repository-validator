@@ -167,6 +167,11 @@ public class ValidatorConfig {
     public IOFileFilter modelValidatorFilter() {
         return defaultFilter();
     }
+    
+    @Bean
+    public IOFileFilter suspiciousFileValidatorFilter() {
+        return defaultFilter();
+    }
 
     @Bean
     public IOFileFilter checksumValidatorFilter() {
