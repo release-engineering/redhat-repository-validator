@@ -34,15 +34,11 @@ import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.util.filter.DependencyFilterUtils;
 import org.jboss.wolf.validator.Validator;
 import org.jboss.wolf.validator.ValidatorContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 
 @Named
 @Order(100)
 public class DependenciesValidator implements Validator {
-
-    private static final Logger logger = LoggerFactory.getLogger(DependenciesValidator.class);
 
     @Inject @Named("dependenciesValidatorFilter")
     private IOFileFilter fileFilter;
@@ -55,10 +51,8 @@ public class DependenciesValidator implements Validator {
 
     @Override
     public void validate(ValidatorContext ctx) {
-        logger.debug("start...");
         Collection<File> pomFiles = listPomFiles(ctx.getValidatedRepository(), fileFilter);
         for (File pomFile : pomFiles) {
-            logger.debug("validate `{}`", pomFile);
             validate(ctx, pomFile);
         }
     }

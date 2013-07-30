@@ -45,6 +45,8 @@ import org.jboss.wolf.validator.impl.bom.BomFilter;
 import org.jboss.wolf.validator.impl.bom.BomFilterSimple;
 import org.jboss.wolf.validator.internal.DepthOneOptionalDependencySelector;
 import org.jboss.wolf.validator.internal.LocalRepositoryModelResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -60,6 +62,8 @@ import org.springframework.context.annotation.Scope;
         useDefaultFilters = false, 
         includeFilters = @Filter(value = Named.class))
 public class ValidatorConfig {
+    
+    private static final Logger logger = LoggerFactory.getLogger(Validator.class);
     
     @Autowired
     private BeanFactory beanFactory;
@@ -81,6 +85,7 @@ public class ValidatorConfig {
             @Override
             public void validate(ValidatorContext ctx) {
                 for (Validator validator : validators) {
+                    logger.debug("starting {}", validator.getClass().getSimpleName());
                     validator.validate(ctx);
                 }
             }

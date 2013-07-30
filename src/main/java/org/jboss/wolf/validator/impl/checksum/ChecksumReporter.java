@@ -1,7 +1,5 @@
 package org.jboss.wolf.validator.impl.checksum;
 
-import static org.jboss.wolf.validator.internal.Utils.relativize;
-
 import java.io.PrintStream;
 import java.util.List;
 
@@ -33,7 +31,7 @@ public class ChecksumReporter implements Reporter {
         if (!checksumNotExistExceptions.isEmpty()) {
             out.println("Found " + checksumNotExistExceptions.size() + " missing checksums.");
             for (ChecksumNotExistException e : checksumNotExistExceptions) {
-                out.println(relativize(ctx, e.getFile()) + " not exist " + e.getAlgorithm());
+                out.println(e.getFile() + " not exist " + e.getAlgorithm());
                 ctx.addProcessedException(e);
             }
         }
@@ -41,7 +39,7 @@ public class ChecksumReporter implements Reporter {
         if (!checksumNotMatchExceptions.isEmpty()) {
             out.println("Found " + checksumNotMatchExceptions.size() + " not match checksums.");
             for (ChecksumNotMatchException e : checksumNotMatchExceptions) {
-                out.println(relativize(ctx, e.getFile()) + " not match " + e.getAlgorithm());
+                out.println(e.getFile() + " not match " + e.getAlgorithm());
                 ctx.addProcessedException(e);
             }
         }

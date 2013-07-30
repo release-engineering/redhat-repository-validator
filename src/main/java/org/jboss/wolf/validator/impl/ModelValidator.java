@@ -1,5 +1,6 @@
 package org.jboss.wolf.validator.impl;
 
+import static org.jboss.wolf.validator.internal.Utils.relativize;
 import static org.jboss.wolf.validator.internal.ValidatorSupport.listPomFiles;
 
 import java.io.File;
@@ -35,14 +36,12 @@ public class ModelValidator implements Validator {
 
     @Override
     public void validate(ValidatorContext ctx) {
-        logger.debug("start...");
         Collection<File> pomFiles = listPomFiles(ctx.getValidatedRepository(), fileFilter);
         for (File pomFile : pomFiles) {
             if (!ctx.getExceptions(pomFile).isEmpty()) {
-                logger.debug("skipping `{}`, because already contains exceptions", pomFile);
+                logger.debug("skipping `{}`, because already contains exceptions", relativize(ctx, pomFile));
                 continue;
             }
-            logger.debug("validate `{}`", pomFile);
             validate(ctx, pomFile);
         }
     }

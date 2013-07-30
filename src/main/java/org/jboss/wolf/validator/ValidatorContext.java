@@ -1,5 +1,7 @@
 package org.jboss.wolf.validator;
 
+import static org.jboss.wolf.validator.internal.Utils.relativize;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public class ValidatorContext {
 
-    private static final Logger logger = LoggerFactory.getLogger(ValidatorContext.class);
+    private static final Logger logger = LoggerFactory.getLogger(Validator.class);
 
     private final File validatedRepository;
     private final List<RemoteRepository> remoteRepositories;
@@ -39,13 +41,13 @@ public class ValidatorContext {
         return exceptions.isEmpty();
     }
 
-    public void addException(File pomFile, Exception e) {
-        logger.debug("for `{}` register exception `{}`", pomFile, e.getMessage());
+    public void addException(File file, Exception e) {
+        logger.debug("for `{}` register exception `{}: {}`", relativize(this, file), e.getClass().getSimpleName(), e.getMessage());
 
-        List<Exception> exceptionList = exceptions.get(pomFile);
+        List<Exception> exceptionList = exceptions.get(file);
         if (exceptionList == null) {
             exceptionList = new ArrayList<Exception>();
-            exceptions.put(pomFile, exceptionList);
+            exceptions.put(file, exceptionList);
         }
         exceptionList.add(e);
     }

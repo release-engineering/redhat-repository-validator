@@ -26,8 +26,14 @@ public class UnprocessedExceptionsReporter implements Reporter {
         if (!unprocessedExceptions.isEmpty()) {
             out.println("--- UNPROCESSED EXCEPTIONS REPORT ---");
             out.println("Unprocessed exceptions count " + unprocessedExceptions.size() + ", from total " + allExceptions.size() + ".");
+            
+            Exception lastException = null;
             for (Exception unprocessedException : unprocessedExceptions) {
+                if (lastException == null || !lastException.getClass().getName().equals(unprocessedException.getClass().getName())) {
+                    out.println();
+                }
                 reportException(unprocessedException, 0);
+                lastException = unprocessedException;
             }
             out.println();
             out.flush();

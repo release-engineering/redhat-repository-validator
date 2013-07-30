@@ -45,7 +45,7 @@ public class TestJarSignatureValidator extends AbstractTest {
 
         validator.validate(ctx);
 
-        assertExpectedException(JarSignedException.class, "File target/repos/remote-repo-foo/com/acme/foo/1.0/foo-1.0.jar is signed");
+        assertExpectedException(JarSignedException.class, "File com/acme/foo/1.0/foo-1.0.jar is signed");
     }
 
     @Test
@@ -57,7 +57,7 @@ public class TestJarSignatureValidator extends AbstractTest {
 
         validator.validate(ctx);
 
-        assertExpectedException(JarSignatureVerificationException.class, "Unable to verify signature for file target/repos/remote-repo-foo/com/acme/foo/1.0/foo-1.0.jar");
+        assertExpectedException(JarSignatureVerificationException.class, "Unable to verify signature for file com/acme/foo/1.0/foo-1.0.jar");
     }
 
 }

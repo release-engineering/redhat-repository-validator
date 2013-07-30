@@ -41,8 +41,6 @@ public class BomUnmanagedVersionValidator implements Validator {
 
     @Override
     public void validate(ValidatorContext ctx) {
-        logger.debug("start...");
-
         List<Model> boms = new ArrayList<Model>();
         List<Model> projects = new ArrayList<Model>();
 

@@ -21,13 +21,9 @@ import org.eclipse.aether.util.filter.DependencyFilterUtils;
 import org.jboss.wolf.validator.Validator;
 import org.jboss.wolf.validator.ValidatorContext;
 import org.jboss.wolf.validator.internal.ValidatorSupport;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Named
 public class BomDependencyNotFoundValidator implements Validator {
-
-    private static final Logger logger = LoggerFactory.getLogger(BomDependencyNotFoundValidator.class);
 
     @Inject @Named("bomDependencyNotFoundValidatorFilter")
     private IOFileFilter fileFilter;
@@ -42,7 +38,6 @@ public class BomDependencyNotFoundValidator implements Validator {
 
     @Override
     public void validate(ValidatorContext ctx) {
-        logger.debug("start...");
         List<Model> models = validatorSupport.resolveEffectiveModels(ctx, fileFilter);
         for (Model model : models) {
             if( bomFilter.isBom(model) ) {

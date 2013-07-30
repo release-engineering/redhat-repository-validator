@@ -17,13 +17,9 @@ import org.apache.maven.model.Model;
 import org.jboss.wolf.validator.Validator;
 import org.jboss.wolf.validator.ValidatorContext;
 import org.jboss.wolf.validator.internal.ValidatorSupport;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Named
 public class BomAmbiguousVersionValidator implements Validator {
-
-    private static final Logger logger = LoggerFactory.getLogger(BomAmbiguousVersionValidator.class);
 
     @Inject @Named("bomAmbiguousVersionValidatorFilter")
     private IOFileFilter fileFilter;
@@ -34,7 +30,6 @@ public class BomAmbiguousVersionValidator implements Validator {
 
     @Override
     public void validate(ValidatorContext ctx) {
-        logger.debug("start...");
         validateAmbiguousVersions(ctx);
     }
     
