@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.StringUtils.removeEnd;
 import static org.apache.commons.lang3.StringUtils.removeStart;
 import static org.apache.commons.lang3.StringUtils.substringAfterLast;
 import static org.apache.commons.lang3.StringUtils.substringBeforeLast;
+import static org.jboss.wolf.validator.internal.Utils.relativize;
 import static org.jboss.wolf.validator.internal.ValidatorSupport.listPomFiles;
 
 import java.io.File;
@@ -117,6 +118,11 @@ public class DependenciesValidator implements Validator {
 
             ArtifactTypeRegistry artifactTypeRegistry = repositorySystemSession.getArtifactTypeRegistry();
             ArtifactType artifactType = artifactTypeRegistry.get(model.getPackaging());
+            
+            if (artifactType == null) {
+                ctx.addException(pomFile, new UnknownArtifactTypeException(relativize(ctx, pomFile)));
+                return false;
+            }
 
             Artifact archiveArtifact = new DefaultArtifact(
                     pomArtifact.getGroupId(),

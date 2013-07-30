@@ -295,7 +295,29 @@ public class TestDependenciesValidator extends AbstractTest {
         assertSuccess();
         assertLocalRepoContains("com/acme/foo/1.0/foo-1.0.pom");
         assertLocalRepoContains("com/acme/foo/1.0/foo-1.0.jar");
-    }   
+    }
+    
+    @Test // bug WOLF-51
+    public void shouldResolveMavenArchetypePackaging() throws IOException {
+        Model fooArchetype = pom().artifactId("foo-archetype").packaging("maven-archetype").create(repoFooDir);
+
+        File fooArchetypeFile = toArtifactFile(repoFooDir, fooArchetype);
+        File fooJarFile = new File(fooArchetypeFile.getParentFile(), "foo-archetype-1.0.jar");
+        Files.move(fooArchetypeFile, fooJarFile);
+
+        validator.validate(ctx);
+
+        assertSuccess();
+        assertLocalRepoContains("com/acme/foo-archetype/1.0/foo-archetype-1.0.pom");
+        assertLocalRepoContains("com/acme/foo-archetype/1.0/foo-archetype-1.0.jar");
+    }
+    
+    @Test // bug WOLF-51
+    public void shouldNotThrowNPEForUnknownArtifactType() {
+        pom().artifactId("foo").packaging("unknown").create(repoFooDir);
+        validator.validate(ctx);
+        assertExpectedException(UnknownArtifactTypeException.class, "Unknown artifact type in pom com/acme/foo/1.0/foo-1.0.pom");
+    }
 
     @Test
     public void shouldFindMissingJar() throws IOException {
