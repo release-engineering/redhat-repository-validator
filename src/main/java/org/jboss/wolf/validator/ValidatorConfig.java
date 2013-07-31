@@ -45,6 +45,8 @@ import org.jboss.wolf.validator.impl.bom.BomFilter;
 import org.jboss.wolf.validator.impl.bom.BomFilterSimple;
 import org.jboss.wolf.validator.internal.DepthOneOptionalDependencySelector;
 import org.jboss.wolf.validator.internal.LocalRepositoryModelResolver;
+import org.jboss.wolf.validator.internal.LogRepositoryListener;
+import org.jboss.wolf.validator.internal.LogTransferListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
@@ -271,6 +273,8 @@ public class ValidatorConfig {
         session.setArtifactDescriptorPolicy(new SimpleArtifactDescriptorPolicy(true, true));
         session.setDependencySelector(selector);
         session.setDependencyGraphTransformer(transformer);
+        session.setTransferListener(new LogTransferListener());
+        session.setRepositoryListener(new LogRepositoryListener());
 
         return session;
     }
