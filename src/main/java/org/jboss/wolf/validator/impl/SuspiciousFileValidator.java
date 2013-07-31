@@ -16,9 +16,13 @@ import javax.inject.Named;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.jboss.wolf.validator.Validator;
 import org.jboss.wolf.validator.ValidatorContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Named
 public class SuspiciousFileValidator implements Validator {
+    
+    private static final Logger logger = LoggerFactory.getLogger(SuspiciousFileValidator.class);
     
     private static final String[] CHECKSUM_EXTENSIONS = { "sha1", "md5" };
     private static final String[] ATTACHED_ARTIFACT_TYPES = { "-sources.jar", "-javadoc.jar", "-tests.jar" };
@@ -48,6 +52,7 @@ public class SuspiciousFileValidator implements Validator {
     public void validate(ValidatorContext ctx) {
         Collection<File> files = listFilesAndDirs(ctx.getValidatedRepository(), fileFilter, fileFilter);
         for (File file : files) {
+            logger.trace("validating {}", relativize(ctx, file));
             validateFile(ctx, file);
         }
     }

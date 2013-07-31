@@ -19,9 +19,13 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.jboss.wolf.validator.Validator;
 import org.jboss.wolf.validator.ValidatorContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Named
 public class JarSignatureValidator implements Validator {
+    
+    private static final Logger logger = LoggerFactory.getLogger(JarSignatureValidator.class);
 
     @Inject @Named("jarSignatureValidatorFilter")
     private IOFileFilter fileFilter;
@@ -40,6 +44,7 @@ public class JarSignatureValidator implements Validator {
     public void validate(ValidatorContext ctx) {
         Collection<File> files = listFiles(ctx.getValidatedRepository(), and(fileFilter, suffixFileFilter(".jar")), trueFileFilter());
         for (File file : files) {
+            logger.trace("validating {}", relativize(ctx, file));
             validateSignature(ctx, file);
         }
     }

@@ -1,5 +1,7 @@
 package org.jboss.wolf.validator.impl.version;
 
+import static org.jboss.wolf.validator.internal.Utils.relativize;
+
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -11,9 +13,13 @@ import org.apache.maven.model.Model;
 import org.jboss.wolf.validator.Validator;
 import org.jboss.wolf.validator.ValidatorContext;
 import org.jboss.wolf.validator.internal.ValidatorSupport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Named
 public class VersionPatternValidator implements Validator {
+    
+    private static final Logger logger = LoggerFactory.getLogger(VersionPatternValidator.class);
 
     private static final String DEFAULT_REDHAT_VERSION_PATTERN = ".+-redhat-[0-9]+";
 
@@ -36,6 +42,7 @@ public class VersionPatternValidator implements Validator {
     public void validate(ValidatorContext ctx) {
         List<Model> models = validatorSupport.resolveEffectiveModels(ctx, fileFilter);
         for (Model model : models) {
+            logger.trace("validating {}", relativize(ctx, model.getPomFile()));
             validateVersionPattern(ctx, model);
         }
     }

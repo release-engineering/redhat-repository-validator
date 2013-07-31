@@ -23,9 +23,13 @@ import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.eclipse.aether.util.ChecksumUtils;
 import org.jboss.wolf.validator.Validator;
 import org.jboss.wolf.validator.ValidatorContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Named
 public class ChecksumValidator implements Validator {
+    
+    private static final Logger logger = LoggerFactory.getLogger(ChecksumValidator.class);
 
     private static final Map<String, String> checksumAlgorithms = new HashMap<String, String>();
     static {
@@ -40,6 +44,7 @@ public class ChecksumValidator implements Validator {
     public void validate(ValidatorContext ctx) {
         Collection<File> files = findFiles(ctx);
         for (File file : files) {
+            logger.trace("validating {}", relativize(ctx, file));
             validateChecksum(ctx, file);
         }
     }

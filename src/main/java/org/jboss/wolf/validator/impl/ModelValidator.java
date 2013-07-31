@@ -38,6 +38,7 @@ public class ModelValidator implements Validator {
     public void validate(ValidatorContext ctx) {
         Collection<File> pomFiles = listPomFiles(ctx.getValidatedRepository(), fileFilter);
         for (File pomFile : pomFiles) {
+            logger.trace("validating {}", relativize(ctx, pomFile));
             if (!ctx.getExceptions(pomFile).isEmpty()) {
                 logger.debug("skipping `{}`, because already contains exceptions", relativize(ctx, pomFile));
                 continue;
