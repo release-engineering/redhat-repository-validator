@@ -2,6 +2,7 @@
 <configuration>
 
     <logger name="org.springframework" level="warn" />
+    <logger name="org.apache.http" level="warn" />
     <logger name="org.jboss.wolf.validator.internal.LogTransferListener" level="error" />
     <logger name="org.jboss.wolf.validator.internal.LogRepositoryListener" level="error" />
 

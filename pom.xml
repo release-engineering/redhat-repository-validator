@@ -28,7 +28,7 @@
 
         <version.aether>0.9.0.M2</version.aether>
         <version.maven>3.1.0</version.maven>
-        <version.wagon>1.0</version.wagon>
+        <version.wagon>2.1</version.wagon> <!-- with higher version: NoSuchMethodError org.apache.maven.wagon.shared.http4.AbstractHttpClientWagon.getReadTimeout() -->
         <version.slf4j>1.7.5</version.slf4j>
         <version.logback>1.0.12</version.logback>
         <version.spring>3.2.2.RELEASE</version.spring>
@@ -120,6 +120,11 @@
         </dependency>
         <dependency>
             <groupId>org.apache.maven.wagon</groupId>
+            <artifactId>wagon-http</artifactId>
+            <version>${version.wagon}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.wagon</groupId>
             <artifactId>wagon-file</artifactId>
             <version>${version.wagon}</version>
         </dependency>
@@ -159,6 +164,11 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>3.1</version>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
