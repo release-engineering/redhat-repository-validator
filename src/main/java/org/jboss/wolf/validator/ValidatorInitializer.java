@@ -1,13 +1,11 @@
 package org.jboss.wolf.validator;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.io.FileUtils;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.slf4j.Logger;
@@ -49,13 +47,7 @@ public class ValidatorInitializer {
     private void localRepositoryShouldBeEmpty() {
         File dir = localRepository.getBasedir();
         if (dir.list().length != 0) {
-            logger.warn("Local repository should be empty, cleaning its content...");
-            try {
-                FileUtils.cleanDirectory(dir);
-            } catch (IOException e) {
-                logger.error("Failed to clean local repository");
-                throw new RuntimeException("Failed to clean local repository", e);
-            }
+            logger.warn("Local repository should be empty");
         }
     }
 
