@@ -45,6 +45,7 @@ import org.jboss.wolf.validator.impl.bom.BomFilter;
 import org.jboss.wolf.validator.impl.bom.BomFilterSimple;
 import org.jboss.wolf.validator.internal.DepthOneOptionalDependencySelector;
 import org.jboss.wolf.validator.internal.LocalRepositoryModelResolver;
+import org.jboss.wolf.validator.internal.LogOutputStream;
 import org.jboss.wolf.validator.internal.LogRepositoryListener;
 import org.jboss.wolf.validator.internal.LogTransferListener;
 import org.slf4j.Logger;
@@ -226,7 +227,8 @@ public class ValidatorConfig {
     
     @Bean
     public PrintStream defaultReporterStream() {
-        return System.out;
+        // return System.out;
+        return new PrintStream(new LogOutputStream(Reporter.class.getSimpleName()));
     }
     
     @Bean
