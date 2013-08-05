@@ -238,16 +238,6 @@ public class ValidatorConfig {
     }
 
     @Bean
-    public PrintStream checksumReporterStream() {
-        return defaultReporterStream();
-    }
-
-    @Bean
-    public PrintStream unprocessedExceptionsReporterStream() {
-        return defaultReporterStream();
-    }
-
-    @Bean
     public LocalRepository localRepository() {
         return new LocalRepository(localRepository);
     }

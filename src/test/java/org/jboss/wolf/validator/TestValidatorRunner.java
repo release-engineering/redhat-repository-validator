@@ -157,9 +157,9 @@ public class TestValidatorRunner {
     }
     
     @Test
-    public void shouldRedirectChechsumReportToFile() throws IOException {
+    public void shouldRedirectDefaultReportToFile() throws IOException {
         final File fooFile = new File("foo");
-        final File reportFile = new File("target/checksum-report.txt");
+        final File reportFile = new File("target/report-foo.txt");
 
         FileUtils.deleteQuietly(reportFile);
 
@@ -170,14 +170,14 @@ public class TestValidatorRunner {
                 reporter.report(context);
             };
         };
-        validatorRunner.run("--config", getClass().getResource("/TestValidatorRunner-checksumReporterStream.xml").getFile());
+        validatorRunner.run("--config", getClass().getResource("/TestValidatorRunner-defaultReporterStream.xml").getFile());
 
         assertTrue(reportFile.exists());
         assertTrue(reportFile.isFile());
 
         String reportContent = FileUtils.readFileToString(reportFile);
-        assertTrue(reportContent.contains("CHECKSUM REPORT"));
-        assertTrue(reportContent.contains("Found 1 missing checksums"));
+        assertTrue(reportContent.contains("ChecksumNotExistException (total count 1)"));
+        assertTrue(reportContent.contains("Checksum SHA-1 for file foo not exist"));
     }
 
     private void assertOutputContaints(String s) {
