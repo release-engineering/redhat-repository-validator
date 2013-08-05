@@ -21,6 +21,7 @@ import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
+import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -277,6 +278,10 @@ public class ValidatorConfig {
         session.setDependencyGraphTransformer(transformer);
         session.setTransferListener(new LogTransferListener());
         session.setRepositoryListener(new LogRepositoryListener());
+        
+        if (!session.getConfigProperties().containsKey(ConfigurationProperties.REQUEST_TIMEOUT)) {
+            session.setConfigProperty(ConfigurationProperties.REQUEST_TIMEOUT, 3 * 60 * 1000);
+        }
 
         return session;
     }
