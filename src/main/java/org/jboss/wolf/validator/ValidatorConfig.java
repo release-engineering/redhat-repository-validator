@@ -9,6 +9,8 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 import static org.springframework.core.annotation.AnnotationAwareOrderComparator.sort;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,6 +19,7 @@ import java.util.Properties;
 
 import javax.inject.Named;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
@@ -71,6 +74,9 @@ public class ValidatorConfig {
     
     @Autowired
     private BeanFactory beanFactory;
+    
+    @Value("#{systemProperties['wolf-reportFile']?:'workspace/report.txt'}")
+    private String reportFileName;
     
     @Value("#{systemProperties['wolf-validatedRepository']?:'workspace/validated-repository'}")
     private String validatedRepository;
@@ -228,8 +234,17 @@ public class ValidatorConfig {
     
     @Bean
     public PrintStream defaultReporterStream() {
-        // return System.out;
-        return new PrintStream(new LogOutputStream(Reporter.class.getSimpleName()));
+        try {
+            File reportFile = new File(reportFileName);
+            FileUtils.forceMkdir(reportFile.getParentFile());
+            FileUtils.touch(reportFile);
+            FileOutputStream fileOutputStream = new FileOutputStream(reportFile);
+            LogOutputStream logOutputStream = new LogOutputStream(Reporter.class.getSimpleName(), fileOutputStream);
+            PrintStream printStream = new PrintStream(logOutputStream);
+            return printStream;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
     
     @Bean

@@ -9,15 +9,33 @@ import org.slf4j.LoggerFactory;
 public class LogOutputStream extends OutputStream {
 
     private final Logger logger;
+    private final OutputStream delegate;
     private String buffer;
 
-    public LogOutputStream(String loggerName) {
+    public LogOutputStream(String loggerName, OutputStream delegate) {
         this.logger = LoggerFactory.getLogger(loggerName);
+        this.delegate = delegate;
         this.buffer = "";
     }
 
     @Override
     public void write(int b) throws IOException {
+        delegate.write(b);
+        writeLog(b);
+    }
+
+    @Override
+    public void flush() throws IOException {
+        delegate.flush();
+        flushLog();
+    }
+
+    @Override
+    public void close() throws IOException {
+        delegate.close();
+    }
+
+    private void writeLog(int b) throws IOException {
         byte[] bytes = new byte[1];
         bytes[0] = (byte) (b & 0xff);
         buffer = buffer + new String(bytes);
@@ -27,8 +45,7 @@ public class LogOutputStream extends OutputStream {
         }
     }
 
-    @Override
-    public void flush() {
+    private void flushLog() {
         logger.info(buffer);
         buffer = "";
     }

@@ -27,7 +27,7 @@ Here is help output:
 
     Wolf-validator is a tool used to validate the internal consistency of a maven artifact repository.
     
-    Usage: wolf-validator [-c <file>] [-h] [-lr <dir>] [-rr <url>] [-vr <dir>]
+    Usage: wolf-validator [-c <file>] [-h] [-lr <dir>] [-rr <url>] [-vr <dir>] [-r <file>]
         -c,--config <file>                 use given configuration file,
                                            default value is `wolf-validator-config.xml`
         -h,--help                          print help and exit
@@ -37,6 +37,8 @@ Here is help output:
                                            default remote repository is only maven central
         -vr,--validated-repository <dir>   validate given repository,
                                            default value is `workspace/validated-repository`
+        -r,--report <file>                 write generated report into this file,
+                                           default location for reports is in `workspace/report.txt`                                           
     Example: 
         to run against a given validated repository directory, use: 
         $ wolf-validator -vr ~/myrepository

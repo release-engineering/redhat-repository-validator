@@ -46,6 +46,7 @@ public class TestValidatorRunner {
     @After
     public void dispose() {
         System.setOut(systemOutOriginal);
+        System.clearProperty("wolf-reportFile");
         System.clearProperty("wolf-validatedRepository");
         System.clearProperty("wolf-localRepository");
         System.clearProperty("wolf-remoteRepositories");
@@ -157,27 +158,21 @@ public class TestValidatorRunner {
     }
     
     @Test
-    public void shouldRedirectDefaultReportToFile() throws IOException {
-        final File fooFile = new File("foo");
-        final File reportFile = new File("target/report-foo.txt");
+    public void shouldReportToFileByDefault() {
+        validatorRunner = new AssertReportFileRunner(new File("workspace/report.txt"));
+        validatorRunner.run();
+    }
 
-        FileUtils.deleteQuietly(reportFile);
+    @Test
+    public void shouldRedirectDefaultReportToCustomFile1() throws IOException {
+        validatorRunner = new AssertReportFileRunner(new File("workspace/foo.txt"));
+        validatorRunner.run("--report", "workspace/foo.txt");
+    }
 
-        validatorRunner = new ValidatorRunner() {
-            @Override
-            protected void runValidation() {
-                context.addException(fooFile, new ChecksumNotExistException(fooFile, "SHA-1"));
-                reporter.report(context);
-            };
-        };
+    @Test
+    public void shouldRedirectDefaultReportToCustomFile2() throws IOException {
+        validatorRunner = new AssertReportFileRunner(new File("workspace/bar.txt"));
         validatorRunner.run("--config", getClass().getResource("/TestValidatorRunner-defaultReporterStream.xml").getFile());
-
-        assertTrue(reportFile.exists());
-        assertTrue(reportFile.isFile());
-
-        String reportContent = FileUtils.readFileToString(reportFile);
-        assertTrue(reportContent.contains("ChecksumNotExistException (total count 1)"));
-        assertTrue(reportContent.contains("Checksum SHA-1 for file foo not exist"));
     }
 
     private void assertOutputContaints(String s) {
@@ -242,6 +237,33 @@ public class TestValidatorRunner {
             }
         }
 
+    }
+    
+    private static class AssertReportFileRunner extends ValidatorRunner {
+        
+        private final File reportFile;
+        
+        public AssertReportFileRunner(File reportFile) {
+            this.reportFile = reportFile;
+        }
+
+        @Override
+        protected void runValidation() {
+            context.addException(new File("foo"), new ChecksumNotExistException(new File("foo"), "SHA-1"));
+            reporter.report(context);
+            
+            try {
+                assertTrue(reportFile.exists());
+                assertTrue(reportFile.isFile());
+                
+                String reportContent = FileUtils.readFileToString(reportFile);
+                assertTrue(reportContent.contains("ChecksumNotExistException (total count 1)"));
+                assertTrue(reportContent.contains("Checksum SHA-1 for file foo not exist"));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        };
+        
     }
     
     @Order(1)

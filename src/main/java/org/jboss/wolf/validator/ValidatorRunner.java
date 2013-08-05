@@ -34,6 +34,7 @@ public class ValidatorRunner {
     private final Option validatedRepositoryOption = createOption("vr", "validated-repository", "validate given repository, \ndefault value is `workspace/validated-repository`", "dir");
     private final Option localRepositoryOption = createOption("lr", "local-repository", "use given local repository, \ndefault value is `workspace/local-repository`", "dir");
     private final Option remoteRepositoryOption = createOption("rr", "remote-repository", "use given remote repository, \ndefault remote repository is only maven central", "url");
+    private final Option reportFileOption = createOption("r", "report", "write generated report into this file, \ndefault location for reports is in `workspace/report.txt`", "file");
     private final Option configOption = createOption("c", "config", "use given configuration file, \ndefault value is `wolf-validator-config.xml`", "file");
     private final Option helpOption = createOption("h", "help", "print help and exit", null);
     
@@ -53,6 +54,7 @@ public class ValidatorRunner {
         options.addOption(validatedRepositoryOption);
         options.addOption(localRepositoryOption);
         options.addOption(remoteRepositoryOption);
+        options.addOption(reportFileOption);
         options.addOption(configOption);
         options.addOption(helpOption);
         
@@ -101,10 +103,12 @@ public class ValidatorRunner {
     }
 
     private void initApplicationContext(CommandLine line) {
+        String reportFile = line.getOptionValue(reportFileOption.getOpt(), "workspace/report.txt");
         String validatedRepo = line.getOptionValue(validatedRepositoryOption.getOpt(), "workspace/validated-repository");
         String localRepo = line.getOptionValue(localRepositoryOption.getOpt(), "workspace/local-repository");
         String[] remoteRepos = line.getOptionValues(remoteRepositoryOption.getOpt());
 
+        System.setProperty("wolf-reportFile", reportFile);
         System.setProperty("wolf-validatedRepository", validatedRepo);
         System.setProperty("wolf-localRepository", localRepo);
         System.setProperty("wolf-remoteRepositories", StringUtils.defaultString(StringUtils.join(remoteRepos, ';')));

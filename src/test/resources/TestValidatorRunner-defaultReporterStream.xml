@@ -3,7 +3,7 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <bean id="defaultReporterStream" class="java.io.PrintStream">
-        <constructor-arg value="target/report-foo.txt" />
+        <constructor-arg value="workspace/bar.txt" />
     </bean>
 
 </beans>
