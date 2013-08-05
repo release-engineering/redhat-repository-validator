@@ -41,7 +41,15 @@ public class Utils {
             public int compare(Exception e1, Exception e2) {
                 String name1 = e1.getClass().getSimpleName();
                 String name2 = e2.getClass().getSimpleName();
-                return name1.compareTo(name2);
+                int result = name1.compareTo(name2);
+
+                if (result == 0) {
+                    String msg1 = e1.getMessage();
+                    String msg2 = e2.getMessage();
+                    result = msg1.compareTo(msg2);
+                }
+
+                return result;
             }
         });
         return sortedExceptions;

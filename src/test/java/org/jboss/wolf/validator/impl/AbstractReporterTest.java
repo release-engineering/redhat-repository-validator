@@ -12,9 +12,12 @@ import org.apache.commons.io.filefilter.IOFileFilter;
 import org.jboss.wolf.validator.Reporter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
 
 @ContextConfiguration
+@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 public abstract class AbstractReporterTest extends AbstractTest {
 
     @Inject
