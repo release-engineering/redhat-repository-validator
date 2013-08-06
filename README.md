@@ -80,12 +80,4 @@ Or permanently added in configuration file, see `fooRepository` snippet, where i
 Validators/reporters have to implement interface `org.jboss.wolf.validator.Validator/Reporter`, 
 for simple example take a look on `ChecksumValidator` implementation. 
 Jar file with new validator/reporter add into `lib` subdirectory, so it will be automatically on classpath.
-And register new bean in configuration file `wolf-validator-config.xml`, see example with `fooValidator`.
-
-
-#### How to write reports to file ?
-
-Reporters by default write its output to console. This can be changed globaly for all reporters, 
-by configuring custom bean named `defaultReporterStream` or per one reporter with bean 
-named like reporter class and with suffix stream, for examle `checksumReporterStream`.
-Type of this bean should be `java.io.PrintStream`.        
+And register new bean in configuration file `wolf-validator-config.xml`, see example with `fooValidator`.        
