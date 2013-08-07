@@ -29,7 +29,53 @@
 <!-- CUSTOM VALIDATOR -->
 <!-- 
     <bean id="fooValidator" class="foo.FooValidator" />
- -->
+-->
+
+
+<!-- CUSTOM FILTER IN XML -->
+<!--
+    <bean id="fooValidatorFilter" class="org.apache.commons.io.filefilter.AndFileFilter">
+        <constructor-arg>
+            <list>
+                <bean class="org.apache.commons.io.filefilter.NotFileFilter">
+                    <constructor-arg index="0" ref="expectedRootFilesFilter" />
+                </bean>
+                <bean class="org.apache.commons.io.filefilter.NotFileFilter">
+                    <constructor-arg>
+                        <bean class="org.apache.commons.io.filefilter.NameFileFilter">
+                            <constructor-arg index="0" value="expected-file.xml" />
+                        </bean>
+                    </constructor-arg>
+                </bean>
+            </list>
+        </constructor-arg>
+    </bean>
+-->
+
+
+<!-- CUSTOM FILTER IN GROOVY -->
+<!--
+    <lang:groovy id="fooValidatorFilter" init-method="init">
+        <lang:inline-script>
+            import static org.apache.commons.io.filefilter.FileFilterUtils.nameFileFilter;
+            import static org.apache.commons.io.filefilter.FileFilterUtils.notFileFilter;
+            import org.apache.commons.io.filefilter.AndFileFilter;
+            import org.apache.commons.io.filefilter.IOFileFilter;
+
+            class FooValidatorFilter extends AndFileFilter {
+
+                IOFileFilter expectedRootFilesFilter;
+
+                void init() {
+                    addFileFilter(notFileFilter(expectedRootFilesFilter));
+                    addFileFilter(notFileFilter(nameFileFilter("expected-file.groovy")));
+                }
+
+            }
+        </lang:inline-script>
+        <lang:property name="expectedRootFilesFilter" ref="expectedRootFilesFilter" />
+    </lang:groovy>
+-->
 
 
 <!-- REPORT TO FILE -->
@@ -37,6 +83,6 @@
      <bean id="defaultReporterStream" class="java.io.PrintStream">
         <constructor-arg name="fileName" value="workspace/report.txt" />
     </bean>
-  -->
+-->
 
 </beans>

@@ -69,6 +69,13 @@ Logging configuration can be changed in `wolf-validator-logback.xml` file, defau
 Tool configuration can be changed in `wolf-validator-config.xml` file and it contains some examples already.
 
 
+#### How to add whitelist/filter ?
+
+Into each validator is injected file filter (interface `IOFileFilter`), which allow to skip selected files. 
+By conventions, filter beans have id like validator name with suffix filter, for example `checksumValidatorFilter`. 
+These filter beans can be redefined in external configuration file, see examples in xml or groovy `fooValidatorFilter `.
+
+
 #### How to add remote repository ?
 
 Remote repository can be added via command line options `-rr`, for example `$ wolf-validator -rr file://foo-repository`. 
