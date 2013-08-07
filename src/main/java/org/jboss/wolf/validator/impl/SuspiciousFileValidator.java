@@ -13,6 +13,7 @@ import java.util.Collection;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.jboss.wolf.validator.Validator;
 import org.jboss.wolf.validator.ValidatorContext;
@@ -24,6 +25,7 @@ public class SuspiciousFileValidator implements Validator {
     
     private static final Logger logger = LoggerFactory.getLogger(SuspiciousFileValidator.class);
     
+    private static final String[] POM_EXTENSION = { "pom" };
     private static final String[] CHECKSUM_EXTENSIONS = { "sha1", "md5" };
     private static final String[] ATTACHED_ARTIFACT_TYPES = { "-sources.jar", "-javadoc.jar", "-tests.jar" };
 
@@ -91,7 +93,14 @@ public class SuspiciousFileValidator implements Validator {
         if (fileName.endsWith(".jar")) {
             File pomFile = new File(fileDir, removeExtension(fileName) + ".pom");
             if (!pomFile.isFile()) {
-                fail(ctx, file, "jar file without pom");
+                Collection<File> pomFiles = FileUtils.listFiles(file.getParentFile(), POM_EXTENSION, false);
+                if (pomFiles.isEmpty()) {
+                    fail(ctx, file, "jar file without pom");
+                } else if (pomFiles.size() == 1) {
+                    fail(ctx, file, "jar file without pom, but there is other pom in directory " + pomFiles.iterator().next().getName());
+                } else {
+                    fail(ctx, file, "jar file without pom, but there are other poms in directory");
+                }
             }
             return;
         }

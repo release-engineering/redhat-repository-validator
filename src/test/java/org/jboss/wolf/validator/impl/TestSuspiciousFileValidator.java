@@ -104,6 +104,13 @@ public class TestSuspiciousFileValidator extends AbstractTest {
         validator.validate(ctx);
         assertExpectedException(SuspiciousFileException.class, "File com/acme/foo/1.0/foo-1.0.war is suspicious");
     }
+    
+    @Test
+    public void shouldFindSuspiciousClassifiers() {
+        touch("com/acme/foo/1.0/foo-1.0-native.jar");
+        validator.validate(ctx);
+        assertExpectedException(SuspiciousFileException.class, "File com/acme/foo/1.0/foo-1.0-native.jar is jar file without pom, but there is other pom in directory foo-1.0.pom");
+    }
 
     @Test
     public void shouldIgnoreExpectedDirectory() throws IOException {
