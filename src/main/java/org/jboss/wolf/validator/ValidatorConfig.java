@@ -1,8 +1,6 @@
 package org.jboss.wolf.validator;
 
-import static org.apache.commons.io.IOCase.INSENSITIVE;
 import static org.apache.commons.io.filefilter.FileFilterUtils.and;
-import static org.apache.commons.io.filefilter.FileFilterUtils.nameFileFilter;
 import static org.apache.commons.io.filefilter.FileFilterUtils.notFileFilter;
 import static org.apache.commons.io.filefilter.FileFilterUtils.trueFileFilter;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
@@ -20,7 +18,9 @@ import java.util.Properties;
 import javax.inject.Named;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.AbstractFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
@@ -167,6 +167,34 @@ public class ValidatorConfig {
     public BomFilter bomFilter() {
         return new BomFilterSimple();
     }
+    
+    @Bean
+    public String[] expectedRootFiles() {
+        return new String[] {
+                "example-settings.xml",
+                "readme.txt",
+                "readme.md",
+                "jbosseula.txt" };
+    }
+    
+    @Bean
+    public IOFileFilter expectedRootFilesFilter() {
+        final String validatedRepositoryAbsolutePath = validatorContext().getValidatedRepository().getAbsolutePath();
+        final String[] expectedRootFiles = expectedRootFiles();
+
+        IOFileFilter expectedRootFileFilter = new AbstractFileFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                if (dir.getAbsolutePath().equals(validatedRepositoryAbsolutePath) &&
+                        ArrayUtils.contains(expectedRootFiles, name.toLowerCase())) {
+                    return true;
+                }
+                return false;
+            }
+        };
+
+        return expectedRootFileFilter;
+    }
 
     @Bean
     public IOFileFilter defaultFilter() {
@@ -185,18 +213,14 @@ public class ValidatorConfig {
     
     @Bean
     public IOFileFilter suspiciousFileValidatorFilter() {
-        return defaultFilter();
+        return and(defaultFilter(), notFileFilter(expectedRootFilesFilter()));
     }
 
     @Bean
     public IOFileFilter checksumValidatorFilter() {
-        return and(
-                defaultFilter(), 
-                notFileFilter(nameFileFilter("example-settings.xml", INSENSITIVE)),
-                notFileFilter(nameFileFilter("readme.txt", INSENSITIVE)),
-                notFileFilter(nameFileFilter("readme.md", INSENSITIVE)));
+        return and(defaultFilter(), notFileFilter(expectedRootFilesFilter()));
     }
-
+    
     @Bean
     public IOFileFilter bomAmbiguousVersionValidatorFilter() {
         return defaultFilter();

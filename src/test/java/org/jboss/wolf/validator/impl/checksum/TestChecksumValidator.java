@@ -1,8 +1,5 @@
 package org.jboss.wolf.validator.impl.checksum;
 
-import static org.apache.commons.io.IOCase.INSENSITIVE;
-import static org.apache.commons.io.filefilter.FileFilterUtils.and;
-import static org.apache.commons.io.filefilter.FileFilterUtils.nameFileFilter;
 import static org.apache.commons.io.filefilter.FileFilterUtils.notFileFilter;
 import static org.jboss.wolf.validator.impl.TestUtil.pom;
 import static org.junit.Assert.assertTrue;
@@ -10,11 +7,11 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.IOException;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.jboss.wolf.validator.impl.AbstractTest;
-import org.jboss.wolf.validator.impl.checksum.ChecksumNotExistException;
-import org.jboss.wolf.validator.impl.checksum.ChecksumNotMatchException;
 import org.junit.Test;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,13 +22,13 @@ public class TestChecksumValidator extends AbstractTest {
 
     @Configuration
     public static class TestConfiguration {
+        
+        @Resource(name = "expectedRootFilesFilter")
+        private IOFileFilter expectedRootFilesFilter;
 
         @Bean
         public IOFileFilter checksumValidatorFilter() {
-            return and(
-                    notFileFilter(nameFileFilter("example-settings.xml", INSENSITIVE)),
-                    notFileFilter(nameFileFilter("readme.txt", INSENSITIVE)),
-                    notFileFilter(nameFileFilter("readme.md", INSENSITIVE)));
+            return notFileFilter(expectedRootFilesFilter);
         }
 
     }

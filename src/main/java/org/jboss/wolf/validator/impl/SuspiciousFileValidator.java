@@ -26,9 +26,7 @@ public class SuspiciousFileValidator implements Validator {
     
     private static final String[] CHECKSUM_EXTENSIONS = { "sha1", "md5" };
     private static final String[] ATTACHED_ARTIFACT_TYPES = { "-sources.jar", "-javadoc.jar", "-tests.jar" };
-    private static final String[] ROOT_FILES = { "readme.md", "readme.txt", "example-settings.xml", "JBossEULA.txt" };
 
-    private final String[] rootFiles;
     private final String[] attachedArtifactTypes;
     private final String[] checsumExtensions;
     
@@ -36,14 +34,12 @@ public class SuspiciousFileValidator implements Validator {
     private IOFileFilter fileFilter;
     
     public SuspiciousFileValidator() {
-        this.rootFiles = ROOT_FILES;
         this.attachedArtifactTypes = ATTACHED_ARTIFACT_TYPES;
         this.checsumExtensions = CHECKSUM_EXTENSIONS;
     }
 
-    public SuspiciousFileValidator(String[] rootFiles, String[] attachedArtifactTypes, String[] checsumExtensions) {
+    public SuspiciousFileValidator(String[] attachedArtifactTypes, String[] checsumExtensions) {
         super();
-        this.rootFiles = rootFiles;
         this.attachedArtifactTypes = attachedArtifactTypes;
         this.checsumExtensions = checsumExtensions;
     }
@@ -98,14 +94,6 @@ public class SuspiciousFileValidator implements Validator {
                 fail(ctx, file, "jar file without pom");
             }
             return;
-        }
-
-        if (ctx.getValidatedRepository().getAbsolutePath().equals(file.getParentFile().getAbsolutePath())) {
-            for (String rootFile : rootFiles) {
-                if (fileName.equalsIgnoreCase(rootFile)) {
-                    return; // expected files
-                }
-            }
         }
 
         fail(ctx, file, "suspicious");

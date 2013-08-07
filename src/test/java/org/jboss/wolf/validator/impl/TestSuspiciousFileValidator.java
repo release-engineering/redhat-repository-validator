@@ -7,6 +7,8 @@ import static org.apache.commons.io.filefilter.FileFilterUtils.notFileFilter;
 import java.io.File;
 import java.io.IOException;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.junit.Before;
@@ -20,10 +22,14 @@ public class TestSuspiciousFileValidator extends AbstractTest {
 
     @Configuration
     public static class TestConfiguration {
+        
+        @Resource(name = "expectedRootFilesFilter")
+        private IOFileFilter expectedRootFilesFilter;
 
         @Bean
         public IOFileFilter suspiciousFileValidatorFilter() {
             return and(
+                    notFileFilter(expectedRootFilesFilter),
                     notFileFilter(nameFileFilter("expected-directory")),
                     notFileFilter(nameFileFilter("expected-file")));
         }
