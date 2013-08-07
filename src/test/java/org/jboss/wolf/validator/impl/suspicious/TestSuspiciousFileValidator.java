@@ -128,7 +128,7 @@ public class TestSuspiciousFileValidator extends AbstractTest {
         assertSuccess();
     }
 
-    private void touch(String file) {
+    public static void touch(String file) {
         try {
             FileUtils.touch(new File(repoFooDir, file));
         } catch (IOException e) {
