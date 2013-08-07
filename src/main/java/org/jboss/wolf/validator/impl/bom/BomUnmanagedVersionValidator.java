@@ -61,6 +61,8 @@ public class BomUnmanagedVersionValidator implements Validator {
                 if (bomFilter.isBom(model)) {
                     boms.add(model);
                 }
+            } else if( model.getPackaging().equals("maven-plugin") || model.getPackaging().equals("maven-archetype") ) {
+                // skip, maven plugins and archetypes are not managed in boms
             } else {
                 projects.add(model);
             }

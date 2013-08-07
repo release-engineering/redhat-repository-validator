@@ -81,4 +81,18 @@ public class TestBomUnmanagedVersionValidator extends AbstractTest {
         assertExpectedException(BomUnmanagedVersionException.class, "artifact com.acme:foo-impl:jar:2.0 is unmanaged");
     }
     
+    @Test
+    public void shouldIgnorePlugins() {
+        pom().artifactId("foo-plugin").packaging("maven-plugin").create(repoFooDir);
+        validator.validate(ctx);
+        assertSuccess();
+    }
+    
+    @Test
+    public void shouldIgnoreArchetypes() {
+        pom().artifactId("foo-archetype").packaging("maven-archetype").create(repoFooDir);
+        validator.validate(ctx);
+        assertSuccess();
+    }
+    
 }
