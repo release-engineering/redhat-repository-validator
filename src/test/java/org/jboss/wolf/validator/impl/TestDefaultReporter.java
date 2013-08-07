@@ -8,6 +8,7 @@ import java.io.File;
 import org.apache.commons.lang3.StringUtils;
 import org.jboss.wolf.validator.impl.checksum.ChecksumNotExistException;
 import org.jboss.wolf.validator.impl.checksum.ChecksumNotMatchException;
+import org.jboss.wolf.validator.impl.suspicious.SuspiciousFileException;
 import org.junit.Test;
 
 public class TestDefaultReporter extends AbstractReporterTest {

@@ -1,4 +1,4 @@
-package org.jboss.wolf.validator.impl;
+package org.jboss.wolf.validator.impl.suspicious;
 
 import static org.apache.commons.io.FileUtils.listFilesAndDirs;
 import static org.apache.commons.io.FilenameUtils.isExtension;

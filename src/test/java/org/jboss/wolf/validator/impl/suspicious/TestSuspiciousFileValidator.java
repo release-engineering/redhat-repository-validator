@@ -1,4 +1,4 @@
-package org.jboss.wolf.validator.impl;
+package org.jboss.wolf.validator.impl.suspicious;
 
 import static org.apache.commons.io.filefilter.FileFilterUtils.and;
 import static org.apache.commons.io.filefilter.FileFilterUtils.nameFileFilter;
@@ -11,6 +11,8 @@ import javax.annotation.Resource;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
+import org.jboss.wolf.validator.impl.AbstractTest;
+import org.jboss.wolf.validator.impl.suspicious.SuspiciousFileException;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.annotation.Bean;
