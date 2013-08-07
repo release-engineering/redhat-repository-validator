@@ -7,7 +7,7 @@ import org.jboss.wolf.validator.impl.AbstractTest;
 import org.junit.Test;
 import org.springframework.test.context.ContextConfiguration;
 
-@ContextConfiguration(locations = "TestSuspiciousFileValidatorWithFilterInXml-context.xml", inheritLocations = false)
+@ContextConfiguration(locations = "classpath*:TestSuspiciousFileValidatorWithFilterInXml-context.xml", inheritLocations = false)
 public class TestSuspiciousFileValidatorWithFilterInXml extends AbstractTest {
 
     @Test
