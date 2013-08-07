@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.graph.DependencyNode;
 import org.jboss.wolf.validator.ValidatorContext;
 
 public class Utils {
@@ -21,12 +22,25 @@ public class Utils {
     }
     
     public static List<Artifact> sortArtifacts(Collection<Artifact> artifacts) {
-        ArrayList<Artifact> result = new ArrayList<Artifact>(artifacts);
+        List<Artifact> result = new ArrayList<Artifact>(artifacts);
         Collections.sort(result, new Comparator<Artifact>() {
             @Override
             public int compare(Artifact a1, Artifact a2) {
                 String gav1 = a1.toString();
                 String gav2 = a2.toString();
+                return gav1.compareTo(gav2);
+            }
+        });
+        return result;
+    }
+    
+    public static List<DependencyNode> sortDependencyNodes(Collection<DependencyNode> nodes) {
+        List<DependencyNode> result = new ArrayList<DependencyNode>(nodes);
+        Collections.sort(result, new Comparator<DependencyNode>() {
+            @Override
+            public int compare(DependencyNode n1, DependencyNode n2) {
+                String gav1 = n1.getArtifact().toString();
+                String gav2 = n2.getArtifact().toString();
                 return gav1.compareTo(gav2);
             }
         });

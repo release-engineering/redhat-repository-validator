@@ -74,8 +74,7 @@ public class BomDependencyNotFoundValidator implements Validator {
         try {
             repositorySystem.resolveDependencies(repositorySystemSession, dependencyRequest);
         } catch (DependencyResolutionException e) {
-            Exception bomDependencyNotFoundException = new BomDependencyNotFoundException(bom.getPomFile(), e);
-            ctx.addException(bom.getPomFile(), bomDependencyNotFoundException);
+            ctx.addException(bom.getPomFile(), new BomDependencyNotFoundException(e));
         }
     }
 

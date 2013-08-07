@@ -1,6 +1,7 @@
 package org.jboss.wolf.validator.impl;
 
 import static org.jboss.wolf.validator.internal.Utils.sortArtifacts;
+import static org.jboss.wolf.validator.internal.Utils.sortDependencyNodes;
 
 import java.io.PrintStream;
 import java.util.List;
@@ -11,9 +12,13 @@ import javax.inject.Named;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.collection.DependencyCollectionException;
+import org.eclipse.aether.graph.DefaultDependencyNode;
+import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.DependencyResolutionException;
+import org.eclipse.aether.util.filter.PatternInclusionsDependencyFilter;
+import org.eclipse.aether.util.graph.visitor.PathRecordingDependencyVisitor;
 import org.jboss.wolf.validator.Reporter;
 import org.jboss.wolf.validator.ValidatorContext;
 import org.springframework.core.annotation.Order;
@@ -29,43 +34,66 @@ public class DependencyNotFoundReporter implements Reporter {
     private PrintStream out;
 
     @Override
-    public void report(ValidatorContext ctx) {
-        ListMultimap<Artifact, Artifact> artifactNotFoundMap = ArrayListMultimap.create();
-        
-        List<DependencyCollectionException> dependencyCollectionExceptions = ctx.getExceptions(DependencyCollectionException.class);
-        for (DependencyCollectionException e : dependencyCollectionExceptions) {
-            Artifact from = e.getResult().getRequest().getRoot().getArtifact();
-            findMissingDependencies(artifactNotFoundMap, e, from);
-            ctx.addProcessedException(e);
-        }
-
-        List<DependencyResolutionException> dependencyResolutionExceptions = ctx.getExceptions(DependencyResolutionException.class);
-        for (DependencyResolutionException e : dependencyResolutionExceptions) {
-            Artifact from = e.getResult().getRoot().getDependency().getArtifact();
-            findMissingDependencies(artifactNotFoundMap, e, from);
-            ctx.addProcessedException(e);
-        }
-
-        if( !artifactNotFoundMap.isEmpty() ) {
-            out.println("--- DEPENDENCY NOT FOUND REPORT ---");
-            out.println("Found " + artifactNotFoundMap.keySet().size() + " missing dependencies.");
-            for (Artifact artifact : sortArtifacts(artifactNotFoundMap.keySet())) {
-                out.println(artifact);
-                List<Artifact> roots = sortArtifacts(artifactNotFoundMap.get(artifact));
-                for (Artifact root : roots) {
-                    out.println("    in: " + root);
-                }
-            }
+    public final void report(ValidatorContext ctx) {
+        ListMultimap<Artifact, DependencyNode> artifactNotFoundMap = ArrayListMultimap.create();
+        collectMissingDependencies(ctx, artifactNotFoundMap);
+        if (!artifactNotFoundMap.isEmpty()) {
+            printHeader(artifactNotFoundMap);
+            printMissingDependencies(artifactNotFoundMap);
             out.println();
             out.flush();
         }
     }
 
-    private void findMissingDependencies(ListMultimap<Artifact, Artifact> artifactNotFoundMap, Exception e, Artifact from) {
+    protected void collectMissingDependencies(ValidatorContext ctx, ListMultimap<Artifact, DependencyNode> artifactNotFoundMap) {
+        List<DependencyCollectionException> dependencyCollectionExceptions = ctx.getExceptions(DependencyCollectionException.class);
+        for (DependencyCollectionException e : dependencyCollectionExceptions) {
+            DependencyNode from = new DefaultDependencyNode(e.getResult().getRequest().getRoot());
+            collectMissingDependencies(artifactNotFoundMap, e, from);
+            ctx.addProcessedException(e);
+        }
+    
+        List<DependencyResolutionException> dependencyResolutionExceptions = ctx.getExceptions(DependencyResolutionException.class);
+        for (DependencyResolutionException e : dependencyResolutionExceptions) {
+            DependencyNode from = e.getResult().getRoot();
+            collectMissingDependencies(artifactNotFoundMap, e, from);
+            ctx.addProcessedException(e);
+        }
+    }
+
+    protected void collectMissingDependencies(ListMultimap<Artifact, DependencyNode> artifactNotFoundMap, Exception e, DependencyNode from) {
         ArtifactResolutionException artifactResolutionException = findCause(e, ArtifactResolutionException.class);
         for (ArtifactResult artifactResult : artifactResolutionException.getResults()) {
             if (!artifactResult.isResolved()) {
                 artifactNotFoundMap.put(artifactResult.getRequest().getArtifact(), from);
+            }
+        }
+    }
+
+    protected void printHeader(ListMultimap<Artifact, DependencyNode> artifactNotFoundMap) {
+        out.println("--- DEPENDENCY NOT FOUND REPORT ---");
+        out.println("Found " + artifactNotFoundMap.keySet().size() + " missing dependencies.");
+    }
+
+    protected void printMissingDependencies(ListMultimap<Artifact, DependencyNode> artifactNotFoundMap) {
+        for (Artifact artifact : sortArtifacts(artifactNotFoundMap.keySet())) {
+            out.println("miss: " + artifact);
+            List<DependencyNode> roots = sortDependencyNodes(artifactNotFoundMap.get(artifact));
+            for (DependencyNode root : roots) {
+                out.println("    from: " + root.getArtifact());
+                PathRecordingDependencyVisitor pathVisitor = new PathRecordingDependencyVisitor(new PatternInclusionsDependencyFilter(artifact.toString()));
+                root.accept(pathVisitor);
+                List<List<DependencyNode>> paths = pathVisitor.getPaths();
+                for (List<DependencyNode> path : paths) {
+                    out.print("        path: ");
+                    for (int i = 0; i < path.size(); i++) {
+                        out.print(path.get(i).getArtifact());
+                        if (i != path.size() - 1) {
+                            out.print(" > ");
+                        }
+                    }
+                    out.println();
+                }
             }
         }
     }

@@ -1,20 +1,20 @@
 package org.jboss.wolf.validator.impl.bom;
 
-import java.io.File;
+import org.eclipse.aether.resolution.DependencyResolutionException;
 
 public class BomDependencyNotFoundException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    private final File bomFile;
+    private final DependencyResolutionException dependencyResolutionException;
 
-    public BomDependencyNotFoundException(File bomFile, Exception cause) {
-        super("BOM " + bomFile.getName() + " dependency not found: " + cause.getMessage(), cause);
-        this.bomFile = bomFile;
+    public BomDependencyNotFoundException(DependencyResolutionException dependencyResolutionException) {
+        super(dependencyResolutionException);
+        this.dependencyResolutionException = dependencyResolutionException;
     }
 
-    public File getBomFile() {
-        return bomFile;
+    public DependencyResolutionException getDependencyResolutionException() {
+        return dependencyResolutionException;
     }
 
 }

@@ -275,7 +275,12 @@ public class ValidatorConfig {
     public PrintStream dependencyNotFoundReporterStream() {
         return defaultReporterStream();
     }
-
+    
+    @Bean
+    public PrintStream bomDependencyNotFoundReporterStream() {
+        return defaultReporterStream();
+    }
+    
     @Bean
     public LocalRepository localRepository() {
         return new LocalRepository(localRepository);
