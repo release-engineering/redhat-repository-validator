@@ -3,7 +3,7 @@ package org.jboss.wolf.validator.impl.bom;
 import static org.jboss.wolf.validator.internal.Utils.relativize;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.Iterator;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -44,11 +44,14 @@ public class BomDependencyNotFoundValidator implements Validator {
 
     @Override
     public void validate(ValidatorContext ctx) {
-        List<Model> models = validatorSupport.resolveEffectiveModels(ctx, fileFilter);
-        for (Model model : models) {
-            if( bomFilter.isBom(model) ) {
-                logger.trace("validating {}", relativize(ctx, model.getPomFile()));
-                validateBomDependencies(ctx, model);
+        Iterator<Model> modelIterator = validatorSupport.effectiveModelIterator(ctx, fileFilter);
+        while (modelIterator.hasNext()) {
+            Model model = modelIterator.next();
+            if (model != null) {
+                if (bomFilter.isBom(model)) {
+                    logger.trace("validating {}", relativize(ctx, model.getPomFile()));
+                    validateBomDependencies(ctx, model);
+                }
             }
         }
     }

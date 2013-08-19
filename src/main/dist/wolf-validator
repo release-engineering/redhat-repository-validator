@@ -1,1 +1,1 @@
-java -Dlogback.configurationFile=wolf-validator-logback.xml -classpath "wolf-validator.jar:lib/*" org.jboss.wolf.validator.ValidatorRunner "$@"
+java -Xmx1024m -Dlogback.configurationFile=wolf-validator-logback.xml -classpath "wolf-validator.jar:lib/*" org.jboss.wolf.validator.ValidatorRunner "$@"

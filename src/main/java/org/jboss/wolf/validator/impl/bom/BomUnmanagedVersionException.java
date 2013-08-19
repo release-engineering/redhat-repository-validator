@@ -1,20 +1,18 @@
 package org.jboss.wolf.validator.impl.bom;
 
-import org.apache.maven.model.Model;
-
 public class BomUnmanagedVersionException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    private final Model model;
+    private final String gav;
 
-    public BomUnmanagedVersionException(Model model) {
-        super("Artifact " + model + " is unmanaged, its version is not managed in BOMs");
-        this.model = model;
+    public BomUnmanagedVersionException(String gav) {
+        super("Artifact " + gav + " is unmanaged, its version is not managed in BOMs");
+        this.gav = gav;
     }
 
-    public Model getModel() {
-        return model;
+    public String getGav() {
+        return gav;
     }
 
 }

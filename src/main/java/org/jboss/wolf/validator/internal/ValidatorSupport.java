@@ -1,5 +1,6 @@
 package org.jboss.wolf.validator.internal;
 
+import static org.apache.commons.io.FileUtils.iterateFiles;
 import static org.apache.commons.io.FileUtils.listFiles;
 import static org.apache.commons.io.filefilter.FileFilterUtils.and;
 import static org.apache.commons.io.filefilter.FileFilterUtils.suffixFileFilter;
@@ -9,6 +10,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -46,23 +48,40 @@ public class ValidatorSupport {
         Collection<File> pomFiles = listFiles(dir, and(filter, suffixFileFilter(".pom")), trueFileFilter());
         return pomFiles;
     }
-
-    public List<Model> resolveEffectiveModels(final ValidatorContext ctx, IOFileFilter fileFilter) {
-        List<Model> models = new ArrayList<Model>();
-        for (File pomFile : listPomFiles(ctx.getValidatedRepository(), fileFilter)) {
-            DefaultModelBuildingRequest request = new DefaultModelBuildingRequest(modelBuildingRequestTemplate);
-            request.setPomFile(pomFile);
-            request.setModelSource(new FileModelSource(pomFile));
-            try {
-                ModelBuildingResult result = modelBuilder.build(request);
-                Model model = result.getEffectiveModel();
-                models.add(model);
-            } catch (ModelBuildingException e) {
-                // this pom file will not be present in result, 
-                // it is not possible to build effective model
+    
+    public Iterator<Model> effectiveModelIterator(final ValidatorContext ctx, IOFileFilter filter) {
+        final Iterator<File> fileIterator = iterateFiles(ctx.getValidatedRepository(), and(filter, suffixFileFilter(".pom")), trueFileFilter());
+        final Iterator<Model> modelIterator = new Iterator<Model>() {
+            
+            @Override
+            public boolean hasNext() {
+                return fileIterator.hasNext();
             }
-        }
-        return models;
+            
+            @Override
+            public Model next() {
+                File file = fileIterator.next();
+                DefaultModelBuildingRequest request = new DefaultModelBuildingRequest(modelBuildingRequestTemplate);
+                request.setPomFile(file);
+                request.setModelSource(new FileModelSource(file));
+                try {
+                    ModelBuildingResult result = modelBuilder.build(request);
+                    Model model = result.getEffectiveModel();
+                    return model;
+                } catch (ModelBuildingException e) {
+                    // this pom file will not be present in result, 
+                    // it is not possible to build effective model
+                }
+                return null;
+            }
+            
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+        };
+        
+        return modelIterator;
     }
     
     // copy from DefaultArtifactDescriptorReader

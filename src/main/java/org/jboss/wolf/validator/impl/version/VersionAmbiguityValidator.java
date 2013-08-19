@@ -1,6 +1,7 @@
 package org.jboss.wolf.validator.impl.version;
 
 import java.io.File;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -33,11 +34,14 @@ public class VersionAmbiguityValidator implements Validator {
     }
 
     private void collectVersions(ValidatorContext ctx, ListMultimap<String, File> ga2filesMap, ListMultimap<String, String> ga2versionsMap) {
-        List<Model> models = validatorSupport.resolveEffectiveModels(ctx, fileFilter);
-        for (Model model : models) {
-            String ga = model.getGroupId() + ":" + model.getArtifactId();
-            ga2filesMap.put(ga, model.getPomFile());
-            ga2versionsMap.put(ga, model.getVersion());
+        Iterator<Model> modelIterator = validatorSupport.effectiveModelIterator(ctx, fileFilter);
+        while (modelIterator.hasNext()) {
+            Model model = modelIterator.next();
+            if (model != null) {
+                String ga = model.getGroupId() + ":" + model.getArtifactId();
+                ga2filesMap.put(ga, model.getPomFile());
+                ga2versionsMap.put(ga, model.getVersion());
+            }
         }
     }
 

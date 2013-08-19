@@ -1,7 +1,11 @@
 package org.jboss.wolf.validator.impl.bom;
 
+import static org.jboss.wolf.validator.internal.Utils.relativize;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -34,45 +38,48 @@ public class BomAmbiguousVersionValidator implements Validator {
     }
     
     private void validateAmbiguousVersions(ValidatorContext ctx) {
-        Map<DepKey, Map<DepVersion, List<Pair<Dependency, Model>>>> dependencies = collectDependencies(ctx);
+        Map<DepKey, Map<DepVersion, List<Pair<Dependency, File>>>> dependencies = collectDependencies(ctx);
         for (DepKey depKey : dependencies.keySet()) {
-            Map<DepVersion, List<Pair<Dependency, Model>>> versions = dependencies.get(depKey);
+            Map<DepVersion, List<Pair<Dependency, File>>> versions = dependencies.get(depKey);
             if (versions.size() > 1) {
-                List<Pair<Dependency, Model>> ambiguousDependencies = new ArrayList<Pair<Dependency, Model>>();
-                for (Entry<DepVersion, List<Pair<Dependency, Model>>> versionEntry : versions.entrySet()) {
+                List<Pair<Dependency, File>> ambiguousDependencies = new ArrayList<Pair<Dependency, File>>();
+                for (Entry<DepVersion, List<Pair<Dependency, File>>> versionEntry : versions.entrySet()) {
                     ambiguousDependencies.addAll(versionEntry.getValue());
                 }
                 Exception ambiguousVersionException = new BomAmbiguousVersionException(ambiguousDependencies.get(0).getKey().getManagementKey(), ambiguousDependencies);
-                for (Pair<Dependency, Model> ambiguousDependency : ambiguousDependencies) {
-                    ctx.addException(ambiguousDependency.getValue().getPomFile(), ambiguousVersionException);
+                for (Pair<Dependency, File> ambiguousDependency : ambiguousDependencies) {
+                    ctx.addException(ambiguousDependency.getValue(), ambiguousVersionException);
                 }
             }
         }
     }
 
-    private Map<DepKey, Map<DepVersion, List<Pair<Dependency, Model>>>> collectDependencies(ValidatorContext ctx) {
-        Map<DepKey, Map<DepVersion, List<Pair<Dependency, Model>>>> dependencies = new HashMap<DepKey, Map<DepVersion, List<Pair<Dependency, Model>>>>();
+    private Map<DepKey, Map<DepVersion, List<Pair<Dependency, File>>>> collectDependencies(ValidatorContext ctx) {
+        Map<DepKey, Map<DepVersion, List<Pair<Dependency, File>>>> dependencies = new HashMap<DepKey, Map<DepVersion, List<Pair<Dependency, File>>>>();
         
-        List<Model> models = validatorSupport.resolveEffectiveModels(ctx, fileFilter);
-        for (Model model : models) {
-            if( bomFilter.isBom(model) ) {
-                for (Dependency dependency : model.getDependencyManagement().getDependencies()) {
-                    DepKey depKey = new DepKey(dependency);
-                    DepVersion depVersion = new DepVersion(dependency);
+        Iterator<Model> modelIterator = validatorSupport.effectiveModelIterator(ctx, fileFilter);
+        while (modelIterator.hasNext()) {
+            Model model = modelIterator.next();
+            if (model != null) {
+                if( bomFilter.isBom(model) ) {
+                    for (Dependency dependency : model.getDependencyManagement().getDependencies()) {
+                        DepKey depKey = new DepKey(dependency);
+                        DepVersion depVersion = new DepVersion(dependency);
 
-                    Map<DepVersion, List<Pair<Dependency, Model>>> versions = dependencies.get(depKey);
-                    if (versions == null) {
-                        versions = new HashMap<DepVersion, List<Pair<Dependency, Model>>>();
-                        dependencies.put(depKey, versions);
+                        Map<DepVersion, List<Pair<Dependency, File>>> versions = dependencies.get(depKey);
+                        if (versions == null) {
+                            versions = new HashMap<DepVersion, List<Pair<Dependency, File>>>();
+                            dependencies.put(depKey, versions);
+                        }
+
+                        List<Pair<Dependency, File>> pairs = versions.get(depVersion);
+                        if (pairs == null) {
+                            pairs = new ArrayList<Pair<Dependency, File>>();
+                            versions.put(depVersion, pairs);
+                        }
+
+                        pairs.add(new ImmutablePair<Dependency, File>(dependency, relativize(ctx, model.getPomFile())));
                     }
-
-                    List<Pair<Dependency, Model>> pairs = versions.get(depVersion);
-                    if (pairs == null) {
-                        pairs = new ArrayList<Pair<Dependency, Model>>();
-                        versions.put(depVersion, pairs);
-                    }
-
-                    pairs.add(new ImmutablePair<Dependency, Model>(dependency, model));
                 }
             }
         }

@@ -4,7 +4,7 @@ import static org.jboss.wolf.validator.internal.Utils.relativize;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
+import java.util.Iterator;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -43,10 +43,13 @@ public class VersionOverlapValidator implements Validator {
 
     @Override
     public void validate(ValidatorContext ctx) {
-        List<Model> models = validatorSupport.resolveEffectiveModels(ctx, fileFilter);
-        for (Model model : models) {
-            logger.trace("validating {}", relativize(ctx, model.getPomFile()));
-            validateVersionOverlap(ctx, model);
+        Iterator<Model> modelIterator = validatorSupport.effectiveModelIterator(ctx, fileFilter);
+        while (modelIterator.hasNext()) {
+            Model model = modelIterator.next();
+            if (model != null) {
+                logger.trace("validating {}", relativize(ctx, model.getPomFile()));
+                validateVersionOverlap(ctx, model);
+            }
         }
     }
 

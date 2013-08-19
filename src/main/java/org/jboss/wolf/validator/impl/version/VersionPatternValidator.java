@@ -2,7 +2,7 @@ package org.jboss.wolf.validator.impl.version;
 
 import static org.jboss.wolf.validator.internal.Utils.relativize;
 
-import java.util.List;
+import java.util.Iterator;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
@@ -40,10 +40,13 @@ public class VersionPatternValidator implements Validator {
 
     @Override
     public void validate(ValidatorContext ctx) {
-        List<Model> models = validatorSupport.resolveEffectiveModels(ctx, fileFilter);
-        for (Model model : models) {
-            logger.trace("validating {}", relativize(ctx, model.getPomFile()));
-            validateVersionPattern(ctx, model);
+        Iterator<Model> modelIterator = validatorSupport.effectiveModelIterator(ctx, fileFilter);
+        while (modelIterator.hasNext()) {
+            Model model = modelIterator.next();
+            if (model != null) {
+                logger.trace("validating {}", relativize(ctx, model.getPomFile()));
+                validateVersionPattern(ctx, model);
+            }
         }
     }
 

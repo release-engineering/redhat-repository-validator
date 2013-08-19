@@ -73,7 +73,7 @@ public class BomUnmanagedVersionValidator implements Validator {
         for (Model project : projects) {
             Model bom = findBom(boms, project);
             if( bom == null ) {
-                ctx.addException(project.getPomFile(), new BomUnmanagedVersionException(project));
+                ctx.addException(project.getPomFile(), new BomUnmanagedVersionException(project.getId()));
             } else {
                 logger.debug("project `{}` managed in bom `{}`", project, bom);
             }
