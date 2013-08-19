@@ -49,23 +49,24 @@ public class DependencyNotFoundReporter implements Reporter {
         List<DependencyCollectionException> dependencyCollectionExceptions = ctx.getExceptions(DependencyCollectionException.class);
         for (DependencyCollectionException e : dependencyCollectionExceptions) {
             DependencyNode from = new DefaultDependencyNode(e.getResult().getRequest().getRoot());
-            collectMissingDependencies(artifactNotFoundMap, e, from);
-            ctx.addProcessedException(e);
+            collectMissingDependencies(ctx, artifactNotFoundMap, e, from);
         }
     
         List<DependencyResolutionException> dependencyResolutionExceptions = ctx.getExceptions(DependencyResolutionException.class);
         for (DependencyResolutionException e : dependencyResolutionExceptions) {
             DependencyNode from = e.getResult().getRoot();
-            collectMissingDependencies(artifactNotFoundMap, e, from);
-            ctx.addProcessedException(e);
+            collectMissingDependencies(ctx, artifactNotFoundMap, e, from);
         }
     }
 
-    protected void collectMissingDependencies(ListMultimap<Artifact, DependencyNode> artifactNotFoundMap, Exception e, DependencyNode from) {
+    protected void collectMissingDependencies(ValidatorContext ctx, ListMultimap<Artifact, DependencyNode> artifactNotFoundMap, Exception e, DependencyNode from) {
         ArtifactResolutionException artifactResolutionException = findCause(e, ArtifactResolutionException.class);
-        for (ArtifactResult artifactResult : artifactResolutionException.getResults()) {
-            if (!artifactResult.isResolved()) {
-                artifactNotFoundMap.put(artifactResult.getRequest().getArtifact(), from);
+        if (artifactResolutionException != null) {
+            ctx.addProcessedException(e);
+            for (ArtifactResult artifactResult : artifactResolutionException.getResults()) {
+                if (!artifactResult.isResolved()) {
+                    artifactNotFoundMap.put(artifactResult.getRequest().getArtifact(), from);
+                }
             }
         }
     }

@@ -26,8 +26,7 @@ public class BomDependencyNotFoundReporter extends DependencyNotFoundReporter {
         List<BomDependencyNotFoundException> bomDependencyNotFoundExceptions = ctx.getExceptions(BomDependencyNotFoundException.class);
         for (BomDependencyNotFoundException e : bomDependencyNotFoundExceptions) {
             DependencyNode from = e.getDependencyResolutionException().getResult().getRoot();
-            collectMissingDependencies(artifactNotFoundMap, e, from);
-            ctx.addProcessedException(e);
+            collectMissingDependencies(ctx, artifactNotFoundMap, e, from);
         }
     }
     
