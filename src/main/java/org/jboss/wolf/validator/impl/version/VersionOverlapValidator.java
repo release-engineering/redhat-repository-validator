@@ -88,7 +88,7 @@ public class VersionOverlapValidator implements Validator {
     }
 
     private File createTempLocalRepository() {
-        File tempLocalRepository = new File(FileUtils.getTempDirectory(), "wolf-validator-temp");
+        File tempLocalRepository = new File("workspace", "temp");
         try {
             FileUtils.forceMkdir(tempLocalRepository);
         } catch (IOException e) {
