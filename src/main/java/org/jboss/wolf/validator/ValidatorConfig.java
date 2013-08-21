@@ -96,7 +96,12 @@ public class ValidatorConfig {
             public void validate(ValidatorContext ctx) {
                 for (Validator validator : validators) {
                     logger.debug("starting {}", validator.getClass().getSimpleName());
-                    validator.validate(ctx);
+                    try {
+                        validator.validate(ctx);
+                    } catch (RuntimeException e) {
+                        logger.error("validator " + validator.getClass().getSimpleName() + " ended with unexpected exception!", e);
+                        ctx.addException(ctx.getValidatedRepository(), e);
+                    }
                 }
             }
         };
@@ -110,7 +115,11 @@ public class ValidatorConfig {
             @Override
             public void report(ValidatorContext ctx) {
                 for (Reporter reporter : reporters) {
-                    reporter.report(ctx);
+                    try {
+                        reporter.report(ctx);
+                    } catch(RuntimeException e) {
+                        logger.error("reporter " + reporter.getClass().getSimpleName() + " ended with unexpected exception!", e);
+                    }
                 }
             }
         };

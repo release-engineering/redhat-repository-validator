@@ -11,6 +11,7 @@ import java.io.PrintStream;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
@@ -146,12 +147,29 @@ public class TestValidatorRunner {
         validatorRunner = new ValidatorRunner() {
             @Override
             protected void runValidation() {
+                String[] validatorNames = appCtx.getBeanNamesForType(Validator.class);
+                assertTrue(ArrayUtils.contains(validatorNames, "stubValidator"));
+            };
+        };
+        validatorRunner.run("--config", getClass().getResource("/TestValidatorRunner-stubValidatorAdditionally.xml").getFile());
+    }
+    
+    @Test
+    public void shouldSurviveUnexpectedExceptionInValidator() {
+        validatorRunner = new ValidatorRunner() {
+            @Override
+            protected void runValidation() {
                 try {
-                    validator.validate(context);
-                    fail();
-                } catch (RuntimeException e) {
-                    assertTrue(e.getMessage().equals("stubValidator"));
+                    FileUtils.forceMkdir(context.getValidatedRepository());
+                } catch (IOException e) {
+                    // noop
                 }
+                
+                validator.validate(context);
+                
+                List<Exception> exceptions = context.getExceptions(context.getValidatedRepository());
+                assertEquals(exceptions.size(), 1);
+                assertEquals(exceptions.get(0).getMessage(), "stubValidator");
             };
         };
         validatorRunner.run("--config", getClass().getResource("/TestValidatorRunner-stubValidatorAdditionally.xml").getFile());
@@ -174,7 +192,7 @@ public class TestValidatorRunner {
         validatorRunner = new AssertReportFileRunner(new File("workspace/bar.txt"));
         validatorRunner.run("--config", getClass().getResource("/TestValidatorRunner-defaultReporterStream.xml").getFile());
     }
-
+    
     private void assertOutputContaints(String s) {
         String systemOut = systemOutBuffer.toString();
         if (!systemOut.contains(s)) {
