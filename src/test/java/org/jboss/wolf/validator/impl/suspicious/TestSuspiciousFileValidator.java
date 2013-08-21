@@ -127,6 +127,13 @@ public class TestSuspiciousFileValidator extends AbstractTest {
         validator.validate(ctx);
         assertSuccess();
     }
+    
+    @Test
+    public void shouldIgnoreEmptyValidatedRepository() throws IOException {
+        FileUtils.cleanDirectory(repoFooDir);
+        validator.validate(ctx);
+        assertSuccess();
+    }
 
     public static void touch(String file) {
         try {

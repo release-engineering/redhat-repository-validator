@@ -59,6 +59,10 @@ public class SuspiciousFileValidator implements Validator {
         String fileName = file.getName();
         String fileDir = file.getParent();
         
+        if (file.isDirectory() && file.getAbsolutePath().equals(ctx.getValidatedRepository().getAbsolutePath())) {
+            return;
+        }
+
         if (file.isDirectory()) {
             if (file.list().length == 0) {
                 fail(ctx, file, "empty directory");
