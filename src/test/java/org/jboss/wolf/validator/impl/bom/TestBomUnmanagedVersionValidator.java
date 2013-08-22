@@ -78,7 +78,7 @@ public class TestBomUnmanagedVersionValidator extends AbstractTest {
 
         validator.validate(ctx);
 
-        assertExpectedException(BomUnmanagedVersionException.class, "artifact com.acme:foo-impl:jar:2.0 is unmanaged");
+        assertExpectedException(BomUnmanagedVersionException.class, "artifact com.acme:foo-impl:2.0 is unmanaged");
     }
     
     @Test

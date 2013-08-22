@@ -3,15 +3,14 @@ package org.jboss.wolf.validator.impl.bom;
 import static org.jboss.wolf.validator.internal.ValidatorSupport.listPomFiles;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
@@ -24,6 +23,10 @@ import org.jboss.wolf.validator.Validator;
 import org.jboss.wolf.validator.ValidatorContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Maps;
 
 @Named
 public class BomUnmanagedVersionValidator implements Validator {
@@ -41,14 +44,14 @@ public class BomUnmanagedVersionValidator implements Validator {
 
     @Override
     public void validate(ValidatorContext ctx) {
-        List<Model> boms = new ArrayList<Model>();
-        List<Model> projects = new ArrayList<Model>();
-
-        collectBomsAndProjects(ctx, boms, projects);
-        findUnmanagedVersions(ctx, boms, projects);
+        Map<String, File> projectGavToFileMap = Maps.newHashMap();
+        ListMultimap<String, String> dependencyGavToBomGavMap = ArrayListMultimap.create();
+        
+        collectData(ctx, projectGavToFileMap, dependencyGavToBomGavMap);
+        findUnmanagedVersions(ctx, projectGavToFileMap, dependencyGavToBomGavMap);
     }
 
-    private void collectBomsAndProjects(ValidatorContext ctx, List<Model> boms, List<Model> projects) {
+    private void collectData(ValidatorContext ctx, Map<String, File> projectGavToFileMap, ListMultimap<String, String> dependencyGavToBomGavMap) {
         Collection<File> pomFiles = listPomFiles(ctx.getValidatedRepository(), fileFilter);
         for (File pomFile : pomFiles) {
             if (!ctx.getExceptions(pomFile).isEmpty()) {
@@ -59,38 +62,32 @@ public class BomUnmanagedVersionValidator implements Validator {
             Model model = buildModel(pomFile);
             if (model.getPackaging().equals("pom")) {
                 if (bomFilter.isBom(model)) {
-                    boms.add(model);
+                    String bomGav = model.getGroupId() + ":" + model.getArtifactId() + ":" + model.getVersion();
+                    for (Dependency bomDependency : model.getDependencyManagement().getDependencies()) {
+                        String dependencyGav = bomDependency.getGroupId() + ":" + bomDependency.getArtifactId() + ":" + bomDependency.getVersion();
+                        dependencyGavToBomGavMap.put(dependencyGav, bomGav);
+                    }
                 }
             } else if( model.getPackaging().equals("maven-plugin") || model.getPackaging().equals("maven-archetype") ) {
                 // skip, maven plugins and archetypes are not managed in boms
             } else {
-                projects.add(model);
+                String projectGav = model.getGroupId() + ":" + model.getArtifactId() + ":" + model.getVersion();
+                projectGavToFileMap.put(projectGav, model.getPomFile());
             }
         }
     }
 
-    private void findUnmanagedVersions(ValidatorContext ctx, List<Model> boms, List<Model> projects) {
-        for (Model project : projects) {
-            Model bom = findBom(boms, project);
-            if( bom == null ) {
-                ctx.addException(project.getPomFile(), new BomUnmanagedVersionException(project.getId()));
+    private void findUnmanagedVersions(ValidatorContext ctx, Map<String, File> projectGavToFileMap, ListMultimap<String, String> dependencyGavToBomGavMap) {
+        for (String projectGav : projectGavToFileMap.keySet()) {
+            List<String> bomGavList = dependencyGavToBomGavMap.get(projectGav);
+            if (bomGavList.isEmpty()) {
+                ctx.addException(projectGavToFileMap.get(projectGav), new BomUnmanagedVersionException(projectGav));
             } else {
-                logger.debug("project `{}` managed in bom `{}`", project, bom);
-            }
-        }
-    }
-
-    private Model findBom(List<Model> boms, Model project) {
-        for (Model bom : boms) {
-            for (Dependency bomDependency : bom.getDependencyManagement().getDependencies()) {
-                if (ObjectUtils.equals(project.getGroupId(), bomDependency.getGroupId()) &&
-                        ObjectUtils.equals(project.getArtifactId(), bomDependency.getArtifactId()) &&
-                        ObjectUtils.equals(project.getVersion(), bomDependency.getVersion())) {
-                    return bom;
+                if (logger.isDebugEnabled()) {
+                    logger.debug("project `{}` is managed in boms: `{}`", projectGav, dependencyGavToBomGavMap.get(projectGav));
                 }
             }
         }
-        return null;
     }
 
     private Model buildModel(File pomFile) {
