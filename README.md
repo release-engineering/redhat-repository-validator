@@ -33,7 +33,7 @@ Here is help output:
         -h,--help                          print help and exit
         -lr,--local-repository <dir>       use given local repository,
                                            default value is `workspace/local-repository`
-        -rr,--remote-repository <url>      use given remote repository,
+        -rr,--remote-repository <url>      use given remote repository, this option can be used multiple times,
                                            default remote repository is only maven central
         -vr,--validated-repository <dir>   validate given repository,
                                            default value is `workspace/validated-repository`

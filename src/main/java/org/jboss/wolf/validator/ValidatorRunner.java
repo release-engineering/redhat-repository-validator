@@ -33,7 +33,7 @@ public class ValidatorRunner {
 
     private final Option validatedRepositoryOption = createOption("vr", "validated-repository", "validate given repository, \ndefault value is `workspace/validated-repository`", "dir");
     private final Option localRepositoryOption = createOption("lr", "local-repository", "use given local repository, \ndefault value is `workspace/local-repository`", "dir");
-    private final Option remoteRepositoryOption = createOption("rr", "remote-repository", "use given remote repository, \ndefault remote repository is only maven central", "url");
+    private final Option remoteRepositoryOption = createOption("rr", "remote-repository", "use given remote repository, this option can be used multiple times, \ndefault remote repository is only maven central", "url");
     private final Option reportFileOption = createOption("r", "report", "write generated report into this file, \ndefault location for reports is in `workspace/report.txt`", "file");
     private final Option configOption = createOption("c", "config", "use given configuration file, \ndefault value is `wolf-validator-config.xml`", "file");
     private final Option helpOption = createOption("h", "help", "print help and exit", null);
