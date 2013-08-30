@@ -316,7 +316,7 @@ public class TestDependenciesValidator extends AbstractTest {
     public void shouldNotThrowNPEForUnknownArtifactType() {
         pom().artifactId("foo").packaging("unknown").create(repoFooDir);
         validator.validate(ctx);
-        assertExpectedException(UnknownArtifactTypeException.class, "Unknown artifact type in pom com/acme/foo/1.0/foo-1.0.pom");
+        assertExpectedException(UnknownArtifactTypeException.class, "Unknown artifact type, packaging is unknown in pom com/acme/foo/1.0/foo-1.0.pom");
     }
 
     @Test
