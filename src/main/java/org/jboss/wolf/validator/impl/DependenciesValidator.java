@@ -125,7 +125,7 @@ public class DependenciesValidator implements Validator {
             ArtifactType artifactType = artifactTypeRegistry.get(model.getPackaging());
             
             if (artifactType == null) {
-                ctx.addException(pomFile, new UnknownArtifactTypeException(relativize(ctx, pomFile)));
+                ctx.addException(pomFile, new UnknownArtifactTypeException(model.getPackaging(), relativize(ctx, pomFile)));
                 return false;
             }
 
