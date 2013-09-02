@@ -10,8 +10,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.eclipse.aether.util.filter.PatternInclusionsDependencyFilter;
+import org.eclipse.aether.util.graph.visitor.PathRecordingDependencyVisitor;
 import org.jboss.wolf.validator.ValidatorContext;
 
 public class Utils {
@@ -67,6 +71,32 @@ public class Utils {
             }
         });
         return sortedExceptions;
+    }
+    
+    public static <T extends Exception> T findCause(Throwable e, Class<T> clazz) {
+        int index = ExceptionUtils.indexOfThrowable(e, ArtifactResolutionException.class);
+        if (index != -1) {
+            Throwable[] throwables = ExceptionUtils.getThrowables(e);
+            return clazz.cast(throwables[index]);
+        } else {
+            return null;
+        }
+    }
+    
+    public static String findPathToDependency(Artifact artifact, DependencyNode root) {
+        StringBuilder pathBuilder = new StringBuilder();
+        PathRecordingDependencyVisitor pathVisitor = new PathRecordingDependencyVisitor(new PatternInclusionsDependencyFilter(artifact.toString()));
+        root.accept(pathVisitor);
+        List<List<DependencyNode>> paths = pathVisitor.getPaths();
+        for (List<DependencyNode> path : paths) {
+            for (int i = 0; i < path.size(); i++) {
+                pathBuilder.append(path.get(i).getArtifact());
+                if (i != path.size() - 1) {
+                    pathBuilder.append(" > ");
+                }
+            }
+        }
+        return pathBuilder.toString();
     }
 
 }

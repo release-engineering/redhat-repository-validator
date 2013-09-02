@@ -1,5 +1,7 @@
 package org.jboss.wolf.validator.impl;
 
+import static org.jboss.wolf.validator.internal.Utils.findCause;
+import static org.jboss.wolf.validator.internal.Utils.findPathToDependency;
 import static org.jboss.wolf.validator.internal.Utils.sortArtifacts;
 import static org.jboss.wolf.validator.internal.Utils.sortDependencyNodes;
 
@@ -9,7 +11,6 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.collection.DependencyCollectionException;
 import org.eclipse.aether.graph.DefaultDependencyNode;
@@ -17,8 +18,6 @@ import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.DependencyResolutionException;
-import org.eclipse.aether.util.filter.PatternInclusionsDependencyFilter;
-import org.eclipse.aether.util.graph.visitor.PathRecordingDependencyVisitor;
 import org.jboss.wolf.validator.Reporter;
 import org.jboss.wolf.validator.ValidatorContext;
 import org.springframework.core.annotation.Order;
@@ -82,30 +81,10 @@ public class DependencyNotFoundReporter implements Reporter {
             List<DependencyNode> roots = sortDependencyNodes(artifactNotFoundMap.get(artifact));
             for (DependencyNode root : roots) {
                 out.println("    from: " + root.getArtifact());
-                PathRecordingDependencyVisitor pathVisitor = new PathRecordingDependencyVisitor(new PatternInclusionsDependencyFilter(artifact.toString()));
-                root.accept(pathVisitor);
-                List<List<DependencyNode>> paths = pathVisitor.getPaths();
-                for (List<DependencyNode> path : paths) {
-                    out.print("        path: ");
-                    for (int i = 0; i < path.size(); i++) {
-                        out.print(path.get(i).getArtifact());
-                        if (i != path.size() - 1) {
-                            out.print(" > ");
-                        }
-                    }
-                    out.println();
-                }
+                out.print("        path: ");
+                out.print(findPathToDependency(artifact, root));
+                out.println();
             }
-        }
-    }
-
-    private <T extends Exception> T findCause(Throwable e, Class<T> clazz) {
-        int index = ExceptionUtils.indexOfThrowable(e, ArtifactResolutionException.class);
-        if (index != -1) {
-            Throwable[] throwables = ExceptionUtils.getThrowables(e);
-            return clazz.cast(throwables[index]);
-        } else {
-            return null;
         }
     }
 

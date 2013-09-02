@@ -60,6 +60,13 @@ Validators
 - `VersionPatternValidator` try to find artifacts, which version doesn't match regex pattern (eg. -redhat-x postfix)
 
 
+Reporters
+---------
+
+- `DefaultReporter`, `DependencyNotFoundReporter` and `BomDependencyNotFoundReporter` produces simple text reports, which are writen by default into log and into file `workspace/report.txt`
+- `SurefireXmlReporter` produce xml files in same format like maven surefire plugin, which can be consumed by tools like Jenkins, default output directory is `workspace/surefire-reports`
+
+
 How to
 ------
 
