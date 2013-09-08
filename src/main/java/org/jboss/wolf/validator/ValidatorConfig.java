@@ -1,8 +1,6 @@
 package org.jboss.wolf.validator;
 
-import static org.apache.commons.io.filefilter.FileFilterUtils.and;
-import static org.apache.commons.io.filefilter.FileFilterUtils.notFileFilter;
-import static org.apache.commons.io.filefilter.FileFilterUtils.trueFileFilter;
+import static org.apache.commons.io.filefilter.FileFilterUtils.*;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 import static org.springframework.core.annotation.AnnotationAwareOrderComparator.sort;
 
@@ -249,7 +247,12 @@ public class ValidatorConfig {
     public IOFileFilter jarSignatureValidatorFilter() {
         return defaultFilter();
     }
-    
+
+    @Bean
+    public IOFileFilter jarSourcesValidatorFilter() {
+        return defaultFilter();
+    }
+
     @Bean
     public IOFileFilter versionAmbiguityValidatorFilter() {
         return defaultFilter();
