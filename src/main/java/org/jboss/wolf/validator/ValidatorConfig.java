@@ -249,6 +249,11 @@ public class ValidatorConfig {
     }
 
     @Bean
+    public IOFileFilter xmlFileValidatorFilter() {
+        return defaultFilter();
+    }
+
+    @Bean
     public IOFileFilter jarSourcesValidatorFilter() {
         return defaultFilter();
     }
