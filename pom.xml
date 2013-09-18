@@ -14,6 +14,13 @@
             <organization>Red Hat</organization>
             <organizationUrl>http://www.redhat.com/</organizationUrl>
         </developer>
+        <developer>
+            <id>vchepeli</id>
+            <name>Vitalii Chepeliuk</name>
+            <email>vchepeli@redhat.com</email>
+            <organization>Red Hat</organization>
+            <organizationUrl>http://www.redhat.com/</organizationUrl>
+        </developer>
     </developers>
 
     <scm>
