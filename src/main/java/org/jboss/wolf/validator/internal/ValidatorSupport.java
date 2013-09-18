@@ -49,6 +49,21 @@ public class ValidatorSupport {
         return pomFiles;
     }
     
+    public ModelBuildingResult buildModel(File pomFile) {
+        ModelBuildingResult result = null;
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest(modelBuildingRequestTemplate);
+        request.setPomFile(pomFile);
+        request.setModelSource(new FileModelSource(pomFile));
+        try {
+            result = modelBuilder.build(request);
+        } catch (ModelBuildingException e) {
+            result = null;
+        }
+        
+        return result;
+    }
+    
     public Iterator<Model> effectiveModelIterator(final ValidatorContext ctx, IOFileFilter filter) {
         final Iterator<File> fileIterator = iterateFiles(ctx.getValidatedRepository(), and(filter, suffixFileFilter(".pom")), trueFileFilter());
         final Iterator<Model> modelIterator = new Iterator<Model>() {
@@ -61,18 +76,7 @@ public class ValidatorSupport {
             @Override
             public Model next() {
                 File file = fileIterator.next();
-                DefaultModelBuildingRequest request = new DefaultModelBuildingRequest(modelBuildingRequestTemplate);
-                request.setPomFile(file);
-                request.setModelSource(new FileModelSource(file));
-                try {
-                    ModelBuildingResult result = modelBuilder.build(request);
-                    Model model = result.getEffectiveModel();
-                    return model;
-                } catch (ModelBuildingException e) {
-                    // this pom file will not be present in result, 
-                    // it is not possible to build effective model
-                }
-                return null;
+                return buildModel(file).getEffectiveModel();
             }
             
             @Override

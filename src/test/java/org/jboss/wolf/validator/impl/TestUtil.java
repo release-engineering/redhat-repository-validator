@@ -172,10 +172,15 @@ public class TestUtil {
 
     }
     
-
     public static class DependencyBuilder {
 
         private Dependency dependency = new Dependency();
+        
+        public DependencyBuilder() {
+            dependency.setGroupId("com.acme");
+            dependency.setArtifactId("foo");
+            dependency.setVersion("1.0");
+        }
         
         public DependencyBuilder to(Model model) {
             dependency.setGroupId(model.getGroupId());

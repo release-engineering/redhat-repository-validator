@@ -1,5 +1,6 @@
 package org.jboss.wolf.validator.impl.bom;
 
+import static org.jboss.wolf.validator.internal.Utils.gav;
 import static org.jboss.wolf.validator.internal.ValidatorSupport.listPomFiles;
 
 import java.io.File;
@@ -13,14 +14,9 @@ import javax.inject.Named;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.building.DefaultModelBuildingRequest;
-import org.apache.maven.model.building.FileModelSource;
-import org.apache.maven.model.building.ModelBuilder;
-import org.apache.maven.model.building.ModelBuildingException;
-import org.apache.maven.model.building.ModelBuildingRequest;
-import org.apache.maven.model.building.ModelBuildingResult;
 import org.jboss.wolf.validator.Validator;
 import org.jboss.wolf.validator.ValidatorContext;
+import org.jboss.wolf.validator.internal.ValidatorSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,11 +32,9 @@ public class BomUnmanagedVersionValidator implements Validator {
     @Inject @Named("bomUnmanagedVersionValidatorFilter")
     private IOFileFilter fileFilter;
     @Inject
-    private ModelBuilder modelBuilder;
-    @Inject
-    private ModelBuildingRequest modelBuildingRequestTemplate;
-    @Inject
     private BomFilter bomFilter;
+    @Inject
+    private ValidatorSupport validatorSupport;
 
     @Override
     public void validate(ValidatorContext ctx) {
@@ -59,19 +53,19 @@ public class BomUnmanagedVersionValidator implements Validator {
                 continue;
             }
 
-            Model model = buildModel(pomFile);
+            Model model = validatorSupport.buildModel(pomFile).getEffectiveModel();
             if (model.getPackaging().equals("pom")) {
                 if (bomFilter.isBom(model)) {
-                    String bomGav = model.getGroupId() + ":" + model.getArtifactId() + ":" + model.getVersion();
+                    String bomGav = gav(model);
                     for (Dependency bomDependency : model.getDependencyManagement().getDependencies()) {
-                        String dependencyGav = bomDependency.getGroupId() + ":" + bomDependency.getArtifactId() + ":" + bomDependency.getVersion();
+                        String dependencyGav = gav(bomDependency);
                         dependencyGavToBomGavMap.put(dependencyGav, bomGav);
                     }
                 }
             } else if( model.getPackaging().equals("maven-plugin") || model.getPackaging().equals("maven-archetype") ) {
                 // skip, maven plugins and archetypes are not managed in boms
             } else {
-                String projectGav = model.getGroupId() + ":" + model.getArtifactId() + ":" + model.getVersion();
+                String projectGav = gav(model);
                 projectGavToFileMap.put(projectGav, model.getPomFile());
             }
         }
@@ -87,18 +81,6 @@ public class BomUnmanagedVersionValidator implements Validator {
                     logger.debug("project `{}` is managed in boms: `{}`", projectGav, dependencyGavToBomGavMap.get(projectGav));
                 }
             }
-        }
-    }
-
-    private Model buildModel(File pomFile) {
-        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest(modelBuildingRequestTemplate);
-        request.setPomFile(pomFile);
-        request.setModelSource(new FileModelSource(pomFile));
-        try {
-            ModelBuildingResult result = modelBuilder.build(request);
-            return result.getEffectiveModel();
-        } catch (ModelBuildingException e) {
-            throw new RuntimeException(e);
         }
     }
 

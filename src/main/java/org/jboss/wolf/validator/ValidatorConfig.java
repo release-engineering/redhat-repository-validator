@@ -244,6 +244,11 @@ public class ValidatorConfig {
     }
     
     @Bean
+    public IOFileFilter bomVersionPropertyValidatorFilter() {
+        return defaultFilter();
+    }
+    
+    @Bean
     public IOFileFilter jarSignatureValidatorFilter() {
         return defaultFilter();
     }

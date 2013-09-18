@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Model;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
@@ -19,6 +21,14 @@ import org.eclipse.aether.util.graph.visitor.PathRecordingDependencyVisitor;
 import org.jboss.wolf.validator.ValidatorContext;
 
 public class Utils {
+    
+    public static String gav(Model model) {
+        return model.getGroupId() + ":" + model.getArtifactId() + ":" + model.getVersion();
+    }
+    
+    public static String gav(Dependency dependency) {
+        return dependency.getGroupId() + ":" + dependency.getArtifactId() + ":" + dependency.getVersion();
+    }
     
     public static File relativize(ValidatorContext ctx, File file) {
         URI relativePath = ctx.getValidatedRepository().toURI().relativize(file.toURI());
