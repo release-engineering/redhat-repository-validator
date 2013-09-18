@@ -1,13 +1,15 @@
 package org.jboss.wolf.validator.impl.xml;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.IOFileFilter;
-import org.jboss.wolf.validator.Validator;
-import org.jboss.wolf.validator.ValidatorContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
+import static org.apache.commons.io.filefilter.FileFilterUtils.and;
+import static org.apache.commons.io.filefilter.FileFilterUtils.nameFileFilter;
+import static org.apache.commons.io.filefilter.FileFilterUtils.notFileFilter;
+import static org.apache.commons.io.filefilter.FileFilterUtils.suffixFileFilter;
+import static org.apache.commons.io.filefilter.FileFilterUtils.trueFileFilter;
+import static org.jboss.wolf.validator.internal.Utils.relativize;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -16,14 +18,15 @@ import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
 
-import static org.apache.commons.io.filefilter.FileFilterUtils.*;
-import static org.apache.commons.io.filefilter.FileFilterUtils.notFileFilter;
-import static org.apache.commons.io.filefilter.FileFilterUtils.suffixFileFilter;
-import static org.jboss.wolf.validator.internal.Utils.relativize;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.jboss.wolf.validator.Validator;
+import org.jboss.wolf.validator.ValidatorContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 @Named
 public class XmlFileValidator implements Validator {
