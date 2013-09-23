@@ -1,5 +1,6 @@
 package org.jboss.wolf.validator.impl;
 
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.apache.maven.surefire.report.CategorizedReportEntry.reportEntry;
 import static org.jboss.wolf.validator.internal.Utils.findCause;
 import static org.jboss.wolf.validator.internal.Utils.findPathToDependency;
@@ -14,6 +15,7 @@ import java.util.ListIterator;
 import javax.inject.Named;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.maven.plugin.surefire.report.ReportEntryType;
 import org.apache.maven.plugin.surefire.report.StatelessXmlReporter;
 import org.apache.maven.plugin.surefire.report.TestSetStats;
@@ -218,27 +220,49 @@ public class SurefireXmlReporter implements Reporter {
         private InternalStackTraceWriter(Exception exception) {
             this.exception = exception;
         }
+        
+        private String stackTrace() {
+            return exception.getMessage() != null ? "" : ExceptionUtils.getStackTrace(exception);
+        }
 
         @Override
         public String writeTraceToString() {
-            return "";
+            return stackTrace();
         }
 
         @Override
         public String writeTrimmedTraceToString() {
-            return "";
+            return stackTrace();
         }
 
         @Override
         public String smartTrimmedStackTrace() {
-            return "";
+            return stackTrace();
         }
 
         @Override
         public SafeThrowable getThrowable() {
-            return new SafeThrowable(exception);
+            return new InternalSafeThrowable(exception);
         }
 
+    }
+    
+    private static class InternalSafeThrowable extends SafeThrowable {
+
+        public InternalSafeThrowable(Throwable target) {
+            super(target);
+        }
+        
+        @Override
+        public String getMessage() {
+            return defaultIfNull(super.getMessage(), "");
+        }
+        
+        @Override
+        public String getLocalizedMessage() {
+            return defaultIfNull(super.getLocalizedMessage(), "");
+        }
+        
     }
 
 }

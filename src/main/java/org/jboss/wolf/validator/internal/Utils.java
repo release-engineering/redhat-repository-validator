@@ -1,5 +1,7 @@
 package org.jboss.wolf.validator.internal;
 
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
@@ -72,8 +74,8 @@ public class Utils {
                 int result = name1.compareTo(name2);
 
                 if (result == 0) {
-                    String msg1 = e1.getMessage();
-                    String msg2 = e2.getMessage();
+                    String msg1 = defaultIfNull(e1.getMessage(), "");
+                    String msg2 = defaultIfNull(e2.getMessage(), "");
                     result = msg1.compareTo(msg2);
                 }
 

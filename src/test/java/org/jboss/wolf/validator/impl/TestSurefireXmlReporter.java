@@ -50,5 +50,24 @@ public class TestSurefireXmlReporter {
         assertTrue(checksumNotExistExceptionReport.contains("<testcase name=\"__Checksum sha1 for file workspace/validated-repository/foo not exist\" classname=\"ChecksumNotExistException\""));
         assertTrue(checksumNotExistExceptionReport.contains("<testcase name=\"__Checksum sha1 for file workspace/validated-repository/bar not exist\" classname=\"ChecksumNotExistException\""));
     }
+    
+    @Test
+    public void shouldNotCrashWhenExceptionHasNullMessage() {
+        File validateRepository = new File("workspace/validated-repository");
+        File f1 = new File(validateRepository, "f1");
+        File f2 = new File(validateRepository, "f2");
+        
+        ValidatorContext ctx = new ValidatorContext(validateRepository, Collections.<RemoteRepository> emptyList());
+        ctx.addException(f1, new Exception((String)null));
+        ctx.addException(f2, new Exception((String)null));
+        
+        SurefireXmlReporter reporter = new SurefireXmlReporter();
+        reporter.report(ctx);
+        
+        File exceptionReportFile = new File("workspace/surefire-reports/TEST-Exception.xml");
+
+        assertTrue(exceptionReportFile.exists());
+        assertTrue(exceptionReportFile.isFile());
+    }
 
 }

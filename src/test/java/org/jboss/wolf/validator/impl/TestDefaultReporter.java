@@ -86,5 +86,18 @@ public class TestDefaultReporter extends AbstractReporterTest {
         assertTrue(index1 < index2);
         assertTrue(index2 < index3);
     }
+    
+    @Test
+    public void shouldNotCrashWhenExceptionHasNullMessage() {
+        ctx.addException(f1, new Exception((String)null));
+        ctx.addException(f2, new Exception((String)null));
+        
+        reporter.report(ctx);
+        
+        assertReportContains(
+                "Exception (total count 2)\n"
+              + "null\n"
+              + "null\n");
+    }
 
 }
