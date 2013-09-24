@@ -10,15 +10,12 @@ import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 
 @Named
 public class ValidatorInitializer {
 
     private static final Logger logger = LoggerFactory.getLogger(ValidatorInitializer.class);
 
-    @Value("#{systemProperties['wolf-distribution']?:'workspace/validated-distribution'}")
-    private String path2distribution;
     @Inject
     private LocalRepository localRepository;
 
@@ -84,13 +81,13 @@ public class ValidatorInitializer {
     private void logInformation(ValidatorContext ctx) {
         StringBuilder log = new StringBuilder();
         log.append("Used configuration \n");
-        log.append("    local repository     : ").append(localRepository.getBasedir()).append("\n");
-        log.append("    validated repository : ").append(ctx.getValidatedRepository()).append("\n");
-        log.append("    remote repositories  : \n");
+        log.append("    local repository       : ").append(localRepository.getBasedir()).append("\n");
+        log.append("    validated repository   : ").append(ctx.getValidatedRepository()).append("\n");
+        log.append("    validated distribution : ").append(ctx.getValidatedDistribution()).append("\n");
+        log.append("    remote repositories    : \n");
         for (RemoteRepository remoteRepository : ctx.getRemoteRepositories()) {
             log.append("        ").append(remoteRepository.getUrl()).append("\n");
         }
-        log.append("    distribution         : ").append(path2distribution).append("\n");
         logger.info(log.toString());
     }
 

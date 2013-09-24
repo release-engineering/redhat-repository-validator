@@ -1,5 +1,11 @@
 package org.jboss.wolf.validator.impl.distribution;
 
+import static org.apache.commons.io.filefilter.FileFilterUtils.trueFileFilter;
+import static org.jboss.wolf.validator.impl.TestUtil.pom;
+
+import java.io.File;
+import java.io.IOException;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.jboss.wolf.validator.impl.AbstractTest;
@@ -7,12 +13,6 @@ import org.junit.Test;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
-
-import java.io.File;
-import java.io.IOException;
-
-import static org.apache.commons.io.filefilter.FileFilterUtils.trueFileFilter;
-import static org.jboss.wolf.validator.impl.TestUtil.pom;
 
 @ContextConfiguration
 public class DistributionValidatorTest extends AbstractTest {
@@ -30,86 +30,67 @@ public class DistributionValidatorTest extends AbstractTest {
     private final File distBazJar = new File(distributionDir, "baz-1.0.jar");
 
     @Test
-    public void deleteDistFolder_shouldSkipValidation() throws IOException {
+    public void shouldSkipValidationIfDirectoryDontExists() throws IOException {
         FileUtils.deleteDirectory(distributionDir);
-
+        
         validator.validate(ctx);
         assertSuccess();
     }
 
     @Test
-    public void sameJarInRepoAndDist_shouldSuccess() throws IOException {
+    public void shouldSuccess() throws IOException {
         pom().artifactId("foo").create(repoFooDir);
-
         FileUtils.copyFile(new File(repoFooDir + "/com/acme/foo/1.0/foo-1.0.jar"), distFooJar);
-
+        
         validator.validate(ctx);
         assertSuccess();
     }
 
     @Test
-    public void noJarInDist_shouldFail() throws IOException {
+    public void shouldFindCoruptedFiles() throws IOException {
         pom().artifactId("foo").create(repoFooDir);
-
-        //FileUtils.copyFile(new File(repoFooDir + "/com/acme/foo/1.0/foo-1.0.jar"), distFooJar);
-
+        FileUtils.copyFile(new File("target/test-classes/empty-signed-damaged.jar"), distFooJar);
+    
         validator.validate(ctx);
-        assertExpectedException(DistributionFileException.class, "File com/acme/foo/1.0/foo-1.0.jar is not present in DISTRIBUTION");
+        assertExpectedException(DistributionCoruptedFileException.class, "File in distribution foo-1.0.jar has same name like file in repository com/acme/foo/1.0/foo-1.0.jar, but has different content");
     }
 
     @Test
-    public void noJarInRepo_shouldFail() throws IOException {
+    public void shouldFindDuplicatedFiles() throws IOException {
         pom().artifactId("foo").create(repoFooDir);
+        FileUtils.copyFile(new File(repoFooDir + "/com/acme/foo/1.0/foo-1.0.jar"), distFooJar);
+        FileUtils.copyFile(new File(repoFooDir + "/com/acme/foo/1.0/foo-1.0.jar"), distBarJar);
+        FileUtils.copyFile(new File(repoFooDir + "/com/acme/foo/1.0/foo-1.0.jar"), distBazJar);
+    
+        validator.validate(ctx);
+        assertExpectedException(DistributionDuplicateFilesException.class, "Duplicate files in distribution: bar-1.0.jar, baz-1.0.jar, foo-1.0.jar");
+    }
 
+    @Test
+    public void shouldFindMisnomerFiles() throws IOException {
+        pom().artifactId("foo").create(repoFooDir);
+        FileUtils.copyFile(new File(repoFooDir + "/com/acme/foo/1.0/foo-1.0.jar"), distBarJar);
+    
+        validator.validate(ctx);
+        assertExpectedException(DistributionMisnomerFileException.class, "File in distribution bar-1.0.jar has same content like file in repository com/acme/foo/1.0/foo-1.0.jar, but has different name");
+    }
+
+    @Test
+    public void shouldFindMissingFiles() throws IOException {
+        pom().artifactId("foo").create(repoFooDir);
+        
+        validator.validate(ctx);
+        assertExpectedException(DistributionMissingFileException.class, "Distribution doesn't contains file from repository: com/acme/foo/1.0/foo-1.0.jar");
+    }
+
+    @Test
+    public void shouldFindRedundantFiles() throws IOException {
+        pom().artifactId("foo").create(repoFooDir);
         FileUtils.copyFile(new File(repoFooDir + "/com/acme/foo/1.0/foo-1.0.jar"), distFooJar);
         FileUtils.deleteQuietly(new File(repoFooDir + "/com/acme/foo/1.0/foo-1.0.jar"));
 
         validator.validate(ctx);
-        assertExpectedException(DistributionFileException.class, "File foo-1.0.jar is not pressent in REPOSITORY");
-    }
-
-    @Test
-    public void equalJarsInRepo_shouldFail() throws IOException {
-        pom().artifactId("foo").create(repoFooDir);
-        pom().artifactId("bar").create(repoFooDir);
-        pom().artifactId("baz").create(repoFooDir);
-
-        FileUtils.copyFile(new File(repoFooDir + "/com/acme/foo/1.0/foo-1.0.jar"), distFooJar);
-
-        validator.validate(ctx);
-        assertExpectedException(DistributionEqualFilesException.class, "Files from REPOSITORY [com/acme/bar/1.0/bar-1.0.jar, com/acme/baz/1.0/baz-1.0.jar, com/acme/foo/1.0/foo-1.0.jar] are equal");
-    }
-
-    @Test
-    public void equalJarsInDist_shouldFail() throws IOException {
-        pom().artifactId("foo").create(repoFooDir);
-
-        FileUtils.copyFile(new File(repoFooDir + "/com/acme/foo/1.0/foo-1.0.jar"), distFooJar);
-        FileUtils.copyFile(new File(repoFooDir + "/com/acme/foo/1.0/foo-1.0.jar"), distBarJar);
-        FileUtils.copyFile(new File(repoFooDir + "/com/acme/foo/1.0/foo-1.0.jar"), distBazJar);
-
-        validator.validate(ctx);
-        assertExpectedException(DistributionEqualFilesException.class, "Files from DISTRIBUTION [bar-1.0.jar, baz-1.0.jar, foo-1.0.jar] are equal");
-    }
-
-    @Test
-    public void notEqualJarName_shouldFail() throws IOException {
-        pom().artifactId("foo").create(repoFooDir);
-
-        FileUtils.copyFile(new File(repoFooDir + "/com/acme/foo/1.0/foo-1.0.jar"), distBarJar);
-
-        validator.validate(ctx);
-        assertExpectedException(DistributionNotEqualNamesException.class, "File from REPOSITORY com/acme/foo/1.0/foo-1.0.jar does not have the same name as file from DISTRIBUTION bar-1.0.jar");
-    }
-
-    @Test
-    public void notEqualJarSize_shouldFail() throws IOException {
-        pom().artifactId("foo").create(repoFooDir);
-
-        FileUtils.copyFile(new File("target/test-classes/empty-signed-damaged.jar"), distFooJar);
-
-        validator.validate(ctx);
-        assertExpectedException(DistributionNotEqualSizeException.class, "File from REPOSITORY com/acme/foo/1.0/foo-1.0.jar has not same size as file from DISTRIBUTION foo-1.0.jar");
+        assertExpectedException(DistributionRedundantFileException.class, "Distribution contains file, which is not in repository: foo-1.0.jar");
     }
 
 }

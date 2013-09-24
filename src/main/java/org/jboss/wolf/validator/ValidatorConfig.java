@@ -1,6 +1,8 @@
 package org.jboss.wolf.validator;
 
-import static org.apache.commons.io.filefilter.FileFilterUtils.*;
+import static org.apache.commons.io.filefilter.FileFilterUtils.and;
+import static org.apache.commons.io.filefilter.FileFilterUtils.notFileFilter;
+import static org.apache.commons.io.filefilter.FileFilterUtils.trueFileFilter;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 import static org.springframework.core.annotation.AnnotationAwareOrderComparator.sort;
 
@@ -78,6 +80,9 @@ public class ValidatorConfig {
 
     @Value("#{systemProperties['wolf-validatedRepository']?:'workspace/validated-repository'}")
     private String validatedRepository;
+    
+    @Value("#{systemProperties['wolf-validatedDistribution']?:'workspace/validated-distribution'}")
+    private String validatedDistribution;
 
     @Value("#{systemProperties['wolf-localRepository']?:'workspace/local-repository'}")
     private String localRepository;
@@ -167,7 +172,10 @@ public class ValidatorConfig {
     @Bean
     @Scope(SCOPE_PROTOTYPE)
     public ValidatorContext validatorContext() {
-        return new ValidatorContext(new File(validatedRepository), effectiveRemoteRepositories());
+        return new ValidatorContext(
+                  new File(validatedRepository),
+                  new File(validatedDistribution),
+                  effectiveRemoteRepositories());
     }
 
     @Bean

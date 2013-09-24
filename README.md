@@ -27,7 +27,7 @@ Here is help output:
 
     Wolf-validator is a tool used to validate the internal consistency of a maven artifact repository.
     
-    Usage: wolf-validator [-c <file>] [-h] [-lr <dir>] [-rr <url>] [-vr <dir>] [-r <file>]
+    Usage: wolf-validator [-c <file>] [-h] [-lr <dir>] [-rr <url>] [-vr <dir>] [-vd <dir>] [-r <file>]
         -c,--config <file>                 use given configuration file,
                                            default value is `wolf-validator-config.xml`
         -h,--help                          print help and exit
@@ -37,6 +37,8 @@ Here is help output:
                                            default remote repository is only maven central
         -vr,--validated-repository <dir>   validate given repository,
                                            default value is `workspace/validated-repository`
+        -vd,--validated-distribution <dir> validate given distribution, verify if current distribution is valid
+                                           default value is `workspace/validated-distribution`
         -r,--report <file>                 write generated report into this file,
                                            default location for reports is in `workspace/report.txt`                                           
     Example: 
@@ -61,7 +63,7 @@ Validators
 - `VersionPatternValidator` try to find artifacts, which version doesn't match regex pattern (eg. -redhat-x postfix)
 - `JarSourcesValidator` try to find artifacts, which do not contain sources within them(verify if *-sources.jar exists)
 - `XmlFileValidator` try to find xml files and then verify if they are valid
-- `DistributionValidator` try to validate libraries in distribution against libraries in repository
+- `DistributionValidator` try to validate artifacts in distribution against validated repository
 
 
 Reporters

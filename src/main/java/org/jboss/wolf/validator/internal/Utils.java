@@ -90,7 +90,7 @@ public class Utils {
         return sortedExceptions;
     }
 
-    public static Collection<File> sortFilesViaPath(Collection<File> files){
+    public static List<File> sortFiles(Collection<File> files){
         List<File> sorted = new ArrayList<File>(files);
         Collections.sort(sorted, new Comparator<File>() {
             @Override

@@ -13,12 +13,8 @@ public class JarSourcesVerificationException extends Exception {
         this.file = file;
     }
 
-    public JarSourcesVerificationException(File file, Throwable cause) {
-        super("Unable to find sources for file " + file, cause);
-        this.file = file;
-    }
-
     public File getFile() {
         return file;
     }
+
 }

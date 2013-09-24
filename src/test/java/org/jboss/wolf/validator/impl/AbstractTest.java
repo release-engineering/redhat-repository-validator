@@ -50,10 +50,6 @@ public abstract class AbstractTest {
     
     protected static IOFileFilter fileFilter;
 
-    static {
-        System.setProperty("wolf-distribution", distributionDir.getPath());
-    }
-
     @Inject
     protected Validator validator;
     @Inject
@@ -147,7 +143,7 @@ public abstract class AbstractTest {
         @Scope(SCOPE_PROTOTYPE)
         @Override
         public ValidatorContext validatorContext() {
-            return new ValidatorContext(repoFooDir, remoteRepos);
+            return new ValidatorContext(repoFooDir, distributionDir, remoteRepos);
         }
         
         @Bean

@@ -20,17 +20,23 @@ public class ValidatorContext {
     private static final Logger logger = LoggerFactory.getLogger(Validator.class);
 
     private final File validatedRepository;
+    private final File validatedDistribution;
     private final List<RemoteRepository> remoteRepositories;
     private final Map<File, List<Exception>> exceptions = new HashMap<File, List<Exception>>();
     private final Set<Exception> processedExceptions = new HashSet<Exception>();
 
-    public ValidatorContext(File validatedRepository, List<RemoteRepository> remoteRepositories) {
+    public ValidatorContext(File validatedRepository, File validatedDistribution, List<RemoteRepository> remoteRepositories) {
         this.validatedRepository = validatedRepository;
+        this.validatedDistribution = validatedDistribution; 
         this.remoteRepositories = Collections.unmodifiableList(new ArrayList<RemoteRepository>(remoteRepositories));
     }
 
     public File getValidatedRepository() {
         return validatedRepository;
+    }
+    
+    public File getValidatedDistribution() {
+        return validatedDistribution;
     }
 
     public List<RemoteRepository> getRemoteRepositories() {

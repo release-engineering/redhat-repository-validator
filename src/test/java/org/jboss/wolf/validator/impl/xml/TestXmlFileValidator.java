@@ -1,5 +1,10 @@
 package org.jboss.wolf.validator.impl.xml;
 
+import static org.apache.commons.io.filefilter.FileFilterUtils.trueFileFilter;
+
+import java.io.File;
+import java.io.IOException;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.jboss.wolf.validator.impl.AbstractTest;
@@ -7,11 +12,6 @@ import org.junit.Test;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
-
-import java.io.File;
-import java.io.IOException;
-
-import static org.apache.commons.io.filefilter.FileFilterUtils.trueFileFilter;
 
 @ContextConfiguration
 public class TestXmlFileValidator extends AbstractTest {
@@ -25,7 +25,7 @@ public class TestXmlFileValidator extends AbstractTest {
 
     private final File validXmlFile = new File(repoFooDir, "settings-valid.xml");
     private final File notValidXmlFile = new File(repoFooDir, "settings-not-valid.xml");
-    private final File sourceXmlFile = new File("target/test-classes/settings-valid.xml");
+    private final File sourceXmlFile = new File("target/test-classes/TestXmlFileValidator-settings.xml");
 
     @Test
     public void validXML_shouldSuccess() throws IOException {

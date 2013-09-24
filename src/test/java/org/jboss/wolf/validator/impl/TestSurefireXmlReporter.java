@@ -21,7 +21,7 @@ public class TestSurefireXmlReporter {
         File fooFile = new File(validateRepository, "foo");
         File barFile = new File(validateRepository, "bar");
 
-        ValidatorContext ctx = new ValidatorContext(validateRepository, Collections.<RemoteRepository> emptyList());
+        ValidatorContext ctx = new ValidatorContext(validateRepository, null, Collections.<RemoteRepository> emptyList());
         ctx.addException(fooFile, new SuspiciousFileException(fooFile, "suspicious because foo"));
         ctx.addException(barFile, new SuspiciousFileException(barFile, "suspicious because bar"));
         ctx.addException(fooFile, new ChecksumNotExistException(fooFile, "sha1"));
@@ -57,7 +57,7 @@ public class TestSurefireXmlReporter {
         File f1 = new File(validateRepository, "f1");
         File f2 = new File(validateRepository, "f2");
         
-        ValidatorContext ctx = new ValidatorContext(validateRepository, Collections.<RemoteRepository> emptyList());
+        ValidatorContext ctx = new ValidatorContext(validateRepository, null, Collections.<RemoteRepository> emptyList());
         ctx.addException(f1, new Exception((String)null));
         ctx.addException(f2, new Exception((String)null));
         

@@ -7,7 +7,6 @@ import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.maven.model.Model;
 import org.jboss.wolf.validator.impl.AbstractTest;
-import org.jboss.wolf.validator.impl.bom.BomDependencyNotFoundException;
 import org.junit.Test;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

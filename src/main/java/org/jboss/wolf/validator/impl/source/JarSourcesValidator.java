@@ -1,20 +1,24 @@
 package org.jboss.wolf.validator.impl.source;
 
+import static org.apache.commons.io.FileUtils.listFiles;
+import static org.apache.commons.io.FilenameUtils.removeExtension;
+import static org.apache.commons.io.filefilter.FileFilterUtils.and;
+import static org.apache.commons.io.filefilter.FileFilterUtils.notFileFilter;
+import static org.apache.commons.io.filefilter.FileFilterUtils.suffixFileFilter;
+import static org.apache.commons.io.filefilter.FileFilterUtils.trueFileFilter;
+import static org.jboss.wolf.validator.internal.Utils.relativize;
+
+import java.io.File;
+import java.util.Collection;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.jboss.wolf.validator.Validator;
 import org.jboss.wolf.validator.ValidatorContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.io.File;
-import java.util.Collection;
-
-import static org.apache.commons.io.FileUtils.listFiles;
-import static org.apache.commons.io.FilenameUtils.removeExtension;
-import static org.apache.commons.io.filefilter.FileFilterUtils.*;
-import static org.jboss.wolf.validator.internal.Utils.relativize;
 
 @Named
 public class JarSourcesValidator implements Validator {
