@@ -36,7 +36,12 @@ public class Utils {
         URI relativePath = ctx.getValidatedRepository().toURI().relativize(file.toURI());
         return new File(relativePath.toString());
     }
-    
+
+    public static File relativizeFile(File parentDir, File file) {
+        URI relativePath = parentDir.toURI().relativize(file.toURI());
+        return new File(relativePath.toString());
+    }
+
     public static List<Artifact> sortArtifacts(Collection<Artifact> artifacts) {
         List<Artifact> result = new ArrayList<Artifact>(artifacts);
         Collections.sort(result, new Comparator<Artifact>() {
@@ -84,7 +89,18 @@ public class Utils {
         });
         return sortedExceptions;
     }
-    
+
+    public static Collection<File> sortFilesViaPath(Collection<File> files){
+        List<File> sorted = new ArrayList<File>(files);
+        Collections.sort(sorted, new Comparator<File>() {
+            @Override
+            public int compare(File f1, File f2) {
+                return f1.getPath().compareTo(f2.getPath());
+            }
+        });
+        return sorted;
+    }
+
     public static <T extends Exception> T findCause(Throwable e, Class<T> clazz) {
         int index = ExceptionUtils.indexOfThrowable(e, ArtifactResolutionException.class);
         if (index != -1) {

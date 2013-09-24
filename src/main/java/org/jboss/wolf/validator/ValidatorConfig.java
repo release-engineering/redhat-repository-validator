@@ -64,18 +64,18 @@ import org.springframework.context.annotation.Scope;
 
 @Configuration
 @ComponentScan(
-        useDefaultFilters = false, 
+        useDefaultFilters = false,
         includeFilters = @Filter(value = Named.class))
 public class ValidatorConfig {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(Validator.class);
-    
+
     @Autowired
     private BeanFactory beanFactory;
-    
+
     @Value("#{systemProperties['wolf-reportFile']?:'workspace/report.txt'}")
     private String reportFileName;
-    
+
     @Value("#{systemProperties['wolf-validatedRepository']?:'workspace/validated-repository'}")
     private String validatedRepository;
 
@@ -84,7 +84,7 @@ public class ValidatorConfig {
 
     @Value("#{systemProperties['wolf-remoteRepositories']?.split(';')}")
     private String[] remoteRepositories;
-    
+
     @Bean
     @Primary
     public Validator validator(final Validator[] validators) {
@@ -104,7 +104,7 @@ public class ValidatorConfig {
             }
         };
     }
-    
+
     @Bean
     @Primary
     public Reporter reporter(final Reporter[] reporters) {
@@ -115,7 +115,7 @@ public class ValidatorConfig {
                 for (Reporter reporter : reporters) {
                     try {
                         reporter.report(ctx);
-                    } catch(RuntimeException e) {
+                    } catch (RuntimeException e) {
                         logger.error("reporter " + reporter.getClass().getSimpleName() + " ended with unexpected exception!", e);
                     }
                 }
@@ -132,7 +132,7 @@ public class ValidatorConfig {
     @Bean
     public List<RemoteRepository> effectiveRemoteRepositories() {
         RemoteRepository validatedRemoteRepository = new RemoteRepository.Builder("validated", "default", new File(validatedRepository).toURI().toString()).build();
-        
+
         List<RemoteRepository> repositories = new ArrayList<RemoteRepository>();
         repositories.add(validatedRemoteRepository);
         repositories.addAll(remoteRepositoriesFromArguments());
@@ -140,7 +140,7 @@ public class ValidatorConfig {
         repositories.add(centralRemoteRepository());
         return Collections.unmodifiableList(repositories);
     }
-    
+
     private List<RemoteRepository> remoteRepositoriesFromArguments() {
         List<RemoteRepository> repositories = new ArrayList<RemoteRepository>();
         if (remoteRepositories != null) {
@@ -153,7 +153,7 @@ public class ValidatorConfig {
         }
         return repositories;
     }
-    
+
     private List<RemoteRepository> remoteRepositoriesFromConfiguration() {
         List<RemoteRepository> repositories = new ArrayList<RemoteRepository>();
         if (beanFactory.containsBean("remoteRepositories")) {
@@ -163,7 +163,7 @@ public class ValidatorConfig {
         }
         return repositories;
     }
-    
+
     @Bean
     @Scope(SCOPE_PROTOTYPE)
     public ValidatorContext validatorContext() {
@@ -174,16 +174,16 @@ public class ValidatorConfig {
     public BomFilter bomFilter() {
         return new BomFilterSimple();
     }
-    
+
     @Bean
     public String[] expectedRootFiles() {
-        return new String[] {
+        return new String[]{
                 "example-settings.xml",
                 "readme.txt",
                 "readme.md",
-                "jbosseula.txt" };
+                "jbosseula.txt"};
     }
-    
+
     @Bean
     public IOFileFilter expectedRootFilesFilter() {
         final String validatedRepositoryAbsolutePath = validatorContext().getValidatedRepository().getAbsolutePath();
@@ -212,12 +212,12 @@ public class ValidatorConfig {
     public IOFileFilter dependenciesValidatorFilter() {
         return defaultFilter();
     }
-    
+
     @Bean
     public IOFileFilter modelValidatorFilter() {
         return defaultFilter();
     }
-    
+
     @Bean
     public IOFileFilter suspiciousFileValidatorFilter() {
         return and(defaultFilter(), notFileFilter(expectedRootFilesFilter()));
@@ -227,7 +227,7 @@ public class ValidatorConfig {
     public IOFileFilter checksumValidatorFilter() {
         return and(defaultFilter(), notFileFilter(expectedRootFilesFilter()));
     }
-    
+
     @Bean
     public IOFileFilter bomAmbiguousVersionValidatorFilter() {
         return defaultFilter();
@@ -242,7 +242,7 @@ public class ValidatorConfig {
     public IOFileFilter bomUnmanagedVersionValidatorFilter() {
         return defaultFilter();
     }
-    
+
     @Bean
     public IOFileFilter bomVersionPropertyValidatorFilter() {
         return defaultFilter();
@@ -264,20 +264,25 @@ public class ValidatorConfig {
     }
 
     @Bean
+    public IOFileFilter distributionValidatorFilter() {
+        return defaultFilter();
+    }
+
+    @Bean
     public IOFileFilter versionAmbiguityValidatorFilter() {
         return defaultFilter();
     }
-    
+
     @Bean
     public IOFileFilter versionOverlapValidatorFilter() {
         return defaultFilter();
     }
-    
+
     @Bean
     public IOFileFilter versionPatternValidatorFilter() {
         return defaultFilter();
     }
-    
+
     @Bean
     public PrintStream defaultReporterStream() {
         try {
@@ -292,17 +297,17 @@ public class ValidatorConfig {
             throw new RuntimeException(e);
         }
     }
-    
+
     @Bean
     public PrintStream dependencyNotFoundReporterStream() {
         return defaultReporterStream();
     }
-    
+
     @Bean
     public PrintStream bomDependencyNotFoundReporterStream() {
         return defaultReporterStream();
     }
-    
+
     @Bean
     public LocalRepository localRepository() {
         return new LocalRepository(localRepository);
@@ -318,11 +323,11 @@ public class ValidatorConfig {
                 new ExclusionDependencySelector());
 
         DependencyGraphTransformer transformer = new ConflictResolver(
-                new NearestVersionSelector(), 
+                new NearestVersionSelector(),
                 new JavaScopeSelector(),
-                new SimpleOptionalitySelector(), 
+                new SimpleOptionalitySelector(),
                 new JavaScopeDeriver());
-        
+
         DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
         session.setLocalRepositoryManager(repositorySystem.newLocalRepositoryManager(session, localRepository()));
         session.setSystemProperties(System.getProperties());
@@ -334,7 +339,7 @@ public class ValidatorConfig {
         session.setDependencyGraphTransformer(transformer);
         session.setTransferListener(new LogTransferListener());
         session.setRepositoryListener(new LogRepositoryListener());
-        
+
         if (!session.getConfigProperties().containsKey(ConfigurationProperties.REQUEST_TIMEOUT)) {
             session.setConfigProperty(ConfigurationProperties.REQUEST_TIMEOUT, 3 * 60 * 1000);
         }

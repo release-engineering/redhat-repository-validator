@@ -61,6 +61,7 @@ Validators
 - `VersionPatternValidator` try to find artifacts, which version doesn't match regex pattern (eg. -redhat-x postfix)
 - `JarSourcesValidator` try to find artifacts, which do not contain sources within them(verify if *-sources.jar exists)
 - `XmlFileValidator` try to find xml files and then verify if they are valid
+- `DistributionValidator` try to validate libraries in distribution against libraries in repository
 
 
 Reporters

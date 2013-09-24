@@ -37,7 +37,8 @@ public class ValidatorRunner {
     private final Option reportFileOption = createOption("r", "report", "write generated report into this file, \ndefault location for reports is in `workspace/report.txt`", "file");
     private final Option configOption = createOption("c", "config", "use given configuration file, \ndefault value is `wolf-validator-config.xml`", "file");
     private final Option helpOption = createOption("h", "help", "print help and exit", null);
-    
+    private final Option distributionOption = createOption("vd", "validated-distribution", "validate given distribution, verify if current distribution is valid", "dir");
+
     protected ApplicationContext appCtx;
     
     @Inject
@@ -57,6 +58,7 @@ public class ValidatorRunner {
         options.addOption(reportFileOption);
         options.addOption(configOption);
         options.addOption(helpOption);
+        options.addOption(distributionOption);
         
         try {
             CommandLineParser parser = new BasicParser();
@@ -107,11 +109,14 @@ public class ValidatorRunner {
         String validatedRepo = line.getOptionValue(validatedRepositoryOption.getOpt(), "workspace/validated-repository");
         String localRepo = line.getOptionValue(localRepositoryOption.getOpt(), "workspace/local-repository");
         String[] remoteRepos = line.getOptionValues(remoteRepositoryOption.getOpt());
+        String distribution = line.getOptionValue(distributionOption.getOpt());
 
         System.setProperty("wolf-reportFile", reportFile);
         System.setProperty("wolf-validatedRepository", validatedRepo);
         System.setProperty("wolf-localRepository", localRepo);
         System.setProperty("wolf-remoteRepositories", StringUtils.defaultString(StringUtils.join(remoteRepos, ';')));
+        if (null != distribution) // this option is optional
+            System.setProperty("wolf-distribution", distribution);
 
         String userConfigFile = line.getOptionValue(configOption.getOpt());
         if (userConfigFile == null) {
