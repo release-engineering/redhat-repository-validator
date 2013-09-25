@@ -76,7 +76,8 @@ public class ValidatorSupport {
             @Override
             public Model next() {
                 File file = fileIterator.next();
-                return buildModel(file).getEffectiveModel();
+                ModelBuildingResult model = buildModel(file);
+                return model != null ? model.getEffectiveModel() : null;
             }
             
             @Override
