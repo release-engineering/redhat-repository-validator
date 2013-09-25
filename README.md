@@ -4,7 +4,7 @@ wolf-validator
 [![Build Status](https://travis-ci.org/thradec/wolf-validator.png)](https://travis-ci.org/thradec/wolf-validator)
 
 
-Wolf-validator is a tool used to validate the internal consistency of a maven artifact repository.
+Wolf-validator is a tool used to validate the internal consistency of a maven artifact repository and could be also used for validation associated distribution directory.
 
 
 Building
