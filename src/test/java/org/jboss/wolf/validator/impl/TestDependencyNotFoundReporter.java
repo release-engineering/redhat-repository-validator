@@ -44,5 +44,35 @@ public class TestDependencyNotFoundReporter extends AbstractReporterTest {
                 + "    from: com.acme:foo-impl:pom:1.0\n"
                 + "        path: com.acme:foo-impl:pom:1.0 > com.acme:foo-api:jar:1.0");
     }
+    
+    @Test
+    public void shouldNotPrintEmptyPath() {
+        Model fooParent = pom().artifactId("foo-parent").packaging("pom").build();
+        pom().artifactId("foo-api").parent(fooParent).create(repoFooDir);
+
+        validator.validate(ctx);
+        reporter.report(ctx);
+
+        assertReportContains(
+                  "Found 1 missing dependencies.\n"
+                + "miss: com.acme:foo-parent:pom:1.0\n"
+                + "    from: com.acme:foo-api:pom:1.0\n"
+                + "");
+    }
+    
+    @Test
+    public void shouldNotPrintPathSameLikeFrom() {
+        Model fooApi = pom().artifactId("foo-api").build();
+        pom().artifactId("foo-impl").dependency(fooApi).create(repoFooDir);
+
+        validator.validate(ctx);
+        reporter.report(ctx);
+
+        assertReportContains(
+                  "Found 1 missing dependencies.\n"
+                + "miss: com.acme:foo-api:jar:1.0\n"
+                + "    from: com.acme:foo-impl:pom:1.0\n"
+                + "");
+    }
 
 }

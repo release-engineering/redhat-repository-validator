@@ -1,5 +1,7 @@
 package org.jboss.wolf.validator.impl;
 
+import static org.apache.commons.lang3.ObjectUtils.notEqual;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.jboss.wolf.validator.internal.Utils.findCause;
 import static org.jboss.wolf.validator.internal.Utils.findPathToDependency;
 import static org.jboss.wolf.validator.internal.Utils.sortArtifacts;
@@ -81,9 +83,13 @@ public class DependencyNotFoundReporter implements Reporter {
             List<DependencyNode> roots = sortDependencyNodes(artifactNotFoundMap.get(artifact));
             for (DependencyNode root : roots) {
                 out.println("    from: " + root.getArtifact());
-                out.print("        path: ");
-                out.print(findPathToDependency(artifact, root));
-                out.println();
+                String path = findPathToDependency(artifact, root);
+                String simplePath = root.getArtifact() + " > " + artifact;
+                if (isNotEmpty(path) && notEqual(path, simplePath)) {
+                    out.print("        path: ");
+                    out.print(path);
+                    out.println();
+                }
             }
         }
     }
