@@ -9,6 +9,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.SystemUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jboss.wolf.validator.Reporter;
 import org.jboss.wolf.validator.ValidatorContext;
 
@@ -52,7 +54,14 @@ public class DefaultReporter implements Reporter {
             msg.append(e.getClass().getSimpleName());
             msg.append(" ");
         }
-        msg.append(e.getMessage());
+        
+        if (e.getMessage() != null) {
+            msg.append(e.getMessage());
+        }
+        if (e.getMessage() == null && e.getCause() == null) {
+            msg.append(ExceptionUtils.getStackTrace(e));
+            msg.append(SystemUtils.LINE_SEPARATOR);
+        }
 
         out.println(msg.toString());
 

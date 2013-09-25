@@ -90,14 +90,13 @@ public class TestDefaultReporter extends AbstractReporterTest {
     @Test
     public void shouldNotCrashWhenExceptionHasNullMessage() {
         ctx.addException(f1, new Exception((String)null));
-        ctx.addException(f2, new Exception((String)null));
         
         reporter.report(ctx);
         
         assertReportContains(
-                "Exception (total count 2)\n"
-              + "null\n"
-              + "null\n");
+                "Exception (total count 1)\n"
+              + "java.lang.Exception\n"
+              + "\tat org.jboss.wolf.validator.impl.TestDefaultReporter.shouldNotCrashWhenExceptionHasNullMessage(");
     }
 
 }
