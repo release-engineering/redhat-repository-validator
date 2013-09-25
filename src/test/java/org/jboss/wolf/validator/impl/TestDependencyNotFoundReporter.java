@@ -18,8 +18,7 @@ public class TestDependencyNotFoundReporter extends AbstractReporterTest {
         assertReportContains(
                   "Found 1 missing dependencies.\n"
                 + "miss: com.acme:foo-api:jar:1.0\n"
-                + "    from: com.acme:foo-impl:pom:1.0\n"
-                + "        path: com.acme:foo-impl:pom:1.0 > com.acme:foo-api:jar:1.0");
+                + "    from: com.acme:foo-impl:pom:1.0");
     }
 
     @Test
@@ -40,9 +39,7 @@ public class TestDependencyNotFoundReporter extends AbstractReporterTest {
                 + "        path: com.acme:foo-impl:pom:1.0 > com.acme:bar-impl:jar:1.0 > com.acme:bar-api:jar:1.0\n"
                 + "miss: com.acme:foo-api:jar:1.0\n"
                 + "    from: com.acme:foo-dist:pom:1.0\n"
-                + "        path: com.acme:foo-dist:pom:1.0 > com.acme:foo-api:jar:1.0\n"
-                + "    from: com.acme:foo-impl:pom:1.0\n"
-                + "        path: com.acme:foo-impl:pom:1.0 > com.acme:foo-api:jar:1.0");
+                + "    from: com.acme:foo-impl:pom:1.0");
     }
     
     @Test
