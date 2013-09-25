@@ -2,6 +2,7 @@ package org.jboss.wolf.validator.impl.distribution;
 
 import static org.apache.commons.io.filefilter.FileFilterUtils.trueFileFilter;
 import static org.jboss.wolf.validator.impl.TestUtil.pom;
+import static org.jboss.wolf.validator.impl.suspicious.TestSuspiciousFileValidator.touch;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,6 +41,10 @@ public class DistributionValidatorTest extends AbstractTest {
     @Test
     public void shouldSuccess() throws IOException {
         pom().artifactId("foo").create(repoFooDir);
+        touch("com/acme/foo/1.0/foo-1.0-sources.jar");
+        touch("com/acme/foo/1.0/foo-1.0-javadoc.jar");
+        touch("com/acme/foo/1.0/foo-1.0-tests.jar");
+        touch("com/acme/foo/1.0/foo-1.0-test-sources.jar");
         FileUtils.copyFile(new File(repoFooDir + "/com/acme/foo/1.0/foo-1.0.jar"), distFooJar);
         
         validator.validate(ctx);

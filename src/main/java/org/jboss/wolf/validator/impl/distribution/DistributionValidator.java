@@ -1,7 +1,7 @@
 package org.jboss.wolf.validator.impl.distribution;
 
-import static org.apache.commons.io.FileUtils.listFiles;
 import static org.apache.commons.io.filefilter.FileFilterUtils.and;
+import static org.apache.commons.io.filefilter.FileFilterUtils.notFileFilter;
 import static org.apache.commons.io.filefilter.FileFilterUtils.suffixFileFilter;
 import static org.apache.commons.io.filefilter.FileFilterUtils.trueFileFilter;
 import static org.jboss.wolf.validator.internal.Utils.relativize;
@@ -20,6 +20,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.eclipse.aether.util.ChecksumUtils;
 import org.jboss.wolf.validator.Validator;
@@ -134,9 +135,9 @@ public class DistributionValidator implements Validator {
             }
         }
     }
-
+    
     private ListMultimap<String, File> mapFilesToChecksum(File dir) {
-        Collection<File> files = listFiles(dir, and(fileFilter, suffixFileFilter(".jar")), trueFileFilter());
+        Collection<File> files = listFiles(dir);
         ListMultimap<String, File> filesHash = ArrayListMultimap.create();
         for (File file : files) {
             try {
@@ -147,6 +148,19 @@ public class DistributionValidator implements Validator {
             }
         }
         return filesHash;
+    }
+    
+    private Collection<File> listFiles(File dir) {
+        IOFileFilter filter = and(
+                fileFilter,
+                suffixFileFilter(".jar"),
+                notFileFilter(suffixFileFilter("-javadoc.jar")),
+                notFileFilter(suffixFileFilter("-sources.jar")),
+                notFileFilter(suffixFileFilter("-tests.jar")),
+                notFileFilter(suffixFileFilter("-test-sources.jar")));
+        
+        Collection<File> files = FileUtils.listFiles(dir, filter, trueFileFilter());
+        return files;
     }
 
 }
