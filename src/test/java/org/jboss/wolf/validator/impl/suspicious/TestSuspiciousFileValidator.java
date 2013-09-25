@@ -55,6 +55,12 @@ public class TestSuspiciousFileValidator extends AbstractTest {
         touch("com/acme/foo/1.0/foo-1.0-javadoc.jar");
         touch("com/acme/foo/1.0/foo-1.0-javadoc.jar.md5");
         touch("com/acme/foo/1.0/foo-1.0-javadoc.jar.sha1");
+        touch("com/acme/foo/1.0/foo-1.0-tests.jar");
+        touch("com/acme/foo/1.0/foo-1.0-tests.jar.md5");
+        touch("com/acme/foo/1.0/foo-1.0-tests.jar.sha1");
+        touch("com/acme/foo/1.0/foo-1.0-test-sources.jar");
+        touch("com/acme/foo/1.0/foo-1.0-test-sources.jar.md5");
+        touch("com/acme/foo/1.0/foo-1.0-test-sources.jar.sha1");
     }
 
     @Test

@@ -27,7 +27,7 @@ public class SuspiciousFileValidator implements Validator {
     
     private static final String[] POM_EXTENSION = { "pom" };
     private static final String[] CHECKSUM_EXTENSIONS = { "sha1", "md5" };
-    private static final String[] ATTACHED_ARTIFACT_TYPES = { "-sources.jar", "-javadoc.jar", "-tests.jar" };
+    private static final String[] ATTACHED_ARTIFACT_TYPES = { "-javadoc.jar", "-tests.jar", "-test-sources.jar", "-sources.jar" };
 
     private final String[] attachedArtifactTypes;
     private final String[] checsumExtensions;
