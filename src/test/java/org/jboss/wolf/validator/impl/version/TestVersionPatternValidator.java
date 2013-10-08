@@ -27,10 +27,16 @@ public class TestVersionPatternValidator extends AbstractTest {
     public void shouldSuccess() {
         String[] versions = {
                 "1-redhat-1",
+                "1-redhat-1",
                 "1-redhat-1234567890",
                 "1.2.3-redhat-1",
                 "1.2.GA-redhat-2",
-                "1.23.456.Final-redhat-333"
+                "1.23.456.Final-redhat-333",
+                "1.redhat-1",
+                "1.redhat-1234567890",
+                "1.2.3.redhat-1",
+                "1.2.GA.redhat-2",
+                "1.23.456.Final.redhat-333"
         };
 
         for (String version : versions) {
@@ -49,7 +55,11 @@ public class TestVersionPatternValidator extends AbstractTest {
                 "1-redHat-1",
                 "1-redhat",
                 "1-redhat-",
-                "1-redhat-alfa"
+                "1-redhat-alfa",
+                "1-redHat-1",
+                "1.redhat",
+                "1.redhat-",
+                "1.redhat-alfa"
         };
 
         for (String version : versions) {

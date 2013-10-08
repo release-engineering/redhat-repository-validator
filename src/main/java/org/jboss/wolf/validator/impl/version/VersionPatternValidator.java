@@ -21,7 +21,7 @@ public class VersionPatternValidator implements Validator {
     
     private static final Logger logger = LoggerFactory.getLogger(VersionPatternValidator.class);
 
-    private static final String DEFAULT_REDHAT_VERSION_PATTERN = ".+-redhat-[0-9]+";
+    private static final String DEFAULT_REDHAT_VERSION_PATTERN = ".+[\\.-]redhat-[0-9]+";
 
     @Inject @Named("versionPatternValidatorFilter")
     private IOFileFilter fileFilter;
