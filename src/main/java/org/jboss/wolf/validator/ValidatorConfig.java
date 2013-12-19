@@ -235,6 +235,11 @@ public class ValidatorConfig {
     public IOFileFilter checksumValidatorFilter() {
         return and(defaultFilter(), notFileFilter(expectedRootFilesFilter()));
     }
+    
+    @Bean
+    public IOFileFilter bestPracticesValidatorFilter() {
+        return defaultFilter();
+    }
 
     @Bean
     public IOFileFilter bomAmbiguousVersionValidatorFilter() {

@@ -64,7 +64,7 @@ public class TestBomDependencyNotFoundValidator extends AbstractTest {
 
     @Test
     public void shouldFindMissingBomDependency() {
-        Model bar = pom().artifactId("bar").build();
+        Model bar = pom().artifactId("bar").model();
 
         pom().artifactId("foo-bom").
                 packaging("pom").
@@ -78,7 +78,7 @@ public class TestBomDependencyNotFoundValidator extends AbstractTest {
 
     @Test
     public void shouldFindMissingBomTransitiveDependency() {
-        Model barApi = pom().artifactId("bar-api").build();
+        Model barApi = pom().artifactId("bar-api").model();
         Model barImpl = pom().artifactId("bar-impl").dependency(barApi).create(repoBarDir);
 
         pom().artifactId("foo-bom").
@@ -93,7 +93,7 @@ public class TestBomDependencyNotFoundValidator extends AbstractTest {
 
     @Test
     public void shouldIgnoreBomExcludedDependency() {
-        Model barApi = pom().artifactId("bar-api").build();
+        Model barApi = pom().artifactId("bar-api").model();
         Model barImpl = pom().artifactId("bar-impl").dependency(barApi).create(repoBarDir);
 
         pom().artifactId("foo-bom").

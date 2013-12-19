@@ -73,7 +73,7 @@ public class TestDependenciesValidator extends AbstractTest {
     
     @Test
     public void shouldResolveParentFromCentral() {
-        Model jbossParent = pom().artifactId("jboss-parent").groupId("org.jboss").version("6").packaging("pom").build();
+        Model jbossParent = pom().artifactId("jboss-parent").groupId("org.jboss").version("6").packaging("pom").model();
         Model fooApi = pom().artifactId("foo-api").parent(jbossParent).create(repoFooDir);
 
         validator.validate(ctx);
@@ -128,7 +128,7 @@ public class TestDependenciesValidator extends AbstractTest {
 
     @Test
     public void shouldResolveDependencyFromCentral() {
-        Model lang = pom().groupId("commons-lang").artifactId("commons-lang").version("2.6").build();
+        Model lang = pom().groupId("commons-lang").artifactId("commons-lang").version("2.6").model();
         Model foo = pom().artifactId("foo").dependency(lang).create(repoFooDir);
 
         validator.validate(ctx);
@@ -333,7 +333,7 @@ public class TestDependenciesValidator extends AbstractTest {
 
     @Test
     public void shouldFindMissingParent() {
-        Model fooParent = pom().artifactId("foo-parent").packaging("pom").build();
+        Model fooParent = pom().artifactId("foo-parent").packaging("pom").model();
         pom().artifactId("foo-api").parent(fooParent).create(repoFooDir);
 
         validator.validate(ctx);
@@ -343,7 +343,7 @@ public class TestDependenciesValidator extends AbstractTest {
 
     @Test
     public void shouldFindMissingGrandParent() {
-        Model barParent = pom().artifactId("bar-parent").packaging("pom").build();
+        Model barParent = pom().artifactId("bar-parent").packaging("pom").model();
         Model fooParent = pom().artifactId("foo-parent").packaging("pom").parent(barParent).create(repoFooDir);
         pom().artifactId("foo-api").parent(fooParent).create(repoFooDir);
 
@@ -355,7 +355,7 @@ public class TestDependenciesValidator extends AbstractTest {
 
     @Test
     public void shouldFindMissingDirectDependency() {
-        Model fooApi = pom().artifactId("foo-api").build();
+        Model fooApi = pom().artifactId("foo-api").model();
         pom().artifactId("foo-impl").dependency(fooApi).create(repoFooDir);
 
         validator.validate(ctx);
@@ -365,7 +365,7 @@ public class TestDependenciesValidator extends AbstractTest {
 
     @Test
     public void shouldFindMissingTransitiveDependency() {
-        Model barApi = pom().artifactId("bar-api").build();
+        Model barApi = pom().artifactId("bar-api").model();
         Model fooApi = pom().artifactId("foo-api").dependency(barApi).create(repoFooDir);
         pom().artifactId("foo-impl").dependency(fooApi).create(repoFooDir);
 
@@ -377,7 +377,7 @@ public class TestDependenciesValidator extends AbstractTest {
 
     @Test
     public void shouldFindMissingDependencyFromCentral() {
-        Model lang = pom().groupId("commons-lang").artifactId("commons-lang").version("999").build();
+        Model lang = pom().groupId("commons-lang").artifactId("commons-lang").version("999").model();
         pom().artifactId("foo").dependency(lang).create(repoFooDir);
 
         validator.validate(ctx);
@@ -407,7 +407,7 @@ public class TestDependenciesValidator extends AbstractTest {
 
     @Test
     public void shouldFindMissingDependencyFromDepMng() {
-        Model bar = pom().artifactId("bar").build();
+        Model bar = pom().artifactId("bar").model();
 
         Model fooParent = pom().artifactId("foo-parent").packaging("pom")
                 .dependencyManagement(bar)
@@ -426,11 +426,11 @@ public class TestDependenciesValidator extends AbstractTest {
 
     @Test
     public void shouldFindMissingBOM() {
-        Model bar = pom().artifactId("bar").build();
+        Model bar = pom().artifactId("bar").model();
 
         Model fooBom = pom().artifactId("foo-bom").packaging("pom")
                 .dependencyManagement(bar)
-                .build();
+                .model();
 
         pom().artifactId("foo-api")
                 .dependencyManagement(dependency().to(fooBom).type("pom").scope("import").build())
@@ -445,7 +445,7 @@ public class TestDependenciesValidator extends AbstractTest {
 
     @Test
     public void shouldFindMissingDependencyFromBOM() {
-        Model bar = pom().artifactId("bar").build();
+        Model bar = pom().artifactId("bar").model();
 
         Model fooBom = pom().artifactId("foo-bom").packaging("pom")
                 .dependencyManagement(bar)
@@ -464,7 +464,7 @@ public class TestDependenciesValidator extends AbstractTest {
     
     @Test
     public void shouldFindMissingDependencyFromActiveProfile() {
-        Model bar = pom().artifactId("bar").build();
+        Model bar = pom().artifactId("bar").model();
         Model foo = pom().artifactId("foo").create(repoFooDir);
 
         Activation fooProfileActivation = new Activation();
@@ -485,7 +485,7 @@ public class TestDependenciesValidator extends AbstractTest {
 
     @Test
     public void shouldIgnoreDependencyWithTestScope() {
-        Model bar = pom().artifactId("bar").build();
+        Model bar = pom().artifactId("bar").model();
         pom().artifactId("foo").dependency(dependency().to(bar).scope("test").build()).create(repoFooDir);
 
         validator.validate(ctx);
@@ -495,7 +495,7 @@ public class TestDependenciesValidator extends AbstractTest {
     
     @Test
     public void shouldIgnoreDependencyWithScopeProvided() {
-        Model bar = pom().artifactId("bar-provided").build();
+        Model bar = pom().artifactId("bar-provided").model();
         pom().artifactId("foo").dependency(dependency().to(bar).scope("provided").build()).create(repoFooDir);
 
         validator.validate(ctx);
@@ -505,7 +505,7 @@ public class TestDependenciesValidator extends AbstractTest {
     
     @Test
     public void shouldIgnoreDependencyWithScopeRuntime() {
-        Model bar = pom().artifactId("bar-runtime").build();
+        Model bar = pom().artifactId("bar-runtime").model();
         pom().artifactId("foo").dependency(dependency().to(bar).scope("runtime").build()).create(repoFooDir);
 
         validator.validate(ctx);
@@ -515,7 +515,7 @@ public class TestDependenciesValidator extends AbstractTest {
 
     @Test
     public void shouldIgnoreOptionalDependency() {
-        Model baz = pom().artifactId("baz").build();
+        Model baz = pom().artifactId("baz").model();
         Model bar = pom().artifactId("bar").dependency(dependency().to(baz).optional().build()).create(repoBarDir);
         pom().artifactId("foo").dependency(dependency().to(bar).build()).create(repoFooDir);
 
@@ -526,7 +526,7 @@ public class TestDependenciesValidator extends AbstractTest {
 
     @Test
     public void shouldIgnoreExcludedDependency() {
-        Model baz = pom().artifactId("baz").build();
+        Model baz = pom().artifactId("baz").model();
         Model bar = pom().artifactId("bar").dependency(baz).create(repoBarDir);
         pom().artifactId("foo").dependency(dependency().to(bar).exclude(baz).build()).create(repoFooDir);
 
@@ -545,7 +545,7 @@ public class TestDependenciesValidator extends AbstractTest {
         Build fooBuild = new Build();
         fooBuild.addPlugin(barPlugin);
 
-        Model foo = pom().artifactId("foo").build();
+        Model foo = pom().artifactId("foo").model();
         foo.setBuild(fooBuild);
 
         createArtifact(repoFooDir, foo);
@@ -568,7 +568,7 @@ public class TestDependenciesValidator extends AbstractTest {
         Build fooBuild = new Build();
         fooBuild.addPlugin(barPlugin);
 
-        Model foo = pom().artifactId("foo").build();
+        Model foo = pom().artifactId("foo").model();
         foo.setBuild(fooBuild);
 
         createArtifact(repoFooDir, foo);

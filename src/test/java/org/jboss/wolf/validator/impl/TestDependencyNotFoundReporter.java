@@ -9,7 +9,7 @@ public class TestDependencyNotFoundReporter extends AbstractReporterTest {
     
     @Test
     public void shouldReportMissingDependency() {
-        Model fooApi = pom().artifactId("foo-api").build();
+        Model fooApi = pom().artifactId("foo-api").model();
         pom().artifactId("foo-impl").dependency(fooApi).create(repoFooDir);
 
         validator.validate(ctx);
@@ -23,9 +23,9 @@ public class TestDependencyNotFoundReporter extends AbstractReporterTest {
 
     @Test
     public void shouldReportMissingDependencies() {
-        Model barApi = pom().artifactId("bar-api").build();
+        Model barApi = pom().artifactId("bar-api").model();
         Model barImpl = pom().artifactId("bar-impl").dependency(barApi).create(repoBarDir);
-        Model fooApi = pom().artifactId("foo-api").build();
+        Model fooApi = pom().artifactId("foo-api").model();
         pom().artifactId("foo-impl").dependency(fooApi).dependency(barImpl).create(repoFooDir);
         pom().artifactId("foo-dist").dependency(fooApi).create(repoFooDir);
 
@@ -44,7 +44,7 @@ public class TestDependencyNotFoundReporter extends AbstractReporterTest {
     
     @Test
     public void shouldNotPrintEmptyPath() {
-        Model fooParent = pom().artifactId("foo-parent").packaging("pom").build();
+        Model fooParent = pom().artifactId("foo-parent").packaging("pom").model();
         pom().artifactId("foo-api").parent(fooParent).create(repoFooDir);
 
         validator.validate(ctx);
@@ -59,7 +59,7 @@ public class TestDependencyNotFoundReporter extends AbstractReporterTest {
     
     @Test
     public void shouldNotPrintPathSameLikeFrom() {
-        Model fooApi = pom().artifactId("foo-api").build();
+        Model fooApi = pom().artifactId("foo-api").model();
         pom().artifactId("foo-impl").dependency(fooApi).create(repoFooDir);
 
         validator.validate(ctx);

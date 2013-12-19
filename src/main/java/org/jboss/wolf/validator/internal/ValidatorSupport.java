@@ -64,29 +64,53 @@ public class ValidatorSupport {
         return result;
     }
     
-    public Iterator<Model> effectiveModelIterator(final ValidatorContext ctx, IOFileFilter filter) {
+    public Iterator<ModelBuildingResult> modelIterator(final ValidatorContext ctx, IOFileFilter filter) {
         final Iterator<File> fileIterator = iterateFiles(ctx.getValidatedRepository(), and(filter, suffixFileFilter(".pom")), trueFileFilter());
-        final Iterator<Model> modelIterator = new Iterator<Model>() {
-            
+        final Iterator<ModelBuildingResult> modelIterator = new Iterator<ModelBuildingResult>() {
+
             @Override
             public boolean hasNext() {
                 return fileIterator.hasNext();
             }
-            
+
             @Override
-            public Model next() {
+            public ModelBuildingResult next() {
                 File file = fileIterator.next();
                 ModelBuildingResult model = buildModel(file);
-                return model != null ? model.getEffectiveModel() : null;
+                return model;
             }
-            
+
             @Override
             public void remove() {
                 throw new UnsupportedOperationException();
             }
         };
-        
+
         return modelIterator;
+    }
+    
+    public Iterator<Model> effectiveModelIterator(final ValidatorContext ctx, IOFileFilter filter) {
+        final Iterator<ModelBuildingResult> modelIterator = modelIterator(ctx, filter);
+        final Iterator<Model> effectiveModelIterator = new Iterator<Model>() {
+
+            @Override
+            public boolean hasNext() {
+                return modelIterator.hasNext();
+            }
+
+            @Override
+            public Model next() {
+                ModelBuildingResult model = modelIterator.next();
+                return model != null ? model.getEffectiveModel() : null;
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+        };
+
+        return effectiveModelIterator;
     }
     
     // copy from DefaultArtifactDescriptorReader

@@ -130,7 +130,7 @@ public class TestUtil {
             return this;
         }
         
-        public Model build() {
+        public Model model() {
             return model;
         }
         
