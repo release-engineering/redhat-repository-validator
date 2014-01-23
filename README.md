@@ -50,7 +50,7 @@ Validators
 ----------
 
 - `DependenciesValidator` try to resolve all required dependencies (scope test, runtime and provided, or optional dependencies are skipped)
-- `ModelValidator` make sure that all pom files are "loadable" (maven can load it's model with strick validation level)
+- `ModelValidator` make sure that all pom files are "loadable" (maven can load it's model with strict validation level)
 - `ChecksumValidator` validate checksums for all repository artifacts (by default  readme and example settings.xml are excluded from this rule)
 - `JarSignatureValidator` validate that all jar files are signed/unsigned
 - `SuspiciousFileValidator` try to find suspicious files in repository (eg. jar without pom, checksum without source file, empty directory, etc...)
@@ -59,7 +59,7 @@ Validators
 - `BomUnmanagedVersionValidator` try to find artifacts which are not defined in any bom files
 - `BomAmbiguousVersionValidator` try to find artifacts which version is defined ambiguous in bom files
 - `BomVersionPropertyValidator` try to find boms which define dependencies without version property
-- `VersionAmiguityValidator` try to find artifacts, which have multiple versions in repository
+- `VersionAmbiguityValidator` try to find artifacts, which have multiple versions in repository
 - `VersionOverlapValidator` try to find artifacts, which overlap with others remote repositories
 - `VersionPatternValidator` try to find artifacts, which version doesn't match regex pattern (eg. -redhat-x postfix)
 - `JarSourcesValidator` try to find artifacts, which do not contain sources within them(verify if *-sources.jar exists)
@@ -71,7 +71,7 @@ Reporters
 ---------
 
 - `DefaultReporter`, `DependencyNotFoundReporter` and `BomDependencyNotFoundReporter` produces simple text reports, which are writen by default into log and into file `workspace/report.txt`
-- `SurefireXmlReporter` produce xml files in same format like maven surefire plugin, which can be consumed by tools like Jenkins, default output directory is `workspace/surefire-reports`
+- `SurefireXmlReporter` produces xml files in same format like maven surefire plugin, which can be consumed by tools like Jenkins, default output directory is `workspace/surefire-reports`
 
 
 How to
@@ -85,7 +85,7 @@ Tool configuration can be changed in `wolf-validator-config.xml` file and it con
 
 #### How to add whitelist/filter ?
 
-Into each validator is injected file filter (interface `IOFileFilter`), which allow to skip selected files. 
+Into each validator is injected file filter (interface `IOFileFilter`), which allows to skip selected files. 
 By conventions, filter beans have id like validator name with suffix filter, for example `checksumValidatorFilter`. 
 These filter beans can be redefined in external configuration file, see examples in xml or groovy `fooValidatorFilter `.
 
@@ -99,6 +99,7 @@ Or permanently added in configuration file, see `fooRepository` snippet, where i
 #### How to add custom validation/report ?
 
 Validators/reporters have to implement interface `org.jboss.wolf.validator.Validator/Reporter`, 
-for simple example take a look on `ChecksumValidator` implementation. 
-Jar file with new validator/reporter add into `lib` subdirectory, so it will be automatically on classpath.
-And register new bean in configuration file `wolf-validator-config.xml`, see example with `fooValidator`.        
+for simple example take a look at `ChecksumValidator` implementation. 
+Jar file with the new validator/reporter needs to be added into `lib` subdirectory, so it will automatically end up 
+on classpath.
+As a last step new bean has to be configured in `wolf-validator-config.xml`, see an example with `fooValidator`.        
