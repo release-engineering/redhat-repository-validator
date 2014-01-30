@@ -1,5 +1,6 @@
 package org.jboss.wolf.validator.impl;
 
+import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.apache.maven.surefire.report.CategorizedReportEntry.reportEntry;
 import static org.jboss.wolf.validator.internal.Utils.findCause;
@@ -90,28 +91,34 @@ public class SurefireXmlReporter implements Reporter {
 
     private void reportDependencyNotFound(List<Exception> exceptionList) {
         ListMultimap<Artifact, DependencyNode> artifactNotFoundMap = collectDependencyNotFoundData(exceptionList);
-
-        TestSetStats testSuite = new TestSetStats(false, false);
-        for (Artifact artifact : sortArtifacts(artifactNotFoundMap.keySet())) {
-            for (DependencyNode root : sortDependencyNodes(artifactNotFoundMap.get(artifact))) {
-                String msg = "Miss " + artifact + " in " + root.getArtifact() + "(path " + findPathToDependency(artifact, root) + ")";
-                testSuite.testError(testCase("DependencyNotFoundReport", msg));
-            }
-        }
-        reportTestSuite("DependencyNotFoundReport", testSuite);
+        reportDependencyNotFound("DependencyNotFoundReport", artifactNotFoundMap);
     }
 
     private void reportBomDependencyNotFound(List<Exception> exceptionList) {
         ListMultimap<Artifact, DependencyNode> artifactNotFoundMap = collectBomDependencyNotFoundData(exceptionList);
-
+        reportDependencyNotFound("BomDependencyNotFoundReport", artifactNotFoundMap);
+    }
+    
+    private void reportDependencyNotFound(String type, ListMultimap<Artifact, DependencyNode> artifactNotFoundMap) {
         TestSetStats testSuite = new TestSetStats(false, false);
         for (Artifact artifact : sortArtifacts(artifactNotFoundMap.keySet())) {
-            for (DependencyNode root : sortDependencyNodes(artifactNotFoundMap.get(artifact))) {
-                String msg = "Miss " + artifact + " in " + root.getArtifact() + "(path " + findPathToDependency(artifact, root) + ")";
-                testSuite.testError(testCase("BomDependencyNotFoundReport", msg));
+            List<DependencyNode> roots = sortDependencyNodes(artifactNotFoundMap.get(artifact));
+            if( roots.size() == 1 ) {
+                String msg = "Miss " + artifact + " in " + roots.get(0).getArtifact() + "(path " + findPathToDependency(artifact, roots.get(0)) + ")";
+                testSuite.testError(testCase(type, msg, null));
+            } else {
+                String msg = "Miss " + artifact + " in " + roots.size() + " artifacts ...";
+                StringBuilder dsc = new StringBuilder();
+                dsc.append("Miss " + artifact + " in ...");
+                dsc.append(LINE_SEPARATOR).append(LINE_SEPARATOR);
+                for(DependencyNode root : roots) {
+                    dsc.append(root.getArtifact() + "(path " + findPathToDependency(artifact, root) + ")");
+                    dsc.append(LINE_SEPARATOR).append(LINE_SEPARATOR);
+                }
+                testSuite.testError(testCase(type, msg, dsc.toString()));
             }
         }
-        reportTestSuite("BomDependencyNotFoundReport", testSuite);
+        reportTestSuite(type, testSuite);
     }
 
     private void reportExceptions(List<Exception> exceptionList) {
@@ -193,8 +200,8 @@ public class SurefireXmlReporter implements Reporter {
         return wrap(reportEntry);
     }
 
-    private WrappedReportEntry testCase(String type, String message) {
-        ReportEntry reportEntry = reportEntry(type, testCasePrefix + message, null, new InternalStackTraceWriter(), 0, "");
+    private WrappedReportEntry testCase(String type, String message, String description) {
+        ReportEntry reportEntry = reportEntry(type, testCasePrefix + message, null, new InternalStackTraceWriter(description), 0, "");
         return wrap(reportEntry);
     }
 
@@ -211,18 +218,28 @@ public class SurefireXmlReporter implements Reporter {
 
         private static final Exception NONE_EXCEPTION = new Exception("");
 
+        private final String description;
         private final Exception exception;
 
-        private InternalStackTraceWriter() {
-            this(NONE_EXCEPTION);
+        private InternalStackTraceWriter(String description) {
+            this(description, NONE_EXCEPTION);
         }
 
         private InternalStackTraceWriter(Exception exception) {
+            this(null, exception);
+        }
+        
+        private InternalStackTraceWriter(String description, Exception exception) {
+            this.description = description;
             this.exception = exception;
         }
         
         private String stackTrace() {
-            return exception.getMessage() != null ? "" : ExceptionUtils.getStackTrace(exception);
+            if (description != null) {
+                return description;
+            } else {
+                return exception.getMessage() != null ? "" : ExceptionUtils.getStackTrace(exception);
+            }
         }
 
         @Override
