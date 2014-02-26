@@ -138,6 +138,11 @@ public class TestUtil {
             createArtifact(repoDir, model, originalText, demagedText);
             return model;
         }
+        
+        public Model create(File repoDir, String jarPath) {
+            createArtifact(repoDir, model, originalText, demagedText, jarPath);
+            return model;
+        }
 
     }
     
@@ -243,6 +248,10 @@ public class TestUtil {
     }
     
     public static void createArtifact(File repoDir, Model pomModel, String originalText, String demagedText) {
+        createArtifact(repoDir, pomModel, originalText, demagedText, "target/test-classes/empty.jar");
+    }
+    
+    public static void createArtifact(File repoDir, Model pomModel, String originalText, String demagedText, String jarPath) {
         try {
             File pomFile = toPomFile(repoDir, pomModel);
             FileUtils.touch(pomFile);
@@ -254,7 +263,7 @@ public class TestUtil {
             s.close();
             
             if (!StringUtils.equals(pomModel.getPackaging(), "pom")) {
-                File srcFile = new File("target/test-classes/empty.jar");
+                File srcFile = new File(jarPath);
                 File destFile = toArtifactFile(repoDir, pomModel);
                 FileUtils.copyFile(srcFile, destFile);
                 createChecksums(destFile);
@@ -266,7 +275,7 @@ public class TestUtil {
                 FileUtils.writeStringToFile(pomFile, pomText);
             }
             
-            createChecksums(pomFile);            
+            createChecksums(pomFile);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

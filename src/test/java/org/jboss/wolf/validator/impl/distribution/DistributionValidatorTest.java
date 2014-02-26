@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.maven.model.Model;
 import org.jboss.wolf.validator.impl.AbstractTest;
 import org.junit.Test;
 import org.springframework.context.annotation.Bean;
@@ -96,6 +97,21 @@ public class DistributionValidatorTest extends AbstractTest {
 
         validator.validate(ctx);
         assertExpectedException(DistributionRedundantFileException.class, "Distribution contains file, which is not in repository: foo-1.0.jar");
+    }
+
+    @Test
+    public void shouldNotFindRedundantFilesIfTheyComeFromRemoteRepositoriesDueTransitiveDependencies() throws IOException {
+        Model barPom = pom().artifactId("bar").create(repoBarDir, "target/test-classes/empty-signed.jar");
+        pom().artifactId("foo").dependency(barPom).create(repoFooDir);
+
+        FileUtils.copyFile(new File(repoFooDir + "/com/acme/foo/1.0/foo-1.0.jar"), distFooJar);
+        FileUtils.copyFile(new File(repoBarDir + "/com/acme/bar/1.0/bar-1.0.jar"), distBarJar);
+        FileUtils.copyDirectory(repoFooDir, repoLocalDir);
+        FileUtils.copyDirectory(repoBarDir, repoLocalDir);
+
+        validator.validate(ctx);
+
+        assertSuccess();
     }
 
 }

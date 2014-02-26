@@ -22,6 +22,7 @@ import javax.inject.Named;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
+import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.util.ChecksumUtils;
 import org.jboss.wolf.validator.Validator;
 import org.jboss.wolf.validator.ValidatorContext;
@@ -41,6 +42,8 @@ public class DistributionValidator implements Validator {
 
     @Inject @Named("distributionValidatorFilter")
     private IOFileFilter fileFilter;
+    @Inject
+    private LocalRepository localRepository;
 
     @Override
     public void validate(ValidatorContext ctx) {
@@ -49,45 +52,50 @@ public class DistributionValidator implements Validator {
             return;
         }
 
-        ListMultimap<String, File> repoFilesMap = mapFilesToChecksum(ctx.getValidatedRepository());
-        ListMultimap<String, File> distFilesMap = mapFilesToChecksum(ctx.getValidatedDistribution());
+        ListMultimap<String, File> validatedRepoFilesMap = mapFilesToChecksum(ctx.getValidatedRepository());
+        ListMultimap<String, File> validatedDistFilesMap = mapFilesToChecksum(ctx.getValidatedDistribution());
+        ListMultimap<String, File> localRepoFilesMap = mapFilesToChecksum(localRepository.getBasedir());
 
-        // find files which are in repository, but not in distribution
-        findMissingFiles(ctx, repoFilesMap, distFilesMap);
+        // find files which are in validated repository, but not in distribution
+        findMissingFiles(ctx, validatedRepoFilesMap, validatedDistFilesMap);
         
-        // find files which are in distribution, but not in repository
-        findRedundantFiles(ctx, repoFilesMap, distFilesMap);
+        // find files which are in distribution, but not in validated repository or in local repository, due transitive dependencies
+        findRedundantFiles(ctx, validatedRepoFilesMap, validatedDistFilesMap, localRepoFilesMap);
         
         // find files which are identical, has same content
-        findDuplicateFiles(ctx, repoFilesMap, distFilesMap);
+        findDuplicateFiles(ctx, validatedRepoFilesMap, validatedDistFilesMap);
         
         // find files which are identical with artifact, but have different names 
-        findMisnomerFiles(ctx, repoFilesMap, distFilesMap);
+        findMisnomerFiles(ctx, validatedRepoFilesMap, validatedDistFilesMap);
         
         // find files which have same name like some artifact, but different content
-        findCoruptedFiles(ctx, repoFilesMap, distFilesMap);
+        findCoruptedFiles(ctx, validatedRepoFilesMap, validatedDistFilesMap);
     }
 
-    private void findMissingFiles(ValidatorContext ctx, ListMultimap<String, File> repoFilesMap, ListMultimap<String, File> distFilesMap) {
-        Set<String> missingFileHashSet = Sets.difference(repoFilesMap.keySet(), distFilesMap.keySet());
+    private void findMissingFiles(ValidatorContext ctx, ListMultimap<String, File> validatedRepoFilesMap, ListMultimap<String, File> validatedDistFilesMap) {
+        Set<String> missingFileHashSet = Sets.difference(validatedRepoFilesMap.keySet(), validatedDistFilesMap.keySet());
         for (String missingFileHash : missingFileHashSet) {
-            File missingFile = repoFilesMap.get(missingFileHash).get(0);
+            File missingFile = validatedRepoFilesMap.get(missingFileHash).get(0);
             ctx.addException(missingFile, 
                     new DistributionMissingFileException(relativize(ctx, missingFile)));
         }
     }
 
-    private void findRedundantFiles(ValidatorContext ctx, ListMultimap<String, File> repoFilesMap, ListMultimap<String, File> distFilesMap) {
-        Set<String> redundantFileHashSet = Sets.difference(distFilesMap.keySet(), repoFilesMap.keySet());
+    private void findRedundantFiles(ValidatorContext ctx, ListMultimap<String, File> validatedRepoFilesMap, ListMultimap<String, File> validatedDistFilesMap, ListMultimap<String, File> localRepoFilesMap) {
+        Set<String> redundantFileHashSet = Sets.difference(validatedDistFilesMap.keySet(), validatedRepoFilesMap.keySet());
         for (String redundantFileHash : redundantFileHashSet) {
-            File redundantFile = distFilesMap.get(redundantFileHash).get(0);
+            if (localRepoFilesMap.containsKey(redundantFileHash)) {
+                // transitive dependency from remote repository, which belongs to distribution
+                continue;
+            }
+            File redundantFile = validatedDistFilesMap.get(redundantFileHash).get(0);
             ctx.addException(redundantFile, 
                     new DistributionRedundantFileException(relativizeFile(ctx.getValidatedDistribution(), redundantFile)));
         }
     }
 
-    private void findDuplicateFiles(ValidatorContext ctx, ListMultimap<String, File> repoFilesMap, ListMultimap<String, File> distFilesMap) {
-        for (Entry<String, Collection<File>> distFileEntry : distFilesMap.asMap().entrySet()) {
+    private void findDuplicateFiles(ValidatorContext ctx, ListMultimap<String, File> validatedRepoFilesMap, ListMultimap<String, File> validatedDistFilesMap) {
+        for (Entry<String, Collection<File>> distFileEntry : validatedDistFilesMap.asMap().entrySet()) {
             if (distFileEntry.getValue().size() > 1) {
                 List<File> duplicateFiles = new ArrayList<File>();
                 for (File distFile : distFileEntry.getValue()) {
@@ -100,9 +108,9 @@ public class DistributionValidator implements Validator {
         }
     }
 
-    private void findMisnomerFiles(ValidatorContext ctx, ListMultimap<String, File> repoFilesMap, ListMultimap<String, File> distFilesMap) {
-        for (Entry<String, File> distFileEntry : distFilesMap.entries()) {
-            for (Entry<String, File> repoFileEntry : repoFilesMap.entries()) {
+    private void findMisnomerFiles(ValidatorContext ctx, ListMultimap<String, File> validatedRepoFilesMap, ListMultimap<String, File> validatedDistFilesMap) {
+        for (Entry<String, File> distFileEntry : validatedDistFilesMap.entries()) {
+            for (Entry<String, File> repoFileEntry : validatedRepoFilesMap.entries()) {
                 String distFileHash = distFileEntry.getKey();
                 String repoFileHash = repoFileEntry.getKey();
                 File distFile = distFileEntry.getValue();
@@ -118,9 +126,9 @@ public class DistributionValidator implements Validator {
         }
     }
 
-    private void findCoruptedFiles(ValidatorContext ctx, ListMultimap<String, File> repoFilesMap, ListMultimap<String, File> distFilesMap) {
-        for (Entry<String, File> distFileEntry : distFilesMap.entries()) {
-            for (Entry<String, File> repoFileEntry : repoFilesMap.entries()) {
+    private void findCoruptedFiles(ValidatorContext ctx, ListMultimap<String, File> validatedRepoFilesMap, ListMultimap<String, File> validatedDistFilesMap) {
+        for (Entry<String, File> distFileEntry : validatedDistFilesMap.entries()) {
+            for (Entry<String, File> repoFileEntry : validatedRepoFilesMap.entries()) {
                 String distFileHash = distFileEntry.getKey();
                 String repoFileHash = repoFileEntry.getKey();
                 File distFile = distFileEntry.getValue();
