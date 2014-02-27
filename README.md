@@ -103,3 +103,46 @@ for simple example take a look at `ChecksumValidator` implementation.
 Jar file with the new validator/reporter needs to be added into `lib` subdirectory, so it will automatically end up 
 on classpath.
 As a last step new bean has to be configured in `wolf-validator-config.xml`, see an example with `fooValidator`.        
+
+
+#### How to execute only specified validators ?
+
+By default all validators on classpath are gathered and executed. There might be cases where running all of them is not practical.
+The class that executes the validators is an ordinary bean. That means it can be redefined in the `wolf-validator-config.xml`.
+Using the example below will result in execution of only `JarSourcesValidator` and `JarSignatureValidator`.
+
+```xml
+<beans>
+...
+    <bean id="validationExecutor" class="org.jboss.wolf.validator.ValidationExecutor">
+        <constructor-arg>
+            <list>
+                <bean class="org.jboss.wolf.validator.impl.source.JarSourcesValidator"/>
+                <bean class="org.jboss.wolf.validator.impl.signature.JarSignatureValidator"/>
+            </list>
+        </constructor-arg>
+    </bean>
+...
+</beans>
+```
+
+
+#### How to execute only specified reporters ?
+
+Similarly as with validators, there might be cases where running all of reporters is not practical.
+The class that executes the reporters is also an ordinary bean and can be redefined in the `wolf-validator-config.xml`.
+Using the example below will result in execution of only the `SurefireXmlReporter`.
+
+```xml
+<beans>
+...
+    <bean id="reportingExecutor" class="org.jboss.wolf.validator.ReportingExecutor">
+        <constructor-arg>
+            <list>
+                <bean class="org.jboss.wolf.validator.impl.SurefireXmlReporter"/>
+            </list>
+        </constructor-arg>
+    </bean>
+...
+</beans>
+```
