@@ -48,7 +48,7 @@ public class ValidatorRunner {
     @Inject
     protected ValidationExecutor validationExecutor;
     @Inject
-    protected Reporter reporter;
+    protected ReportingExecutor reportingExecutor;
 
     public void run(String... arguments) {
         Options options = new Options();
@@ -101,7 +101,7 @@ public class ValidatorRunner {
     protected void runValidation() {
         initializer.initialize(context);
         validationExecutor.execute(context);
-        reporter.report(context);
+        reportingExecutor.execute(context);
     }
 
     private void initApplicationContext(CommandLine line) {

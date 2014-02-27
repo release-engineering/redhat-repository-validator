@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -275,7 +274,7 @@ public class TestValidatorRunner {
         @Override
         protected void runValidation() {
             context.addException(new File("foo"), new ChecksumNotExistException(new File("foo"), "SHA-1"));
-            reporter.report(context);
+            reportingExecutor.execute(context);
             
             try {
                 assertTrue(reportFile.exists());

@@ -13,7 +13,7 @@ public class TestDependencyNotFoundReporter extends AbstractReporterTest {
         pom().artifactId("foo-impl").dependency(fooApi).create(repoFooDir);
 
         validationExecutor.execute(ctx);
-        reporter.report(ctx);
+        reportingExecutor.execute(ctx);
 
         assertReportContains(
                   "Found 1 missing dependencies.\n"
@@ -30,7 +30,7 @@ public class TestDependencyNotFoundReporter extends AbstractReporterTest {
         pom().artifactId("foo-dist").dependency(fooApi).create(repoFooDir);
 
         validationExecutor.execute(ctx);
-        reporter.report(ctx);
+        reportingExecutor.execute(ctx);
 
         assertReportContains(
                   "Found 2 missing dependencies.\n"
@@ -48,7 +48,7 @@ public class TestDependencyNotFoundReporter extends AbstractReporterTest {
         pom().artifactId("foo-api").parent(fooParent).create(repoFooDir);
 
         validationExecutor.execute(ctx);
-        reporter.report(ctx);
+        reportingExecutor.execute(ctx);
 
         assertReportContains(
                   "Found 1 missing dependencies.\n"
@@ -63,7 +63,7 @@ public class TestDependencyNotFoundReporter extends AbstractReporterTest {
         pom().artifactId("foo-impl").dependency(fooApi).create(repoFooDir);
 
         validationExecutor.execute(ctx);
-        reporter.report(ctx);
+        reportingExecutor.execute(ctx);
 
         assertReportContains(
                   "Found 1 missing dependencies.\n"

@@ -92,20 +92,8 @@ public class ValidatorConfig {
 
     @Bean
     @Primary
-    public Reporter reporter(final Reporter[] reporters) {
-        sort(reporters);
-        return new Reporter() {
-            @Override
-            public void report(ValidatorContext ctx) {
-                for (Reporter reporter : reporters) {
-                    try {
-                        reporter.report(ctx);
-                    } catch (RuntimeException e) {
-                        logger.error("reporter " + reporter.getClass().getSimpleName() + " ended with unexpected exception!", e);
-                    }
-                }
-            }
-        };
+    public ReportingExecutor reportingExecutor(Reporter[] reporters) {
+        return new ReportingExecutor(reporters);
     }
 
     @Bean

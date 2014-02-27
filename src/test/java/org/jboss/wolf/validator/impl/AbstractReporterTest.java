@@ -10,6 +10,7 @@ import javax.inject.Inject;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.jboss.wolf.validator.Reporter;
+import org.jboss.wolf.validator.ReportingExecutor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.annotation.DirtiesContext;
@@ -21,7 +22,7 @@ import org.springframework.test.context.ContextConfiguration;
 public abstract class AbstractReporterTest extends AbstractTest {
 
     @Inject
-    protected Reporter reporter;
+    protected ReportingExecutor reportingExecutor;
     @Inject
     protected ByteArrayOutputStream out;
 
