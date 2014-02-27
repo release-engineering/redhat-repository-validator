@@ -31,7 +31,7 @@ public class TestXmlFileValidator extends AbstractTest {
     public void validXML_shouldSuccess() throws IOException {
         FileUtils.copyFile(sourceXmlFile, validXmlFile);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
         assertSuccess();
     }
 
@@ -43,7 +43,7 @@ public class TestXmlFileValidator extends AbstractTest {
         xmlText = xmlText.replace("<profiles>", "  <<profiles>");
         FileUtils.writeStringToFile(notValidXmlFile, xmlText);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
         assertExpectedException(XmlVerificationException.class, "Xml file settings-not-valid.xml has following errors (182, 6): The content of elements must consist of well-formed character data or markup.");
     }
 
@@ -55,7 +55,7 @@ public class TestXmlFileValidator extends AbstractTest {
         xmlText = xmlText.replace("<profiles>", "<profiles");
         FileUtils.writeStringToFile(notValidXmlFile, xmlText);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
         assertExpectedException(XmlVerificationException.class, "Xml file settings-not-valid.xml has following errors (183, 5): Element type \"profiles\" must be followed by either attribute specifications, \">\" or \"/>\".");
     }
 

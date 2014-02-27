@@ -41,7 +41,7 @@ public class TestBomUnmanagedVersionValidator extends AbstractTest {
                 dependencyManagement(fooImpl).
                 create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
     }
@@ -58,7 +58,7 @@ public class TestBomUnmanagedVersionValidator extends AbstractTest {
                 dependencyManagement(dependency().to(fooImpl).version("${version.foo}").build()).
                 create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
     }
@@ -75,7 +75,7 @@ public class TestBomUnmanagedVersionValidator extends AbstractTest {
                 dependencyManagement(fooImpl).
                 create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertExpectedException(BomUnmanagedVersionException.class, "artifact com.acme:foo-impl:2.0 is unmanaged");
     }
@@ -83,14 +83,14 @@ public class TestBomUnmanagedVersionValidator extends AbstractTest {
     @Test
     public void shouldIgnorePlugins() {
         pom().artifactId("foo-plugin").packaging("maven-plugin").create(repoFooDir);
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
         assertSuccess();
     }
     
     @Test
     public void shouldIgnoreArchetypes() {
         pom().artifactId("foo-archetype").packaging("maven-archetype").create(repoFooDir);
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
         assertSuccess();
     }
     

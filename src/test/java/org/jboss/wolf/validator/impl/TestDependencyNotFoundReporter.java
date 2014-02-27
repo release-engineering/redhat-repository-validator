@@ -12,7 +12,7 @@ public class TestDependencyNotFoundReporter extends AbstractReporterTest {
         Model fooApi = pom().artifactId("foo-api").model();
         pom().artifactId("foo-impl").dependency(fooApi).create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
         reporter.report(ctx);
 
         assertReportContains(
@@ -29,7 +29,7 @@ public class TestDependencyNotFoundReporter extends AbstractReporterTest {
         pom().artifactId("foo-impl").dependency(fooApi).dependency(barImpl).create(repoFooDir);
         pom().artifactId("foo-dist").dependency(fooApi).create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
         reporter.report(ctx);
 
         assertReportContains(
@@ -47,7 +47,7 @@ public class TestDependencyNotFoundReporter extends AbstractReporterTest {
         Model fooParent = pom().artifactId("foo-parent").packaging("pom").model();
         pom().artifactId("foo-api").parent(fooParent).create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
         reporter.report(ctx);
 
         assertReportContains(
@@ -62,7 +62,7 @@ public class TestDependencyNotFoundReporter extends AbstractReporterTest {
         Model fooApi = pom().artifactId("foo-api").model();
         pom().artifactId("foo-impl").dependency(fooApi).create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
         reporter.report(ctx);
 
         assertReportContains(

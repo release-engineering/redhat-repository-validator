@@ -39,7 +39,7 @@ public class TestBomDependencyNotFoundValidator extends AbstractTest {
                 dependencyManagement(bar).
                 create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
         assertLocalRepoContains(bar);
@@ -55,7 +55,7 @@ public class TestBomDependencyNotFoundValidator extends AbstractTest {
                 dependencyManagement(barImpl).
                 create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
         assertLocalRepoContains(barApi);
@@ -71,7 +71,7 @@ public class TestBomDependencyNotFoundValidator extends AbstractTest {
                 dependencyManagement(bar).
                 create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertExpectedException(BomDependencyNotFoundException.class, "com.acme:bar:jar:1.0");
     }
@@ -86,7 +86,7 @@ public class TestBomDependencyNotFoundValidator extends AbstractTest {
                 dependencyManagement(barImpl).
                 create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertExpectedException(BomDependencyNotFoundException.class, "com.acme:bar-api:jar:1.0");
     }
@@ -101,7 +101,7 @@ public class TestBomDependencyNotFoundValidator extends AbstractTest {
                 dependencyManagement(dependency().to(barImpl).exclude(barApi).build()).
                 create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
         assertLocalRepoContains(barImpl);

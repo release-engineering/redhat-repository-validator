@@ -46,7 +46,7 @@ public class ValidatorRunner {
     @Inject
     protected ValidatorContext context;
     @Inject
-    protected Validator validator;
+    protected ValidationExecutor validationExecutor;
     @Inject
     protected Reporter reporter;
 
@@ -100,7 +100,7 @@ public class ValidatorRunner {
 
     protected void runValidation() {
         initializer.initialize(context);
-        validator.validate(context);
+        validationExecutor.execute(context);
         reporter.report(context);
     }
 

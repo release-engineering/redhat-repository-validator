@@ -42,7 +42,7 @@ public class TestVersionPatternValidator extends AbstractTest {
         for (String version : versions) {
             init();
             pom().version(version).create(repoFooDir);
-            validator.validate(ctx);
+            validationExecutor.execute(ctx);
             assertSuccess();
         }
     }
@@ -65,7 +65,7 @@ public class TestVersionPatternValidator extends AbstractTest {
         for (String version : versions) {
             init();
             pom().version(version).create(repoFooDir);
-            validator.validate(ctx);
+            validationExecutor.execute(ctx);
             assertExpectedException(VersionPatternException.class, version);
         }
     }

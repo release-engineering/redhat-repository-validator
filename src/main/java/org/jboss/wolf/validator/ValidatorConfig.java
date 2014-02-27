@@ -10,10 +10,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import javax.inject.Named;
 
@@ -57,12 +54,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.*;
 import org.springframework.context.annotation.ComponentScan.Filter;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Scope;
 
 @Configuration
 @ComponentScan(
@@ -90,24 +83,11 @@ public class ValidatorConfig {
     @Value("#{systemProperties['wolf-remoteRepositories']?.split(';')}")
     private String[] remoteRepositories;
 
+
     @Bean
     @Primary
-    public Validator validator(final Validator[] validators) {
-        sort(validators);
-        return new Validator() {
-            @Override
-            public void validate(ValidatorContext ctx) {
-                for (Validator validator : validators) {
-                    logger.debug("starting {}", validator.getClass().getSimpleName());
-                    try {
-                        validator.validate(ctx);
-                    } catch (RuntimeException e) {
-                        logger.error("validator " + validator.getClass().getSimpleName() + " ended with unexpected exception!", e);
-                        ctx.addException(ctx.getValidatedRepository(), e);
-                    }
-                }
-            }
-        };
+    public ValidationExecutor validationExecutor(Validator[] validators) {
+        return new ValidationExecutor(validators);
     }
 
     @Bean

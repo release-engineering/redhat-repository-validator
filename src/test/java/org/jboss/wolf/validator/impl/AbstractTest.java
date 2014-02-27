@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Model;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.jboss.wolf.validator.ValidationExecutor;
 import org.jboss.wolf.validator.Validator;
 import org.jboss.wolf.validator.ValidatorConfig;
 import org.jboss.wolf.validator.ValidatorContext;
@@ -51,7 +52,7 @@ public abstract class AbstractTest {
     protected static IOFileFilter fileFilter;
 
     @Inject
-    protected Validator validator;
+    protected ValidationExecutor validationExecutor;
     @Inject
     protected ValidatorContext ctx;
 

@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -136,7 +138,9 @@ public class TestValidatorRunner {
         validatorRunner = new ValidatorRunner() {
             @Override
             protected void runValidation() {
-                assertTrue(validator instanceof StubValidator);
+                Validator[] validators = validationExecutor.getValidators();
+                assertEquals(validators.length, 1);
+                assertTrue(validators[0] instanceof StubValidator);
             };
         };
         validatorRunner.run("--config", getClass().getResource("/TestValidatorRunner-stubValidatorExclusively.xml").getFile());
@@ -149,6 +153,9 @@ public class TestValidatorRunner {
             protected void runValidation() {
                 String[] validatorNames = appCtx.getBeanNamesForType(Validator.class);
                 assertTrue(ArrayUtils.contains(validatorNames, "stubValidator"));
+
+                Validator stubValidator = (Validator)appCtx.getBean("stubValidator");
+                assertTrue(Arrays.asList(validationExecutor.getValidators()).contains(stubValidator));
             };
         };
         validatorRunner.run("--config", getClass().getResource("/TestValidatorRunner-stubValidatorAdditionally.xml").getFile());
@@ -165,7 +172,7 @@ public class TestValidatorRunner {
                     // noop
                 }
                 
-                validator.validate(context);
+                validationExecutor.execute(context);
                 
                 List<Exception> exceptions = context.getExceptions(context.getValidatedRepository());
                 assertEquals(exceptions.size(), 1);
@@ -291,7 +298,6 @@ public class TestValidatorRunner {
         public void validate(ValidatorContext ctx) {
             throw new RuntimeException("stubValidator");
         }
-
     }
 
 }
