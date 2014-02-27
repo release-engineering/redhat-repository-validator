@@ -5,7 +5,7 @@
     <bean id="validationExecutor" class="org.jboss.wolf.validator.ValidationExecutor" primary="true">
         <constructor-arg>
             <list>
-              <bean id="stubValidator" class="org.jboss.wolf.validator.TestValidatorRunner.StubValidator"/>
+              <bean id="stubValidator" class="org.jboss.wolf.validator.TestAppRunner.StubValidator"/>
             </list>
         </constructor-arg>
     </bean>

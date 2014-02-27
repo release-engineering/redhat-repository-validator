@@ -61,7 +61,7 @@ import org.springframework.context.annotation.ComponentScan.Filter;
 @ComponentScan(
         useDefaultFilters = false,
         includeFilters = @Filter(value = Named.class))
-public class ValidatorConfig {
+public class AppConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(Validator.class);
 

@@ -19,9 +19,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Model;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.jboss.wolf.validator.AppConfig;
 import org.jboss.wolf.validator.ValidationExecutor;
-import org.jboss.wolf.validator.Validator;
-import org.jboss.wolf.validator.ValidatorConfig;
 import org.jboss.wolf.validator.ValidatorContext;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -132,7 +131,7 @@ public abstract class AbstractTest {
 
     @Configuration
     @ImportResource("wolf-validator-app-context.xml")
-    public static class TestConfiguration extends ValidatorConfig {
+    public static class TestConfiguration extends AppConfig {
 
         @Bean
         @Override

@@ -23,16 +23,16 @@ import org.junit.Test;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.core.annotation.Order;
 
-public class TestValidatorRunner {
+public class TestAppRunner {
 
-    private ValidatorRunner validatorRunner;
+    private AppRunner appRunner;
     private PrintStream systemOutOriginal;
     private PrintStream systemOutDelegate;
     private StringBuffer systemOutBuffer;
 
     @Before
     public void init() {
-        validatorRunner = new ValidatorRunner();
+        appRunner = new AppRunner();
         systemOutOriginal = System.out;
         systemOutBuffer = new StringBuffer();
         systemOutDelegate = new PrintStream(new OutputStream() {
@@ -56,85 +56,85 @@ public class TestValidatorRunner {
 
     @Test
     public void shouldPrintHelp1() {
-        validatorRunner.run("-h");
+        appRunner.run("-h");
         assertOutputContaints("print help and exit");
     }
 
     @Test
     public void shouldPrintHelp2() {
-        validatorRunner.run("--help");
+        appRunner.run("--help");
         assertOutputContaints("print help and exit");
     }
 
     @Test
     public void shouldPrintUnrecognizedOption() {
-        validatorRunner.run("--foo", "--bar");
+        appRunner.run("--foo", "--bar");
         assertOutputContaints("Unrecognized option");
     }
 
     @Test(expected = BeanDefinitionStoreException.class)
     public void shouldPrintUnhandledException1() {
-        validatorRunner.run("-c", "file-does-not-exist.xml");
+        appRunner.run("-c", "file-does-not-exist.xml");
         assertOutputContaints("FileNotFoundException: file-does-not-exist.xml");
     }
 
     @Test(expected = BeanDefinitionStoreException.class)
     public void shouldPrintUnhandledException2() {
-        validatorRunner.run("--config", "file-does-not-exist.xml");
+        appRunner.run("--config", "file-does-not-exist.xml");
         assertOutputContaints("FileNotFoundException: file-does-not-exist.xml");
     }
     
     @Test
     public void shouldUseDefaultValidatedRepository() {
-        validatorRunner = new AssertValidatedRepositoryRunner("workspace/validated-repository");
-        validatorRunner.run();
+        appRunner = new AssertValidatedRepositoryRunner("workspace/validated-repository");
+        appRunner.run();
     }
     
     @Test
     public void shouldUseValidatedRepositoryFromArguments() {
-        validatorRunner = new AssertValidatedRepositoryRunner("foo-repo");
-        validatorRunner.run("-vr", "foo-repo");
+        appRunner = new AssertValidatedRepositoryRunner("foo-repo");
+        appRunner.run("-vr", "foo-repo");
     }
     
     @Test
     public void shouldUseDefaultLocalRepository() {
-        validatorRunner = new AssertLocalRepositoryRunner("workspace/local-repository");
-        validatorRunner.run();
+        appRunner = new AssertLocalRepositoryRunner("workspace/local-repository");
+        appRunner.run();
     }
     
     @Test
     public void shouldUseLocalRepositoryFromArguments() {
-        validatorRunner = new AssertLocalRepositoryRunner("foo-local-repo");
-        validatorRunner.run("-lr", "foo-local-repo");
+        appRunner = new AssertLocalRepositoryRunner("foo-local-repo");
+        appRunner.run("-lr", "foo-local-repo");
     }
     
     @Test
     public void shouldUseLocalRepositoryFromConfiguration() {
-        validatorRunner = new AssertLocalRepositoryRunner("/foo-local-repo");
-        validatorRunner.run("-c", getClass().getResource("/TestValidatorRunner-localRepository.xml").getFile());
+        appRunner = new AssertLocalRepositoryRunner("/foo-local-repo");
+        appRunner.run("-c", getClass().getResource("/TestAppRunner-localRepository.xml").getFile());
     }
     
     @Test
     public void shouldUseDefaultRemoteRepositories() {
-        validatorRunner = new AssertRemoteRepositoryRunner("http://repo1.maven.org/maven2/");
-        validatorRunner.run();
+        appRunner = new AssertRemoteRepositoryRunner("http://repo1.maven.org/maven2/");
+        appRunner.run();
     }
     
     @Test
     public void shouldUseRemoteRepositoriesFromArguments() {
-        validatorRunner = new AssertRemoteRepositoryRunner("file://foo", "file://bar", "http://repo1.maven.org/maven2/");
-        validatorRunner.run("-rr", "file://foo", "-rr", "file://bar");
+        appRunner = new AssertRemoteRepositoryRunner("file://foo", "file://bar", "http://repo1.maven.org/maven2/");
+        appRunner.run("-rr", "file://foo", "-rr", "file://bar");
     }
     
     @Test
     public void shouldUseRemoteRepositoriesFromConfiguration() {
-        validatorRunner = new AssertRemoteRepositoryRunner("file://foo", "http://bar.com", "http://repo1.maven.org/maven2/");
-        validatorRunner.run("--config", getClass().getResource("/TestValidatorRunner-remoteRepositories.xml").getFile());
+        appRunner = new AssertRemoteRepositoryRunner("file://foo", "http://bar.com", "http://repo1.maven.org/maven2/");
+        appRunner.run("--config", getClass().getResource("/TestAppRunner-remoteRepositories.xml").getFile());
     }
     
     @Test
     public void shouldUseStubValidatorExclusively() {
-        validatorRunner = new ValidatorRunner() {
+        appRunner = new AppRunner() {
             @Override
             protected void runValidation() {
                 Validator[] validators = validationExecutor.getValidators();
@@ -142,12 +142,12 @@ public class TestValidatorRunner {
                 assertTrue(validators[0] instanceof StubValidator);
             };
         };
-        validatorRunner.run("--config", getClass().getResource("/TestValidatorRunner-stubValidatorExclusively.xml").getFile());
+        appRunner.run("--config", getClass().getResource("/TestAppRunner-stubValidatorExclusively.xml").getFile());
     }
     
     @Test
     public void shouldUseStubValidatorAdditionally() {
-        validatorRunner = new ValidatorRunner() {
+        appRunner = new AppRunner() {
             @Override
             protected void runValidation() {
                 String[] validatorNames = appCtx.getBeanNamesForType(Validator.class);
@@ -157,12 +157,12 @@ public class TestValidatorRunner {
                 assertTrue(Arrays.asList(validationExecutor.getValidators()).contains(stubValidator));
             };
         };
-        validatorRunner.run("--config", getClass().getResource("/TestValidatorRunner-stubValidatorAdditionally.xml").getFile());
+        appRunner.run("--config", getClass().getResource("/TestAppRunner-stubValidatorAdditionally.xml").getFile());
     }
     
     @Test
     public void shouldSurviveUnexpectedExceptionInValidator() {
-        validatorRunner = new ValidatorRunner() {
+        appRunner = new AppRunner() {
             @Override
             protected void runValidation() {
                 try {
@@ -178,25 +178,25 @@ public class TestValidatorRunner {
                 assertEquals(exceptions.get(0).getMessage(), "stubValidator");
             };
         };
-        validatorRunner.run("--config", getClass().getResource("/TestValidatorRunner-stubValidatorAdditionally.xml").getFile());
+        appRunner.run("--config", getClass().getResource("/TestAppRunner-stubValidatorAdditionally.xml").getFile());
     }
     
     @Test
     public void shouldReportToFileByDefault() {
-        validatorRunner = new AssertReportFileRunner(new File("workspace/report.txt"));
-        validatorRunner.run();
+        appRunner = new AssertReportFileRunner(new File("workspace/report.txt"));
+        appRunner.run();
     }
 
     @Test
     public void shouldRedirectDefaultReportToCustomFile1() throws IOException {
-        validatorRunner = new AssertReportFileRunner(new File("workspace/foo.txt"));
-        validatorRunner.run("--report", "workspace/foo.txt");
+        appRunner = new AssertReportFileRunner(new File("workspace/foo.txt"));
+        appRunner.run("--report", "workspace/foo.txt");
     }
 
     @Test
     public void shouldRedirectDefaultReportToCustomFile2() throws IOException {
-        validatorRunner = new AssertReportFileRunner(new File("workspace/bar.txt"));
-        validatorRunner.run("--config", getClass().getResource("/TestValidatorRunner-defaultReporterStream.xml").getFile());
+        appRunner = new AssertReportFileRunner(new File("workspace/bar.txt"));
+        appRunner.run("--config", getClass().getResource("/TestAppRunner-defaultReporterStream.xml").getFile());
     }
     
     private void assertOutputContaints(String s) {
@@ -206,7 +206,7 @@ public class TestValidatorRunner {
         }
     }
     
-    private static class AssertValidatedRepositoryRunner extends ValidatorRunner {
+    private static class AssertValidatedRepositoryRunner extends AppRunner {
         
         private final String expectedValidatedRepository;
 
@@ -222,7 +222,7 @@ public class TestValidatorRunner {
         
     }
     
-    private static class AssertLocalRepositoryRunner extends ValidatorRunner {
+    private static class AssertLocalRepositoryRunner extends AppRunner {
         
         private final String expectedLocalRepository;
 
@@ -240,7 +240,7 @@ public class TestValidatorRunner {
         
     }
     
-    private static class AssertRemoteRepositoryRunner extends ValidatorRunner {
+    private static class AssertRemoteRepositoryRunner extends AppRunner {
 
         private final String[] expectedRemoteRepositories;
 
@@ -263,7 +263,7 @@ public class TestValidatorRunner {
 
     }
     
-    private static class AssertReportFileRunner extends ValidatorRunner {
+    private static class AssertReportFileRunner extends AppRunner {
         
         private final File reportFile;
         

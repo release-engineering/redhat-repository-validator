@@ -53,7 +53,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib</classpathPrefix>
-                            <mainClass>org.jboss.wolf.validator.ValidatorRunner</mainClass>
+                            <mainClass>org.jboss.wolf.validator.AppRunner</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

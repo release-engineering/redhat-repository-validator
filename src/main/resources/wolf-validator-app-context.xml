@@ -39,6 +39,6 @@
     <util:constant id="loggerFactory" static-field="org.eclipse.aether.spi.log.NullLoggerFactory.INSTANCE" />
 
     <context:annotation-config />
-    <bean id="validatorConfig" class="org.jboss.wolf.validator.ValidatorConfig" />
+    <bean id="appConfig" class="org.jboss.wolf.validator.AppConfig" />
 
 </beans>

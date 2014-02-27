@@ -23,12 +23,12 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
-public class ValidatorRunner {
+public class AppRunner {
 
-    private static final Logger logger = LoggerFactory.getLogger(ValidatorRunner.class);
+    private static final Logger logger = LoggerFactory.getLogger(AppRunner.class);
 
     public static void main(String[] args) {
-        new ValidatorRunner().run(args);
+        new AppRunner().run(args);
     }
 
     private final Option validatedRepositoryOption = createOption("vr", "validated-repository", "validate given repository, \ndefault value is `workspace/validated-repository`", "dir");
@@ -42,7 +42,7 @@ public class ValidatorRunner {
     protected ApplicationContext appCtx;
     
     @Inject
-    protected ValidatorInitializer initializer;
+    protected AppInitializer initializer;
     @Inject
     protected ValidatorContext context;
     @Inject

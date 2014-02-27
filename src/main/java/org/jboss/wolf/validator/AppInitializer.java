@@ -12,9 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Named
-public class ValidatorInitializer {
+public class AppInitializer {
 
-    private static final Logger logger = LoggerFactory.getLogger(ValidatorInitializer.class);
+    private static final Logger logger = LoggerFactory.getLogger(AppInitializer.class);
 
     @Inject
     private LocalRepository localRepository;
