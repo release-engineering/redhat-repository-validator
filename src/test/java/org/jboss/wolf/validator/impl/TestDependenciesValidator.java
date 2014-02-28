@@ -42,7 +42,7 @@ public class TestDependenciesValidator extends AbstractTest {
     public void shouldResolvePom() {
         Model foo = pom().artifactId("foo").packaging("pom").create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
         assertLocalRepoContains(foo);
@@ -52,7 +52,7 @@ public class TestDependenciesValidator extends AbstractTest {
     public void shouldResolvePomAndJar() {
         Model foo = pom().artifactId("foo").create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
         assertLocalRepoContains(foo);
@@ -64,7 +64,7 @@ public class TestDependenciesValidator extends AbstractTest {
         Model fooApi = pom().artifactId("foo-api").parent(fooParent).create(repoFooDir);
 
         fileFilter = notFileFilter(nameFileFilter("foo-parent-1.0.pom"));
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
         assertLocalRepoContains(fooApi);
@@ -76,7 +76,7 @@ public class TestDependenciesValidator extends AbstractTest {
         Model jbossParent = pom().artifactId("jboss-parent").groupId("org.jboss").version("6").packaging("pom").model();
         Model fooApi = pom().artifactId("foo-api").parent(jbossParent).create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
         assertLocalRepoContains(fooApi);
@@ -90,7 +90,7 @@ public class TestDependenciesValidator extends AbstractTest {
         Model fooApi = pom().artifactId("foo-api").parent(fooParent).create(repoFooDir);
 
         fileFilter = notFileFilter(nameFileFilter("foo-parent-1.0.pom"));
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
         assertLocalRepoContains(fooApi);
@@ -104,7 +104,7 @@ public class TestDependenciesValidator extends AbstractTest {
         Model fooImpl = pom().artifactId("foo-impl").dependency(fooApi).create(repoFooDir);
 
         fileFilter = notFileFilter(nameFileFilter("foo-api-1.0.pom"));
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
         assertLocalRepoContains(fooApi);
@@ -118,7 +118,7 @@ public class TestDependenciesValidator extends AbstractTest {
         Model fooImpl = pom().artifactId("foo-impl").dependency(fooApi).create(repoFooDir);
 
         fileFilter = notFileFilter(nameFileFilter("foo-api-1.0.pom"));
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
         assertLocalRepoContains(barApi);
@@ -131,7 +131,7 @@ public class TestDependenciesValidator extends AbstractTest {
         Model lang = pom().groupId("commons-lang").artifactId("commons-lang").version("2.6").model();
         Model foo = pom().artifactId("foo").dependency(lang).create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
         assertLocalRepoContains(foo);
@@ -147,7 +147,7 @@ public class TestDependenciesValidator extends AbstractTest {
         File barJdk4File = new File(barFile.getParentFile(), "bar-1.0-jdk14.jar");
         Files.move(barFile, barJdk4File);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
         assertLocalRepoContains("com/acme/bar/1.0/bar-1.0.pom");
@@ -163,7 +163,7 @@ public class TestDependenciesValidator extends AbstractTest {
         File barTestsFile = new File(barFile.getParentFile(), "bar-1.0-tests.jar");
         Files.move(barFile, barTestsFile);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
         assertLocalRepoContains("com/acme/bar/1.0/bar-1.0.pom");
@@ -184,7 +184,7 @@ public class TestDependenciesValidator extends AbstractTest {
                 .create(repoFooDir);
 
         fileFilter = notFileFilter(nameFileFilter("foo-parent-1.0.pom"));
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
         assertLocalRepoContains(bar);
@@ -206,7 +206,7 @@ public class TestDependenciesValidator extends AbstractTest {
                 .create(repoFooDir);
 
         fileFilter = notFileFilter(nameFileFilter("foo-parent-1.0.pom"));
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
         assertLocalRepoContains(bar);
@@ -228,7 +228,7 @@ public class TestDependenciesValidator extends AbstractTest {
                 .create(repoFooDir);
 
         fileFilter = notFileFilter(nameFileFilter("foo-bom-1.0.pom"));
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
         assertLocalRepoContains(bar);
@@ -252,7 +252,7 @@ public class TestDependenciesValidator extends AbstractTest {
 
         createArtifact(repoFooDir, foo);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
         assertLocalRepoContains(foo);
@@ -275,7 +275,7 @@ public class TestDependenciesValidator extends AbstractTest {
 
         createArtifact(repoFooDir, foo);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
         assertLocalRepoContains(foo);
@@ -290,7 +290,7 @@ public class TestDependenciesValidator extends AbstractTest {
         File fooJarFile = new File(fooBundleFile.getParentFile(), "foo-1.0.jar");
         Files.move(fooBundleFile, fooJarFile);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
         assertLocalRepoContains("com/acme/foo/1.0/foo-1.0.pom");
@@ -305,7 +305,7 @@ public class TestDependenciesValidator extends AbstractTest {
         File fooJarFile = new File(fooArchetypeFile.getParentFile(), "foo-archetype-1.0.jar");
         Files.move(fooArchetypeFile, fooJarFile);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
         assertLocalRepoContains("com/acme/foo-archetype/1.0/foo-archetype-1.0.pom");
@@ -315,7 +315,7 @@ public class TestDependenciesValidator extends AbstractTest {
     @Test // bug WOLF-51
     public void shouldNotThrowNPEForUnknownArtifactType() {
         pom().artifactId("foo").packaging("unknown").create(repoFooDir);
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
         assertExpectedException(UnknownArtifactTypeException.class, "Unknown artifact type, packaging is unknown in pom com/acme/foo/1.0/foo-1.0.pom");
     }
 
@@ -326,7 +326,7 @@ public class TestDependenciesValidator extends AbstractTest {
         File fooJar = toArtifactFile(repoFooDir, foo);
         fooJar.delete();
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertExpectedException(ArtifactNotFoundException.class, "Could not find artifact com.acme:foo:jar:1.0");
     }
@@ -336,7 +336,7 @@ public class TestDependenciesValidator extends AbstractTest {
         Model fooParent = pom().artifactId("foo-parent").packaging("pom").model();
         pom().artifactId("foo-api").parent(fooParent).create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertExpectedException(ArtifactNotFoundException.class, "Could not find artifact com.acme:foo-parent:pom:1.0");
     }
@@ -348,7 +348,7 @@ public class TestDependenciesValidator extends AbstractTest {
         pom().artifactId("foo-api").parent(fooParent).create(repoFooDir);
 
         fileFilter = notFileFilter(nameFileFilter("foo-parent-1.0.pom"));
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertExpectedException(ArtifactNotFoundException.class, "Could not find artifact com.acme:bar-parent:pom:1.0");
     }
@@ -358,7 +358,7 @@ public class TestDependenciesValidator extends AbstractTest {
         Model fooApi = pom().artifactId("foo-api").model();
         pom().artifactId("foo-impl").dependency(fooApi).create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertExpectedException(ArtifactNotFoundException.class, "Could not find artifact com.acme:foo-api:jar:1.0");
     }
@@ -370,7 +370,7 @@ public class TestDependenciesValidator extends AbstractTest {
         pom().artifactId("foo-impl").dependency(fooApi).create(repoFooDir);
 
         fileFilter = notFileFilter(nameFileFilter("foo-api-1.0.pom"));
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertExpectedException(ArtifactNotFoundException.class, "Could not find artifact com.acme:bar-api:jar:1.0");
     }
@@ -380,7 +380,7 @@ public class TestDependenciesValidator extends AbstractTest {
         Model lang = pom().groupId("commons-lang").artifactId("commons-lang").version("999").model();
         pom().artifactId("foo").dependency(lang).create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertExpectedException(ArtifactNotFoundException.class, "Could not find artifact commons-lang:commons-lang:jar:999");
     }
@@ -390,7 +390,7 @@ public class TestDependenciesValidator extends AbstractTest {
         Model bar = pom().artifactId("bar").create(repoBarDir);
         pom().artifactId("foo").dependency(dependency().to(bar).classifier("jdk14").build()).create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertExpectedException(ArtifactNotFoundException.class, "Could not find artifact com.acme:bar:jar:jdk14:1.0");
     }
@@ -400,7 +400,7 @@ public class TestDependenciesValidator extends AbstractTest {
         Model bar = pom().artifactId("bar").create(repoBarDir);
         pom().artifactId("foo").dependency(dependency().to(bar).type("test-jar").build()).create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertExpectedException(ArtifactNotFoundException.class, "Could not find artifact com.acme:bar:jar:tests:1.0");
     }
@@ -419,7 +419,7 @@ public class TestDependenciesValidator extends AbstractTest {
                 .create(repoFooDir);
 
         fileFilter = notFileFilter(nameFileFilter("foo-parent-1.0.pom"));
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertExpectedException(ArtifactNotFoundException.class, "Could not find artifact com.acme:bar:jar:1.0");
     }
@@ -438,7 +438,7 @@ public class TestDependenciesValidator extends AbstractTest {
                 .create(repoFooDir);
 
         fileFilter = notFileFilter(nameFileFilter("foo-bom-1.0.pom"));
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertExpectedException(ArtifactNotFoundException.class, "Could not find artifact com.acme:foo-bom:pom:1.0");
     }    
@@ -457,7 +457,7 @@ public class TestDependenciesValidator extends AbstractTest {
                 .create(repoFooDir);
 
         fileFilter = notFileFilter(nameFileFilter("foo-bom-1.0.pom"));
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertExpectedException(ArtifactNotFoundException.class, "Could not find artifact com.acme:bar:jar:1.0");
     }
@@ -478,7 +478,7 @@ public class TestDependenciesValidator extends AbstractTest {
 
         createArtifact(repoFooDir, foo);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertExpectedException(ArtifactNotFoundException.class, "Could not find artifact com.acme:bar:jar:1.0");
     }
@@ -488,7 +488,7 @@ public class TestDependenciesValidator extends AbstractTest {
         Model bar = pom().artifactId("bar").model();
         pom().artifactId("foo").dependency(dependency().to(bar).scope("test").build()).create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
     }
@@ -498,7 +498,7 @@ public class TestDependenciesValidator extends AbstractTest {
         Model bar = pom().artifactId("bar-provided").model();
         pom().artifactId("foo").dependency(dependency().to(bar).scope("provided").build()).create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
     }
@@ -508,7 +508,7 @@ public class TestDependenciesValidator extends AbstractTest {
         Model bar = pom().artifactId("bar-runtime").model();
         pom().artifactId("foo").dependency(dependency().to(bar).scope("runtime").build()).create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
     }
@@ -519,7 +519,7 @@ public class TestDependenciesValidator extends AbstractTest {
         Model bar = pom().artifactId("bar").dependency(dependency().to(baz).optional().build()).create(repoBarDir);
         pom().artifactId("foo").dependency(dependency().to(bar).build()).create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
     }
@@ -530,7 +530,7 @@ public class TestDependenciesValidator extends AbstractTest {
         Model bar = pom().artifactId("bar").dependency(baz).create(repoBarDir);
         pom().artifactId("foo").dependency(dependency().to(bar).exclude(baz).build()).create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
     }
@@ -550,7 +550,7 @@ public class TestDependenciesValidator extends AbstractTest {
 
         createArtifact(repoFooDir, foo);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
     }
@@ -573,7 +573,7 @@ public class TestDependenciesValidator extends AbstractTest {
 
         createArtifact(repoFooDir, foo);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
     }
@@ -591,7 +591,7 @@ public class TestDependenciesValidator extends AbstractTest {
                 .dependency(baz)
                 .create(repoFooDir);
         
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
         
         assertSuccess();
     }

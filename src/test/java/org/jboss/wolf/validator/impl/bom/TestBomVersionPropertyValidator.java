@@ -36,7 +36,7 @@ public class TestBomVersionPropertyValidator extends AbstractTest {
                 dependencyManagement(fooImpl).
                 create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
     }
@@ -52,7 +52,7 @@ public class TestBomVersionPropertyValidator extends AbstractTest {
                 dependencyManagement(fooImpl).
                 create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertExpectedException(BomVersionPropertyException.class, "BOM com.acme:foo-bom:1.0 contains dependencies without version property: com.acme:foo-api:1.2, com.acme:foo-impl:1.2.3");
     }

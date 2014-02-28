@@ -39,7 +39,7 @@ public class TestBestPracticesValidator extends AbstractTest {
         pomBuilder.model().addPluginRepository(repository);
         pomBuilder.create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
         assertExpectedException(BestPracticesException.class, "contains <repositories> configuration");
         assertExpectedException(BestPracticesException.class, "contains <pluginRepositories> configuration");
         assertExpectedException(BestPracticesException.class, "doesn't contains <name>");
@@ -73,7 +73,7 @@ public class TestBestPracticesValidator extends AbstractTest {
         pomBuilder.model().setScm(scm);
         pomBuilder.create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
         assertSuccess();
     }
 

@@ -25,7 +25,7 @@ public class TestDefaultReporter extends AbstractReporterTest {
         ctx.addException(f2, new ChecksumNotExistException(f2, "sha1"));
         ctx.addException(f3, new ChecksumNotExistException(f3, "sha1"));
         
-        reporter.report(ctx);
+        reportingExecutor.execute(ctx);
 
         assertReportContains(
                   "ChecksumNotExistException (total count 3)\n"
@@ -45,7 +45,7 @@ public class TestDefaultReporter extends AbstractReporterTest {
         ctx.addException(f2, suspiciousFileException);
         ctx.addException(f3, suspiciousFileException);
 
-        reporter.report(ctx);
+        reportingExecutor.execute(ctx);
 
         assertEquals(1, StringUtils.countMatches(out.toString(), "File f1 is foo"));
     }
@@ -57,7 +57,7 @@ public class TestDefaultReporter extends AbstractReporterTest {
         ctx.addException(f1, new ChecksumNotMatchException(f1, "sha1", "0", "1"));
         ctx.addException(f2, new ChecksumNotMatchException(f2, "sha1", "0", "1"));
 
-        reporter.report(ctx);
+        reportingExecutor.execute(ctx);
 
         String report = out.toString();
         int index1 = report.indexOf("Checksum sha1 for file f1 not exist");
@@ -76,7 +76,7 @@ public class TestDefaultReporter extends AbstractReporterTest {
         ctx.addException(f2, new ChecksumNotExistException(f2, "sha1"));
         ctx.addException(f1, new ChecksumNotExistException(f1, "sha1"));
 
-        reporter.report(ctx);
+        reportingExecutor.execute(ctx);
 
         String report = out.toString();
         int index1 = report.indexOf("Checksum sha1 for file f1 not exist");
@@ -91,7 +91,7 @@ public class TestDefaultReporter extends AbstractReporterTest {
     public void shouldNotCrashWhenExceptionHasNullMessage() {
         ctx.addException(f1, new Exception((String)null));
         
-        reporter.report(ctx);
+        reportingExecutor.execute(ctx);
         
         assertReportContains(
                 "Exception (total count 1)\n"

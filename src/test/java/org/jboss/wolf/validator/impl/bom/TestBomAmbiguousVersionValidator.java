@@ -33,7 +33,7 @@ public class TestBomAmbiguousVersionValidator extends AbstractTest {
         pom().artifactId("foo-bom-a").packaging("pom").dependencyManagement(bar1).create(repoFooDir);
         pom().artifactId("foo-bom-b").packaging("pom").dependencyManagement(bar2).create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertExpectedException(BomAmbiguousVersionException.class, "ambiguous version for dependency com.acme:bar:jar");
     }
@@ -60,7 +60,7 @@ public class TestBomAmbiguousVersionValidator extends AbstractTest {
                 dependencyManagement(dependency().to(barImpl2).version("${version.bar}").build()).
                 create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertExpectedException(BomAmbiguousVersionException.class, "ambiguous version for dependency com.acme:bar-api:jar");
         assertExpectedException(BomAmbiguousVersionException.class, "ambiguous version for dependency com.acme:bar-impl:jar");
@@ -81,7 +81,7 @@ public class TestBomAmbiguousVersionValidator extends AbstractTest {
                 dependencyManagement(dependency().to(barWar2).type("war").build()).
                 create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
     }

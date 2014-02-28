@@ -16,7 +16,7 @@ public class TestSuspiciousFileValidatorWithFilterInGroovy extends AbstractTest 
         touch("expected-file.groovy");
         touch("unexpected-file");
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertEquals(ctx.getExceptions().size(), 1);
         assertExpectedException(SuspiciousFileException.class, "File unexpected-file is suspicious");

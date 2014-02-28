@@ -39,7 +39,7 @@ public class TestChecksumValidator extends AbstractTest {
     public void shouldSuccess() {
         pom().artifactId("foo").create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
         assertTrue(new File(fooDir, "foo-1.0.jar.md5").exists());
@@ -53,7 +53,7 @@ public class TestChecksumValidator extends AbstractTest {
         pom().artifactId("foo").create(repoFooDir);
         FileUtils.deleteQuietly(new File(fooDir, "foo-1.0.jar.sha1"));
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
         assertExpectedException(ChecksumNotExistException.class, "foo-1.0.jar");
     }
 
@@ -62,7 +62,7 @@ public class TestChecksumValidator extends AbstractTest {
         pom().artifactId("foo").create(repoFooDir);
         FileUtils.deleteQuietly(new File(fooDir, "foo-1.0.jar.md5"));
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
         assertExpectedException(ChecksumNotExistException.class, "foo-1.0.jar");
     }
 
@@ -71,7 +71,7 @@ public class TestChecksumValidator extends AbstractTest {
         pom().artifactId("foo").create(repoFooDir);
         FileUtils.writeStringToFile(new File(fooDir, "foo-1.0.jar.sha1"), "checksum");
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
         assertExpectedException(ChecksumNotMatchException.class, "foo-1.0.jar");
     }
 
@@ -80,7 +80,7 @@ public class TestChecksumValidator extends AbstractTest {
         pom().artifactId("foo").create(repoFooDir);
         FileUtils.writeStringToFile(new File(fooDir, "foo-1.0.jar.md5"), "checksum");
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
         assertExpectedException(ChecksumNotMatchException.class, "foo-1.0.jar");
     }
     
@@ -90,7 +90,7 @@ public class TestChecksumValidator extends AbstractTest {
         FileUtils.touch(new File(repoFooDir, "readme.txt"));
         FileUtils.touch(new File(repoFooDir, "readme.md"));
         
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
         assertSuccess();
     }
 

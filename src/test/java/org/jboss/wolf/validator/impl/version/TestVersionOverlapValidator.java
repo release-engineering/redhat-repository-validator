@@ -39,7 +39,7 @@ public class TestVersionOverlapValidator extends AbstractTest {
         pom().version("1.2").create(repoBarDir);
         pom().version("1.3").create(repoBazDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
     }
@@ -50,7 +50,7 @@ public class TestVersionOverlapValidator extends AbstractTest {
         pom().create(repoBarDir);
         pom().create(repoBazDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertExpectedException(VersionOverlapException.class, "Artifact com.acme:foo:jar:1.0 has overlap with remote repository: bar");
         assertExpectedException(VersionOverlapException.class, "Artifact com.acme:foo:jar:1.0 has overlap with remote repository: baz");

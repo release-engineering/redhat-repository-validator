@@ -32,7 +32,7 @@ public class TestJarSignatureValidator extends AbstractTest {
     @Test
     public void shouldSuccess() throws IOException {
         pom().artifactId("foo").create(repoFooDir);
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
         assertSuccess();
     }
 
@@ -43,7 +43,7 @@ public class TestJarSignatureValidator extends AbstractTest {
         FileUtils.deleteQuietly(fooJar);
         FileUtils.copyFile(new File("target/test-classes/empty-signed.jar"), fooJar);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertExpectedException(JarSignedException.class, "File com/acme/foo/1.0/foo-1.0.jar is signed");
     }
@@ -55,7 +55,7 @@ public class TestJarSignatureValidator extends AbstractTest {
         FileUtils.deleteQuietly(fooJar);
         FileUtils.copyFile(new File("target/test-classes/empty-signed-damaged.jar"), fooJar);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertExpectedException(JarSignatureVerificationException.class, "Unable to verify signature for file com/acme/foo/1.0/foo-1.0.jar");
     }

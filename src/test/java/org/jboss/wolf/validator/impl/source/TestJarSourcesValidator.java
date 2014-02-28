@@ -32,7 +32,7 @@ public class TestJarSourcesValidator extends AbstractTest {
     public void containsSourcesJar_shouldSuccess() throws IOException {
         pom().artifactId("foo").create(repoFooDir);
         FileUtils.touch(fooJarSources);
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
         assertSuccess();
     }
 
@@ -40,7 +40,7 @@ public class TestJarSourcesValidator extends AbstractTest {
     public void removeSourcesJar_shouldFail() throws IOException {
         pom().artifactId("foo").create(repoFooDir);
         FileUtils.deleteQuietly(fooJarSources);
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertExpectedException(JarSourcesVerificationException.class, "Unable to find sources for file com/acme/foo/1.0/foo-1.0.jar");
     }
@@ -49,7 +49,7 @@ public class TestJarSourcesValidator extends AbstractTest {
     public void addTestsJar_shouldFail() throws IOException {
         pom().artifactId("foo").create(repoFooDir);
         FileUtils.touch(fooJarTests);
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertExpectedException(JarSourcesVerificationException.class, "Unable to find sources for file com/acme/foo/1.0/foo-1.0.jar");
     }
@@ -58,7 +58,7 @@ public class TestJarSourcesValidator extends AbstractTest {
     public void addJavaDocJar_shouldFail() throws IOException {
         pom().artifactId("foo").create(repoFooDir);
         FileUtils.touch(fooJarJavaDoc);
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertExpectedException(JarSourcesVerificationException.class, "Unable to find sources for file com/acme/foo/1.0/foo-1.0.jar");
     }
@@ -67,7 +67,7 @@ public class TestJarSourcesValidator extends AbstractTest {
     public void addSourcesJar_shouldSuccess() throws IOException {
         pom().artifactId("foo").create(repoFooDir);
         FileUtils.touch(fooJarSources);
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
     }

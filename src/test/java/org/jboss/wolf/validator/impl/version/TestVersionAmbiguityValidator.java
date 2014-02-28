@@ -29,7 +29,7 @@ public class TestVersionAmbiguityValidator extends AbstractTest {
         pom().version("1.2").create(repoFooDir);
         pom().version("1.3").create(repoFooDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertExpectedException(VersionAmbiguityException.class, "Artifact com.acme:foo has multiple versions: 1.1, 1.2, 1.3");
     }

@@ -21,17 +21,17 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
-public class TestValidatorInitializer {
+public class TestAppInitializer {
 
     @Configuration
     @ImportResource("wolf-validator-app-context.xml")
-    public static class TestConfiguration extends ValidatorConfig {
+    public static class TestConfiguration extends AppConfig {
     }
 
     @Inject
     private ValidatorContext ctx;
     @Inject
-    private ValidatorInitializer initializer;
+    private AppInitializer initializer;
     @Rule
     public ExpectedException exceptionRule = ExpectedException.none();
 

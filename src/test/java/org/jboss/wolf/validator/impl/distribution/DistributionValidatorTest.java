@@ -35,7 +35,7 @@ public class DistributionValidatorTest extends AbstractTest {
     public void shouldSkipValidationIfDirectoryDontExists() throws IOException {
         FileUtils.deleteDirectory(distributionDir);
         
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
         assertSuccess();
     }
 
@@ -48,7 +48,7 @@ public class DistributionValidatorTest extends AbstractTest {
         touch("com/acme/foo/1.0/foo-1.0-test-sources.jar");
         FileUtils.copyFile(new File(repoFooDir + "/com/acme/foo/1.0/foo-1.0.jar"), distFooJar);
         
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
         assertSuccess();
     }
 
@@ -57,7 +57,7 @@ public class DistributionValidatorTest extends AbstractTest {
         pom().artifactId("foo").create(repoFooDir);
         FileUtils.copyFile(new File("target/test-classes/empty-signed-damaged.jar"), distFooJar);
     
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
         assertExpectedException(DistributionCoruptedFileException.class, "File in distribution foo-1.0.jar has same name like file in repository com/acme/foo/1.0/foo-1.0.jar, but has different content");
     }
 
@@ -68,7 +68,7 @@ public class DistributionValidatorTest extends AbstractTest {
         FileUtils.copyFile(new File(repoFooDir + "/com/acme/foo/1.0/foo-1.0.jar"), distBarJar);
         FileUtils.copyFile(new File(repoFooDir + "/com/acme/foo/1.0/foo-1.0.jar"), distBazJar);
     
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
         assertExpectedException(DistributionDuplicateFilesException.class, "Duplicate files in distribution: bar-1.0.jar, baz-1.0.jar, foo-1.0.jar");
     }
 
@@ -77,7 +77,7 @@ public class DistributionValidatorTest extends AbstractTest {
         pom().artifactId("foo").create(repoFooDir);
         FileUtils.copyFile(new File(repoFooDir + "/com/acme/foo/1.0/foo-1.0.jar"), distBarJar);
     
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
         assertExpectedException(DistributionMisnomerFileException.class, "File in distribution bar-1.0.jar has same content like file in repository com/acme/foo/1.0/foo-1.0.jar, but has different name");
     }
 
@@ -85,7 +85,7 @@ public class DistributionValidatorTest extends AbstractTest {
     public void shouldFindMissingFiles() throws IOException {
         pom().artifactId("foo").create(repoFooDir);
         
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
         assertExpectedException(DistributionMissingFileException.class, "Distribution doesn't contains file from repository: com/acme/foo/1.0/foo-1.0.jar");
     }
 
@@ -95,7 +95,7 @@ public class DistributionValidatorTest extends AbstractTest {
         FileUtils.copyFile(new File(repoFooDir + "/com/acme/foo/1.0/foo-1.0.jar"), distFooJar);
         FileUtils.deleteQuietly(new File(repoFooDir + "/com/acme/foo/1.0/foo-1.0.jar"));
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
         assertExpectedException(DistributionRedundantFileException.class, "Distribution contains file, which is not in repository: foo-1.0.jar");
     }
 
@@ -109,7 +109,7 @@ public class DistributionValidatorTest extends AbstractTest {
         FileUtils.copyDirectory(repoFooDir, repoLocalDir);
         FileUtils.copyDirectory(repoBarDir, repoLocalDir);
 
-        validator.validate(ctx);
+        validationExecutor.execute(ctx);
 
         assertSuccess();
     }
