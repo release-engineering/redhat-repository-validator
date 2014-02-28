@@ -4,13 +4,15 @@ import static org.apache.commons.io.filefilter.FileFilterUtils.and;
 import static org.apache.commons.io.filefilter.FileFilterUtils.notFileFilter;
 import static org.apache.commons.io.filefilter.FileFilterUtils.trueFileFilter;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
-import static org.springframework.core.annotation.AnnotationAwareOrderComparator.sort;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Properties;
 
 import javax.inject.Named;
 
@@ -49,21 +51,20 @@ import org.jboss.wolf.validator.internal.LocalRepositoryModelResolver;
 import org.jboss.wolf.validator.internal.LogOutputStream;
 import org.jboss.wolf.validator.internal.LogRepositoryListener;
 import org.jboss.wolf.validator.internal.LogTransferListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 
 @Configuration
 @ComponentScan(
         useDefaultFilters = false,
         includeFilters = @Filter(value = Named.class))
 public class AppConfig {
-
-    private static final Logger logger = LoggerFactory.getLogger(Validator.class);
 
     @Autowired
     private BeanFactory beanFactory;
@@ -85,13 +86,11 @@ public class AppConfig {
 
 
     @Bean
-    @Primary
     public ValidationExecutor validationExecutor(Validator[] validators) {
         return new ValidationExecutor(validators);
     }
 
     @Bean
-    @Primary
     public ReportingExecutor reportingExecutor(Reporter[] reporters) {
         return new ReportingExecutor(reporters);
     }

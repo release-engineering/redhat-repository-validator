@@ -21,6 +21,13 @@
             <organization>Red Hat</organization>
             <organizationUrl>http://www.redhat.com/</organizationUrl>
         </developer>
+        <developer>
+            <id>psiroky</id>
+            <name>Petr Široký</name>
+            <email>psiroky@redhat.com</email>
+            <organization>Red Hat</organization>
+            <organizationUrl>http://www.redhat.com/</organizationUrl>
+        </developer>
     </developers>
 
     <scm>

@@ -1,16 +1,18 @@
 package org.jboss.wolf.validator;
 
+import static org.springframework.core.annotation.AnnotationAwareOrderComparator.sort;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.springframework.core.annotation.AnnotationAwareOrderComparator.sort;
-
 public class ValidationExecutor {
-    private static Logger logger = LoggerFactory.getLogger(ValidationExecutor.class);
+    
+    private static final Logger logger = LoggerFactory.getLogger(ValidationExecutor.class);
 
     private final Validator[] validators;
 
     public ValidationExecutor(Validator... validators) {
+        sort(validators);
         this.validators = validators;
     }
 
@@ -19,15 +21,13 @@ public class ValidationExecutor {
     }
 
     public void execute(ValidatorContext ctx) {
-        sort(validators);
         logValidatorNames();
         for (Validator validator : validators) {
             logger.debug("starting {}", validator.getClass().getSimpleName());
             try {
                 validator.validate(ctx);
             } catch (RuntimeException e) {
-                logger.error("validator " + validator.getClass().getSimpleName() + " ended with unexpected exception!",
-                        e);
+                logger.error("validator " + validator.getClass().getSimpleName() + " ended with unexpected exception!", e);
                 ctx.addException(ctx.getValidatedRepository(), e);
             }
         }

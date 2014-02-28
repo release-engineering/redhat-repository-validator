@@ -112,18 +112,16 @@ The class that executes the validators is an ordinary bean. That means it can be
 Using the example below will result in execution of only `JarSourcesValidator` and `JarSignatureValidator`.
 
 ```xml
-<beans>
 ...
-    <bean id="validationExecutor" class="org.jboss.wolf.validator.ValidationExecutor">
-        <constructor-arg>
-            <list>
-                <bean class="org.jboss.wolf.validator.impl.source.JarSourcesValidator"/>
-                <bean class="org.jboss.wolf.validator.impl.signature.JarSignatureValidator"/>
-            </list>
-        </constructor-arg>
-    </bean>
+<bean id="validationExecutor" class="org.jboss.wolf.validator.ValidationExecutor">
+    <constructor-arg>
+        <list>
+            <ref bean="jarSourcesValidator"/>
+            <ref bean="jarSignatureValidator"/>
+        </list>
+    </constructor-arg>
+</bean>
 ...
-</beans>
 ```
 
 
@@ -134,15 +132,13 @@ The class that executes the reporters is also an ordinary bean and can be redefi
 Using the example below will result in execution of only the `SurefireXmlReporter`.
 
 ```xml
-<beans>
 ...
-    <bean id="reportingExecutor" class="org.jboss.wolf.validator.ReportingExecutor">
-        <constructor-arg>
-            <list>
-                <bean class="org.jboss.wolf.validator.impl.SurefireXmlReporter"/>
-            </list>
-        </constructor-arg>
-    </bean>
+<bean id="reportingExecutor" class="org.jboss.wolf.validator.ReportingExecutor">
+    <constructor-arg>
+        <list>
+            <ref bean="surefireXmlReporter"/>
+        </list>
+    </constructor-arg>
+</bean>
 ...
-</beans>
 ```

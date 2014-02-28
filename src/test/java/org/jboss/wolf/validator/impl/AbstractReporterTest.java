@@ -9,7 +9,6 @@ import javax.inject.Inject;
 
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
-import org.jboss.wolf.validator.Reporter;
 import org.jboss.wolf.validator.ReportingExecutor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
