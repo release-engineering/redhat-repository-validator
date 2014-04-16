@@ -25,8 +25,9 @@ public class BomDependencyNotFoundReporter extends DependencyNotFoundReporter {
     protected void collectMissingDependencies(ValidatorContext ctx, ListMultimap<Artifact, DependencyNode> artifactNotFoundMap) {
         List<BomDependencyNotFoundException> bomDependencyNotFoundExceptions = ctx.getExceptions(BomDependencyNotFoundException.class);
         for (BomDependencyNotFoundException e : bomDependencyNotFoundExceptions) {
-            DependencyNode from = e.getDependencyResolutionException().getResult().getRoot();
-            collectMissingDependencies(ctx, artifactNotFoundMap, e, from);
+            DependencyNode from = e.getDependencyNode();
+            Artifact missingArtifact = e.getMissingArtifact();
+            artifactNotFoundMap.put(missingArtifact, from);
         }
     }
     

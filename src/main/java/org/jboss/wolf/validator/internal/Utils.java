@@ -18,6 +18,7 @@ import org.apache.maven.model.Model;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.util.filter.PatternInclusionsDependencyFilter;
 import org.eclipse.aether.util.graph.visitor.PathRecordingDependencyVisitor;
 import org.jboss.wolf.validator.ValidatorContext;
@@ -102,7 +103,7 @@ public class Utils {
     }
 
     public static <T extends Exception> T findCause(Throwable e, Class<T> clazz) {
-        int index = ExceptionUtils.indexOfThrowable(e, ArtifactResolutionException.class);
+        int index = ExceptionUtils.indexOfThrowable(e, clazz);
         if (index != -1) {
             Throwable[] throwables = ExceptionUtils.getThrowables(e);
             return clazz.cast(throwables[index]);
@@ -125,6 +126,16 @@ public class Utils {
             }
         }
         return pathBuilder.toString();
+    }
+
+    public static List<Artifact> collectMissingArtifacts(ArtifactResolutionException e) {
+        List<Artifact> missingArtifacts = new ArrayList<Artifact>();
+        for (ArtifactResult artifactResult : e.getResults()) {
+            if (artifactResult.isMissing()) {
+                missingArtifacts.add(artifactResult.getRequest().getArtifact());
+            }
+        }
+        return missingArtifacts;
     }
 
 }
