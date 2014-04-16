@@ -49,7 +49,7 @@ public abstract class AbstractReporterTest extends AbstractTest {
         String report = out.toString();
         if (!report.contains(pattern)) {
             System.out.println(report);
-            fail("Report should contains: " + pattern);
+            fail("Report should contain: " + pattern);
         }
     }
 
