@@ -2,7 +2,10 @@ package org.jboss.wolf.validator;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -49,6 +52,8 @@ public class AppRunner {
     protected ValidationExecutor validationExecutor;
     @Inject
     protected ReportingExecutor reportingExecutor;
+    @Inject
+    protected ExceptionFilter[] beanExceptionFilters;
 
     public void run(String... arguments) {
         Options options = new Options();
@@ -100,7 +105,10 @@ public class AppRunner {
 
     protected void runValidation() {
         initializer.initialize(context);
+        // load the exception filters before the validation so that we can fail fast in case of error during the filters creation
+        Set<ExceptionFilter> allExceptionFilters = gatherAllExceptionFilters();
         validationExecutor.execute(context);
+        context.applyExceptionFilters(allExceptionFilters);
         reportingExecutor.execute(context);
     }
 
@@ -143,5 +151,12 @@ public class AppRunner {
         option.setArgName(argName);
         return option;
     }
+
+    private Set<ExceptionFilter> gatherAllExceptionFilters() {
+            Set<ExceptionFilter> allFilters = new HashSet<ExceptionFilter>();
+            allFilters.addAll(Arrays.asList(beanExceptionFilters));
+            // TODO add filters defined in configuration file
+            return allFilters;
+        }
 
 }
