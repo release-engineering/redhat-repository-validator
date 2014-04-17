@@ -165,7 +165,7 @@ public class SurefireXmlReporter implements Reporter {
         while (exceptionIterator.hasNext()) {
             Exception e = exceptionIterator.next();
             if (e instanceof BomDependencyNotFoundException) {
-                DependencyNode from = ((BomDependencyNotFoundException) e).getDependencyResolutionException().getResult().getRoot();
+                DependencyNode from = ((BomDependencyNotFoundException) e).getDependencyNode();
                 if (collectMissingDependencies(artifactNotFoundMap, e, from)) {
                     exceptionIterator.remove();
                 }

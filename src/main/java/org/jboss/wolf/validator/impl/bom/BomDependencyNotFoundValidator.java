@@ -17,6 +17,7 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.resolution.DependencyResolutionException;
@@ -80,8 +81,12 @@ public class BomDependencyNotFoundValidator implements Validator {
         try {
             repositorySystem.resolveDependencies(repositorySystemSession, dependencyRequest);
         } catch (DependencyResolutionException e) {
+            DependencyNode dependencyNode = e.getResult().getRoot();
+            Artifact validatedArtifact = new DefaultArtifact(bom.getGroupId(), bom.getArtifactId(), bom.getPackaging(),
+                    bom.getVersion());
             for (Artifact missingArtifact : Utils.collectMissingArtifacts(findCause(e, ArtifactResolutionException.class))) {
-                ctx.addException(bom.getPomFile(), new BomDependencyNotFoundException(e, missingArtifact));
+                ctx.addException(bom.getPomFile(), new BomDependencyNotFoundException(e, missingArtifact, validatedArtifact,
+                        dependencyNode));
             }
         }
     }

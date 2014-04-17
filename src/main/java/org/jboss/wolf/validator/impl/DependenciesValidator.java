@@ -115,7 +115,7 @@ public class DependenciesValidator implements Validator {
         try {
             repositorySystem.resolveArtifact(repositorySystemSession, pomRequest);
         } catch (ArtifactResolutionException e) {
-            collectAndReportMissingArtifacts(ctx, e, pomFile, null);
+            collectAndReportMissingArtifacts(ctx, e, pomFile, pomArtifact, null);
             return false;
         }
         return true;
@@ -146,7 +146,7 @@ public class DependenciesValidator implements Validator {
             try {
                 repositorySystem.resolveArtifact(repositorySystemSession, archiveRequest);
             } catch (ArtifactResolutionException e) {
-                collectAndReportMissingArtifacts(ctx, e, pomFile, null);
+                collectAndReportMissingArtifacts(ctx, e, pomFile, pomArtifact, null);
                 return false;
             }
         }
@@ -165,7 +165,7 @@ public class DependenciesValidator implements Validator {
             repositorySystem.collectDependencies(repositorySystemSession, collectRequest);
         } catch (DependencyCollectionException e) {
             DependencyNode rootDepNode = new DefaultDependencyNode(e.getResult().getRequest().getRoot());
-            collectAndReportMissingArtifacts(ctx, e, pomFile, rootDepNode);
+            collectAndReportMissingArtifacts(ctx, e, pomFile, pomArtifact, rootDepNode);
             return false;
         }
 
@@ -173,14 +173,15 @@ public class DependenciesValidator implements Validator {
             repositorySystem.resolveDependencies(repositorySystemSession, dependencyRequest);
         } catch (DependencyResolutionException e) {
             DependencyNode rootDepNode = e.getResult().getRoot();
-            collectAndReportMissingArtifacts(ctx, e, pomFile, rootDepNode);
+            collectAndReportMissingArtifacts(ctx, e, pomFile, pomArtifact, rootDepNode);
             return false;
         }
 
         return true;
     }
 
-    private void collectAndReportMissingArtifacts(ValidatorContext ctx, Exception e, File pomFile, DependencyNode rootDepNode) {
+    private void collectAndReportMissingArtifacts(ValidatorContext ctx, Exception e, File pomFile,
+                                                  Artifact validatedArtifact, DependencyNode rootDepNode) {
         ArtifactResolutionException artifactException;
         if (e instanceof ArtifactResolutionException) {
             artifactException = (ArtifactResolutionException) e;
@@ -188,7 +189,8 @@ public class DependenciesValidator implements Validator {
             artifactException = Utils.findCause(e, ArtifactResolutionException.class);
         }
         for (Artifact missingArtifact : Utils.collectMissingArtifacts(artifactException)) {
-            ctx.addException(pomFile, new DependencyNotFoundException(artifactException, missingArtifact, rootDepNode));
+            ctx.addException(pomFile,
+                    new DependencyNotFoundException(artifactException, missingArtifact, validatedArtifact, rootDepNode));
         }
     }
 
