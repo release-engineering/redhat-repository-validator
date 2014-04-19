@@ -6,6 +6,7 @@ public class FilterNamespaceHandler extends NamespaceHandlerSupport {
 
     @Override
     public void init() {
+        registerBeanDefinitionParser("bom-dependency-not-found", new BomDependencyNotFoundFilterParser());
         registerBeanDefinitionParser("dependency-not-found", new DependencyNotFoundFilterParser());
     }
 
