@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://wolf-validator.org/schema/exception-filters"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+
+    <xs:element name="dependency-not-found">
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:choice>
+                    <xs:element name="validated-artifacts" minOccurs="0" maxOccurs="1">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element type="xs:string" name="validated-artifact" maxOccurs="unbounded"
+                                            minOccurs="1"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                    <xs:element name="missing-artifacts" minOccurs="0" maxOccurs="1">
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element type="xs:string" name="missing-artifact" maxOccurs="unbounded"
+                                            minOccurs="1"/>
+                            </xs:sequence>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:choice>
+            </xs:sequence>
+            <xs:attribute type="xs:string" name="missing-artifact" use="optional"/>
+            <xs:attribute type="xs:string" name="validated-artifact" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

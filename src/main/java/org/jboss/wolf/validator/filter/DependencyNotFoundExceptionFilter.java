@@ -36,6 +36,14 @@ public class DependencyNotFoundExceptionFilter implements ExceptionFilter {
         this(missingArtifactRegex, null);
     }
 
+    public String getMissingArtifactRegex() {
+        return missingArtifactPattern.pattern();
+    }
+
+    public String getValidatedArtifactRegex() {
+        return validatedArtifactPattern == null ? null : validatedArtifactPattern.pattern();
+    }
+
     protected Class<? extends DependencyNotFoundException> getExceptionType() {
         return DependencyNotFoundException.class;
     }

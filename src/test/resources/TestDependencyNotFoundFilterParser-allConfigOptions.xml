@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:filter="http://wolf-validator.org/schema/exception-filters"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://wolf-validator.org/schema/exception-filters http://wolf-validator.org/schema/exception-filters.xsd">
+
+
+    <filter:dependency-not-found missing-artifact="com.acme:missing-only:.*:jar"/>
+
+    <filter:dependency-not-found missing-artifact="com.acme:missing-and-validated:.*:jar"
+                                 validated-artifact="com.acme:missing-and-validated-parent:.*:pom"/>
+
+    <filter:dependency-not-found validated-artifact="com.acme:validated-and-list-of-missing-parent:.*:pom">
+        <filter:missing-artifacts>
+            <filter:missing-artifact>com.acme:validated-and-list-of-missing1:.*:jar</filter:missing-artifact>
+            <filter:missing-artifact>com.acme:validated-and-list-of-missing2:.*:jar</filter:missing-artifact>
+        </filter:missing-artifacts>
+    </filter:dependency-not-found>
+
+    <filter:dependency-not-found missing-artifact="com.acme:missing-and-list-of-validated:.*:jar">
+        <filter:validated-artifacts>
+            <filter:validated-artifact>com.acme:missing-and-list-of-validated-parent1:.*:pom</filter:validated-artifact>
+            <filter:validated-artifact>com.acme:missing-and-list-of-validated-parent2:.*:pom</filter:validated-artifact>
+        </filter:validated-artifacts>
+    </filter:dependency-not-found>
+
+</beans>
