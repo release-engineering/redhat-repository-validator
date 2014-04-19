@@ -3,19 +3,14 @@ package org.jboss.wolf.validator.filter.internal;
 import org.jboss.wolf.validator.filter.DependencyNotFoundExceptionFilter;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.beans.factory.xml.AbstractBeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class DependencyNotFoundFilterParser extends AbstractExceptionFilterParser {
-
-    private static int index = 1;
 
     @Override
     protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
@@ -34,15 +29,7 @@ public class DependencyNotFoundFilterParser extends AbstractExceptionFilterParse
         return DependencyNotFoundExceptionFilter.class;
     }
 
-    private void registerBeanDefinitions(BeanDefinitionRegistry registry, Collection<AbstractBeanDefinition> beanDefinitions) {
-        registerBeanDefinitions(registry, beanDefinitions.toArray(new AbstractBeanDefinition[]{}));
-    }
 
-    private void registerBeanDefinitions(BeanDefinitionRegistry registry, AbstractBeanDefinition... beanDefinitions) {
-        for (AbstractBeanDefinition beanDefinition : beanDefinitions) {
-            registry.registerBeanDefinition("dependencyNotFoundFilter" + index++, beanDefinition);
-        }
-    }
 
     private List<AbstractBeanDefinition> parseConfigWithChildren(Element element) {
         List<AbstractBeanDefinition> beanDefinitions = new ArrayList<AbstractBeanDefinition>();
