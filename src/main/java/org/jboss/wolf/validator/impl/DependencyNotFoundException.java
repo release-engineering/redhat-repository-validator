@@ -1,6 +1,7 @@
 package org.jboss.wolf.validator.impl;
 
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.graph.DefaultDependencyNode;
 import org.eclipse.aether.graph.DependencyNode;
 
 public class DependencyNotFoundException extends Exception {
@@ -11,14 +12,14 @@ public class DependencyNotFoundException extends Exception {
     private final DependencyNode dependencyNode;
 
     public DependencyNotFoundException(Exception cause, Artifact missingArtifact, Artifact validatedArtifact, DependencyNode dependencyNode) {
-        super(cause);
+        super("Artifact " + missingArtifact + " (referenced from '" + validatedArtifact + ") not found!", cause);
         this.missingArtifact = missingArtifact;
         this.validatedArtifact = validatedArtifact;
         this.dependencyNode = dependencyNode;
     }
 
     public DependencyNotFoundException(Exception e, Artifact missingArtifact, Artifact validatedArtifact) {
-        this(e, missingArtifact, validatedArtifact, null);
+        this(e, missingArtifact, validatedArtifact, new DefaultDependencyNode(validatedArtifact));
     }
 
     public Artifact getMissingArtifact() {

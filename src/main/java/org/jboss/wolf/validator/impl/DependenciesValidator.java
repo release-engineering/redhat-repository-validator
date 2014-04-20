@@ -115,7 +115,7 @@ public class DependenciesValidator implements Validator {
         try {
             repositorySystem.resolveArtifact(repositorySystemSession, pomRequest);
         } catch (ArtifactResolutionException e) {
-            collectAndReportMissingArtifacts(ctx, e, pomFile, pomArtifact, null);
+            collectAndReportMissingArtifacts(ctx, e, pomFile, pomArtifact, new DefaultDependencyNode(pomArtifact));
             return false;
         }
         return true;
@@ -146,7 +146,7 @@ public class DependenciesValidator implements Validator {
             try {
                 repositorySystem.resolveArtifact(repositorySystemSession, archiveRequest);
             } catch (ArtifactResolutionException e) {
-                collectAndReportMissingArtifacts(ctx, e, pomFile, pomArtifact, null);
+                collectAndReportMissingArtifacts(ctx, e, pomFile, pomArtifact, new DefaultDependencyNode(pomArtifact));
                 return false;
             }
         }

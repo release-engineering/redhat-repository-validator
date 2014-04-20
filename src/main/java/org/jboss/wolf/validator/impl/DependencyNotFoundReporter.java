@@ -67,17 +67,15 @@ public class DependencyNotFoundReporter implements Reporter {
             out.println("miss: " + artifact);
             List<DependencyNode> roots = sortDependencyNodes(artifactNotFoundMap.get(artifact));
             for (DependencyNode root : roots) {
-                // the dependency node might be null if the original exception did not contain any such additional info
-                if (root != null) {
-                    out.println("    from: " + root.getArtifact());
-                    String path = findPathToDependency(artifact, root);
-                    String simplePath = root.getArtifact() + " > " + artifact;
-                    if (isNotEmpty(path) && notEqual(path, simplePath)) {
-                        out.print("        path: ");
-                        out.print(path);
-                        out.println();
-                    }
+                out.println("    from: " + root.getArtifact());
+                String path = findPathToDependency(artifact, root);
+                String simplePath = root.getArtifact() + " > " + artifact;
+                if (isNotEmpty(path) && notEqual(path, simplePath)) {
+                    out.print("        path: ");
+                    out.print(path);
+                    out.println();
                 }
+
             }
         }
     }

@@ -90,29 +90,29 @@ public class SurefireXmlReporter implements Reporter {
     }
 
     private void reportDependencyNotFound(List<Exception> exceptionList) {
-        ListMultimap<Artifact, DependencyNode> artifactNotFoundMap = collectDependencyNotFoundData(exceptionList);
+        ListMultimap<Artifact, DependencyNode> artifactNotFoundMap = collectDependencyNotFoundData(exceptionList, DependencyNotFoundException.class);
         reportDependencyNotFound("DependencyNotFoundReport", artifactNotFoundMap);
     }
 
     private void reportBomDependencyNotFound(List<Exception> exceptionList) {
-        ListMultimap<Artifact, DependencyNode> artifactNotFoundMap = collectBomDependencyNotFoundData(exceptionList);
+        ListMultimap<Artifact, DependencyNode> artifactNotFoundMap = collectDependencyNotFoundData(exceptionList, BomDependencyNotFoundException.class);
         reportDependencyNotFound("BomDependencyNotFoundReport", artifactNotFoundMap);
     }
-    
+
     private void reportDependencyNotFound(String type, ListMultimap<Artifact, DependencyNode> artifactNotFoundMap) {
         TestSetStats testSuite = new TestSetStats(false, false);
         for (Artifact artifact : sortArtifacts(artifactNotFoundMap.keySet())) {
             List<DependencyNode> roots = sortDependencyNodes(artifactNotFoundMap.get(artifact));
-            if( roots.size() == 1 ) {
-                String msg = "Miss " + artifact + " in " + roots.get(0).getArtifact() + "(path " + findPathToDependency(artifact, roots.get(0)) + ")";
+            if (roots.size() == 1) {
+                String msg = "Miss " + artifact + " in " + roots.get(0).getArtifact() + " (path " + findPathToDependency(artifact, roots.get(0)) + ")";
                 testSuite.testError(testCase(type, msg, null));
             } else {
                 String msg = "Miss " + artifact + " in " + roots.size() + " artifacts ...";
                 StringBuilder dsc = new StringBuilder();
                 dsc.append("Miss " + artifact + " in ...");
                 dsc.append(LINE_SEPARATOR).append(LINE_SEPARATOR);
-                for(DependencyNode root : roots) {
-                    dsc.append(root.getArtifact() + "(path " + findPathToDependency(artifact, root) + ")");
+                for (DependencyNode root : roots) {
+                    dsc.append(root.getArtifact() + " (path " + findPathToDependency(artifact, root) + ")");
                     dsc.append(LINE_SEPARATOR).append(LINE_SEPARATOR);
                 }
                 testSuite.testError(testCase(type, msg, dsc.toString()));
@@ -136,55 +136,19 @@ public class SurefireXmlReporter implements Reporter {
         }
     }
 
-    private ListMultimap<Artifact, DependencyNode> collectDependencyNotFoundData(List<Exception> exceptionList) {
+    private ListMultimap<Artifact, DependencyNode> collectDependencyNotFoundData(List<Exception> exceptionList, Class<? extends DependencyNotFoundException> exceptionType) {
         ListMultimap<Artifact, DependencyNode> artifactNotFoundMap = ArrayListMultimap.create();
 
         ListIterator<Exception> exceptionIterator = exceptionList.listIterator();
         while (exceptionIterator.hasNext()) {
             Exception e = exceptionIterator.next();
-            if (e instanceof DependencyCollectionException) {
-                DependencyNode from = new DefaultDependencyNode(((DependencyCollectionException) e).getResult().getRequest().getRoot());
-                if (collectMissingDependencies(artifactNotFoundMap, e, from)) {
-                    exceptionIterator.remove();
-                }
-            }
-            if (e instanceof DependencyResolutionException) {
-                DependencyNode from = ((DependencyResolutionException) e).getResult().getRoot();
-                if (collectMissingDependencies(artifactNotFoundMap, e, from)) {
-                    exceptionIterator.remove();
-                }
+            if (e.getClass().equals(exceptionType)) {
+                DependencyNode from = exceptionType.cast(e).getDependencyNode();
+                artifactNotFoundMap.put(exceptionType.cast(e).getMissingArtifact(), from);
+                exceptionIterator.remove();
             }
         }
         return artifactNotFoundMap;
-    }
-
-    private ListMultimap<Artifact, DependencyNode> collectBomDependencyNotFoundData(List<Exception> exceptionList) {
-        ListMultimap<Artifact, DependencyNode> artifactNotFoundMap = ArrayListMultimap.create();
-
-        ListIterator<Exception> exceptionIterator = exceptionList.listIterator();
-        while (exceptionIterator.hasNext()) {
-            Exception e = exceptionIterator.next();
-            if (e instanceof BomDependencyNotFoundException) {
-                DependencyNode from = ((BomDependencyNotFoundException) e).getDependencyNode();
-                if (collectMissingDependencies(artifactNotFoundMap, e, from)) {
-                    exceptionIterator.remove();
-                }
-            }
-        }
-
-        return artifactNotFoundMap;
-    }
-
-    private boolean collectMissingDependencies(ListMultimap<Artifact, DependencyNode> artifactNotFoundMap, Exception e, DependencyNode from) {
-        ArtifactResolutionException artifactResolutionException = findCause(e, ArtifactResolutionException.class);
-        if (artifactResolutionException != null) {
-            for (ArtifactResult artifactResult : artifactResolutionException.getResults()) {
-                if (!artifactResult.isResolved()) {
-                    artifactNotFoundMap.put(artifactResult.getRequest().getArtifact(), from);
-                }
-            }
-        }
-        return artifactResolutionException != null;
     }
 
     private void reportTestSuite(String testSuiteName, TestSetStats testSuiteData) {
@@ -228,12 +192,12 @@ public class SurefireXmlReporter implements Reporter {
         private InternalStackTraceWriter(Exception exception) {
             this(null, exception);
         }
-        
+
         private InternalStackTraceWriter(String description, Exception exception) {
             this.description = description;
             this.exception = exception;
         }
-        
+
         private String stackTrace() {
             if (description != null) {
                 return description;
@@ -263,23 +227,23 @@ public class SurefireXmlReporter implements Reporter {
         }
 
     }
-    
+
     private static class InternalSafeThrowable extends SafeThrowable {
 
         public InternalSafeThrowable(Throwable target) {
             super(target);
         }
-        
+
         @Override
         public String getMessage() {
             return defaultIfNull(super.getMessage(), "");
         }
-        
+
         @Override
         public String getLocalizedMessage() {
             return defaultIfNull(super.getLocalizedMessage(), "");
         }
-        
+
     }
 
 }
