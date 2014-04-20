@@ -106,9 +106,10 @@ public class ValidatorContext {
         return Collections.unmodifiableList(unprocessedExceptions);
     }
 
-    public void applyExceptionFilters(Set<ExceptionFilter> exceptionFilters) {
-        logger.debug("Applying {} exception filter(s).", exceptionFilters.size());
+    public void applyExceptionFilters(ExceptionFilter[] exceptionFilters) {
+        logger.debug("Applying {} exception filter(s).", exceptionFilters.length);
         for (ExceptionFilter exceptionFilter : exceptionFilters) {
+            logger.debug("Applying exception filter " + exceptionFilter);
             applyExceptionFilter(exceptionFilter);
         }
     }
