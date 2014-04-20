@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:util="http://www.springframework.org/schema/util" xmlns:lang="http://www.springframework.org/schema/lang"
+       xmlns:filter="http://wolf-validator.org/schema/exception-filters"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
-           http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-3.2.xsd">
+           http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-3.2.xsd
+           http://wolf-validator.org/schema/exception-filters http://wolf-validator.org/schema/exception-filters.xsd">
 
 <!-- LOCAL REPOSITORY -->
 <!--
@@ -29,7 +31,7 @@
 
 
 <!-- CUSTOM VALIDATOR -->
-<!-- 
+<!--
     <bean id="fooValidator" class="foo.FooValidator" />
 -->
 
@@ -81,10 +83,37 @@
 
 
 <!-- REPORT TO FILE -->
-<!--  
+<!--
      <bean id="defaultReporterStream" class="java.io.PrintStream">
         <constructor-arg name="fileName" value="workspace/report.txt" />
     </bean>
+-->
+
+<!-- FILTER (IGNORE) SPECIFIED FAILURES -->
+<!--
+    <filter:filename regex="file-prefix.*\.jar"/>
+
+    <filter:filename regex="file-prefix.*\.jar" exception="SuspiciousFileException" />
+
+    <filter:dependency-not-found missing-artifact="groupId:artifactId:.*:jar" />
+
+    <filter:dependency-not-found missing-artifact="groupId:artifactId:.*:jar" validated-artifact="groupId:artifactId:.*:jar"/>
+
+    <filter:dependency-not-found missing-artifact="groupId:artifactId:.*:jar">
+        <filter:validated-artifacts>
+            <filter:validated-artifact>groupId:artifactId:.*:jar</filter:validated-artifact>
+            <filter:validated-artifact>groupId:artifactId:.*:jar</filter:validated-artifact>
+        </filter:validated-artifacts>
+    </filter:dependency-not-found>
+
+    <filter:dependency-not-found validated-artifact="groupId:artifactId:.*:jar">
+        <filter:missing-artifacts>
+            <filter:missing-artifact>groupId:artifactId:.*:jar</filter:missing-artifact>
+            <filter:missing-artifact>groupId:artifactId:.*:jar</filter:missing-artifact>
+        </filter:missing-artifacts>
+    </filter:dependency-not-found>
+
+    <filter:bom-dependency-not-found missing-artifact="groupId:artifactId:.*:jar" />
 -->
 
 </beans>
