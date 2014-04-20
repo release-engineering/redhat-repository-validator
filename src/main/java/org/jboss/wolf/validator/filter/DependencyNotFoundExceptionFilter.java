@@ -74,4 +74,12 @@ public class DependencyNotFoundExceptionFilter implements ExceptionFilter {
         return artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion() + ":" + artifact.getExtension();
     }
 
+    @Override
+    public String toString() {
+        return "DependencyNotFoundExceptionFilter{" +
+                "missingArtifactRegex=" + getMissingArtifactRegex() +
+                ", validatedArtifactRegex=" + getValidatedArtifactRegex() +
+                '}';
+    }
+
 }

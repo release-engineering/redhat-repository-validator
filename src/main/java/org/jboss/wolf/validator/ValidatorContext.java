@@ -121,6 +121,7 @@ public class ValidatorContext {
             List<Exception> exceptionsToRemove = new ArrayList<Exception>();
             for (Exception exception : exceptionList) {
                 if (exceptionFilter.shouldIgnore(exception, fileInRepo)) {
+                    logger.debug("Filtering (ignoring) exception: " + exception);
                     exceptionsToRemove.add(exception);
                 }
             }

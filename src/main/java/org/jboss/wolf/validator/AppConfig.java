@@ -107,6 +107,11 @@ public class AppConfig {
             public boolean shouldIgnore(Exception exception, File fileInRepo) {
                 return false;
             }
+
+            @Override
+            public String toString() {
+                return "NoOpExceptionFilter{Dummy no-op filter. Needed just to ensure that at least one instance of ExceptionFilter exists.}";
+            }
         };
     }
 

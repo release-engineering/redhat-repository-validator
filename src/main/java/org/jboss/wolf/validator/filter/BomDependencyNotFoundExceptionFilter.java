@@ -18,4 +18,12 @@ public class BomDependencyNotFoundExceptionFilter extends DependencyNotFoundExce
         return BomDependencyNotFoundException.class;
     }
 
+    @Override
+    public String toString() {
+        return "BomDependencyNotFoundExceptionFilter{" +
+                "missingArtifactRegex=" + getMissingArtifactRegex() +
+                ", validatedArtifactRegex=" + getMissingArtifactRegex() +
+                '}';
+    }
+
 }

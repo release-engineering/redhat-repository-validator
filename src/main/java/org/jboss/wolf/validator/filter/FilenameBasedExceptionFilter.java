@@ -40,7 +40,7 @@ public class FilenameBasedExceptionFilter implements ExceptionFilter {
     public String toString() {
         return "FilenameBasedExceptionFilter{" +
                 "filenameRegex=" + filenamePattern.pattern() +
-                ", exceptionClass=" + exceptionClass +
+                ", exceptionClass=" + exceptionClass.getCanonicalName() +
                 '}';
     }
 
