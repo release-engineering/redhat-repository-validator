@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:filter="http://wolf-validator.org/schema/exception-filters"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://wolf-validator.org/schema/exception-filters http://wolf-validator.org/schema/exception-filters.xsd">
+
+    <filter:bom-dependency-not-found missing-artifact="org.drools:drools-core:.*:jar" />
+
+</beans>

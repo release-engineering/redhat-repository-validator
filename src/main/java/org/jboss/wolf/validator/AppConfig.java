@@ -95,6 +95,26 @@ public class AppConfig {
         return new ReportingExecutor(reporters);
     }
 
+    /**
+     * Dummy, no-op exception filter, just to make Spring happy.
+     * <p/>
+     * Spring fails if it can't find any ExceptionFilter bean. The no-op bean will prevent the failure.
+     */
+    @Bean
+    public ExceptionFilter dummyNoOpExceptionFilter() {
+        return new ExceptionFilter() {
+            @Override
+            public boolean shouldIgnore(Exception exception, File fileInRepo) {
+                return false;
+            }
+
+            @Override
+            public String toString() {
+                return "NoOpExceptionFilter{Dummy no-op filter. Needed just to ensure that at least one instance of ExceptionFilter exists.}";
+            }
+        };
+    }
+
     @Bean
     public RemoteRepository centralRemoteRepository() {
         RemoteRepository remoteRepositoryCentral = new RemoteRepository.Builder("central", "default", "http://repo1.maven.org/maven2/").build();

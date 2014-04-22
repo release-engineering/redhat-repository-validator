@@ -25,8 +25,10 @@ import org.eclipse.aether.artifact.ArtifactTypeRegistry;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.collection.DependencyCollectionException;
+import org.eclipse.aether.graph.DefaultDependencyNode;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyFilter;
+import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.DependencyRequest;
@@ -35,6 +37,7 @@ import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.util.filter.DependencyFilterUtils;
 import org.jboss.wolf.validator.Validator;
 import org.jboss.wolf.validator.ValidatorContext;
+import org.jboss.wolf.validator.internal.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
@@ -112,7 +115,7 @@ public class DependenciesValidator implements Validator {
         try {
             repositorySystem.resolveArtifact(repositorySystemSession, pomRequest);
         } catch (ArtifactResolutionException e) {
-            ctx.addException(pomFile, e);
+            collectAndReportMissingArtifacts(ctx, e, pomFile, pomArtifact, new DefaultDependencyNode(pomArtifact));
             return false;
         }
         return true;
@@ -143,7 +146,7 @@ public class DependenciesValidator implements Validator {
             try {
                 repositorySystem.resolveArtifact(repositorySystemSession, archiveRequest);
             } catch (ArtifactResolutionException e) {
-                ctx.addException(pomFile, e);
+                collectAndReportMissingArtifacts(ctx, e, pomFile, pomArtifact, new DefaultDependencyNode(pomArtifact));
                 return false;
             }
         }
@@ -161,18 +164,34 @@ public class DependenciesValidator implements Validator {
         try {
             repositorySystem.collectDependencies(repositorySystemSession, collectRequest);
         } catch (DependencyCollectionException e) {
-            ctx.addException(pomFile, e);
+            DependencyNode rootDepNode = new DefaultDependencyNode(e.getResult().getRequest().getRoot());
+            collectAndReportMissingArtifacts(ctx, e, pomFile, pomArtifact, rootDepNode);
             return false;
         }
-        
+
         try {
             repositorySystem.resolveDependencies(repositorySystemSession, dependencyRequest);
         } catch (DependencyResolutionException e) {
-            ctx.addException(pomFile, e);
+            DependencyNode rootDepNode = e.getResult().getRoot();
+            collectAndReportMissingArtifacts(ctx, e, pomFile, pomArtifact, rootDepNode);
             return false;
         }
 
         return true;
+    }
+
+    private void collectAndReportMissingArtifacts(ValidatorContext ctx, Exception e, File pomFile,
+                                                  Artifact validatedArtifact, DependencyNode rootDepNode) {
+        ArtifactResolutionException artifactException;
+        if (e instanceof ArtifactResolutionException) {
+            artifactException = (ArtifactResolutionException) e;
+        } else {
+            artifactException = Utils.findCause(e, ArtifactResolutionException.class);
+        }
+        for (Artifact missingArtifact : Utils.collectMissingArtifacts(artifactException)) {
+            ctx.addException(pomFile,
+                    new DependencyNotFoundException(artifactException, missingArtifact, validatedArtifact, rootDepNode));
+        }
     }
 
 }

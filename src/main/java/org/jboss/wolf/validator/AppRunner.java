@@ -49,6 +49,8 @@ public class AppRunner {
     protected ValidationExecutor validationExecutor;
     @Inject
     protected ReportingExecutor reportingExecutor;
+    @Inject
+    protected ExceptionFilter[] exceptionFilters;
 
     public void run(String... arguments) {
         Options options = new Options();
@@ -101,6 +103,7 @@ public class AppRunner {
     protected void runValidation() {
         initializer.initialize(context);
         validationExecutor.execute(context);
+        context.applyExceptionFilters(exceptionFilters);
         reportingExecutor.execute(context);
     }
 

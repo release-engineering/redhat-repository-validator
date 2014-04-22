@@ -106,4 +106,31 @@ public class ValidatorContext {
         return Collections.unmodifiableList(unprocessedExceptions);
     }
 
+    public void applyExceptionFilters(ExceptionFilter[] exceptionFilters) {
+        logger.debug("Applying {} exception filter(s).", exceptionFilters.length);
+        for (ExceptionFilter exceptionFilter : exceptionFilters) {
+            logger.debug("Applying exception filter " + exceptionFilter);
+            applyExceptionFilter(exceptionFilter);
+        }
+    }
+
+    public void applyExceptionFilter(ExceptionFilter exceptionFilter) {
+        for (Map.Entry<File, List<Exception>> fileToExceptions : exceptions.entrySet()) {
+            File fileInRepo = fileToExceptions.getKey();
+            List<Exception> exceptionList = fileToExceptions.getValue();
+            List<Exception> exceptionsToRemove = new ArrayList<Exception>();
+            for (Exception exception : exceptionList) {
+                if (exceptionFilter.shouldIgnore(exception, fileInRepo)) {
+                    logger.debug("Filtering (ignoring) exception: " + exception);
+                    exceptionsToRemove.add(exception);
+                }
+            }
+            // remove the marked exceptions from list and update the exceptions map
+            if (!exceptionsToRemove.isEmpty()) {
+                exceptionList.removeAll(exceptionsToRemove);
+                exceptions.put(fileInRepo, exceptionList);
+            }
+        }
+    }
+
 }

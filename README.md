@@ -4,13 +4,13 @@ wolf-validator
 [![Build Status](https://travis-ci.org/thradec/wolf-validator.png)](https://travis-ci.org/thradec/wolf-validator)
 
 
-Wolf-validator is a tool used to validate the internal consistency of a maven artifact repository and could be also used for validation associated distribution directory.
+Wolf-validator is a tool used to validate the internal consistency of a maven artifact repository. It can also be used for validation of the associated distribution directory.
 
 
 Building
 --------
 
-- prerequisites Java, Maven and Git
+- prerequisites: Java, Maven and Git
 - clone project from github `$ git clone git@github.com:thradec/wolf-validator.git`
 - go into the newly created directory `$ cd wolf-validator`
 - and run maven build `$ mvn clean package`
@@ -142,3 +142,33 @@ Using the example below will result in execution of only the `SurefireXmlReporte
 </bean>
 ...
 ```
+
+
+#### How to filter out (ignore) specified exceptions ?
+
+Wolf-validator allows filtering (ignoring) of the exceptions using one of the following configuration options. The
+configuration is XML based and needs to be added into the `wolf-validator-config.xml`. Such filtered exceptions will not
+be passed to the reporters.
+
+##### Filtering exceptions based on filename regex
+Following example shows filtering of the `SuspiciousFileException` for all files ending with `.xsd`:
+```xml
+...
+<filter:filename regex=".*\.xsd" exception="SuspiciousFileException" />
+...
+```
+Please consult the sample `wolf-validator-config.xml` for more examples of the filename based filters.
+
+##### Filtering (bom) dependency not found exceptions
+`DependencyNotFoundException`s and `BomDependencyNotFoundException`s can be filterd out based on the information about
+the missing artifact and the validated artifact (e.g. the pom file that references the missing artifact).
+The artifact regular expressions have format `groupId:artifactId:version:extension` and use the standard Java regular
+expression syntax.
+Following example shows filtering of the `DependencyNotFoundExcepiton` for the specified missing artifact referenced
+from the artifact matching the validated-artifact regex.
+```xml
+...
+<filter:dependency-not-found missing-artifact="com.acme:finance:.*:jar" validated-artifact="com.acme:parent:.*:pom" />
+...
+```
+Please consult the sample `wolf-validator-config.xml` for more examples of the (bom-)dependency-not-found filters.

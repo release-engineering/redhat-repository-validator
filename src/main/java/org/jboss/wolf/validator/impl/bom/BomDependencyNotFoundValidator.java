@@ -1,5 +1,6 @@
 package org.jboss.wolf.validator.impl.bom;
 
+import static org.jboss.wolf.validator.internal.Utils.findCause;
 import static org.jboss.wolf.validator.internal.Utils.relativize;
 
 import java.util.Collections;
@@ -16,12 +17,15 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.eclipse.aether.util.artifact.JavaScopes;
 import org.eclipse.aether.util.filter.DependencyFilterUtils;
 import org.jboss.wolf.validator.Validator;
 import org.jboss.wolf.validator.ValidatorContext;
+import org.jboss.wolf.validator.internal.Utils;
 import org.jboss.wolf.validator.internal.ValidatorSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,7 +81,13 @@ public class BomDependencyNotFoundValidator implements Validator {
         try {
             repositorySystem.resolveDependencies(repositorySystemSession, dependencyRequest);
         } catch (DependencyResolutionException e) {
-            ctx.addException(bom.getPomFile(), new BomDependencyNotFoundException(e));
+            DependencyNode dependencyNode = e.getResult().getRoot();
+            Artifact validatedArtifact = new DefaultArtifact(bom.getGroupId(), bom.getArtifactId(), bom.getPackaging(),
+                    bom.getVersion());
+            for (Artifact missingArtifact : Utils.collectMissingArtifacts(findCause(e, ArtifactResolutionException.class))) {
+                ctx.addException(bom.getPomFile(), new BomDependencyNotFoundException(e, missingArtifact, validatedArtifact,
+                        dependencyNode));
+            }
         }
     }
 

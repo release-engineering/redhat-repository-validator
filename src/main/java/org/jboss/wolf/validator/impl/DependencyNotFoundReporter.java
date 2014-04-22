@@ -30,8 +30,9 @@ import com.google.common.collect.ListMultimap;
 @Named
 @Order(100)
 public class DependencyNotFoundReporter implements Reporter {
-    
-    @Inject @Named("dependencyNotFoundReporterStream")
+
+    @Inject
+    @Named("dependencyNotFoundReporterStream")
     private PrintStream out;
 
     @Override
@@ -47,28 +48,12 @@ public class DependencyNotFoundReporter implements Reporter {
     }
 
     protected void collectMissingDependencies(ValidatorContext ctx, ListMultimap<Artifact, DependencyNode> artifactNotFoundMap) {
-        List<DependencyCollectionException> dependencyCollectionExceptions = ctx.getExceptions(DependencyCollectionException.class);
-        for (DependencyCollectionException e : dependencyCollectionExceptions) {
-            DependencyNode from = new DefaultDependencyNode(e.getResult().getRequest().getRoot());
-            collectMissingDependencies(ctx, artifactNotFoundMap, e, from);
-        }
-    
-        List<DependencyResolutionException> dependencyResolutionExceptions = ctx.getExceptions(DependencyResolutionException.class);
-        for (DependencyResolutionException e : dependencyResolutionExceptions) {
-            DependencyNode from = e.getResult().getRoot();
-            collectMissingDependencies(ctx, artifactNotFoundMap, e, from);
-        }
-    }
-
-    protected void collectMissingDependencies(ValidatorContext ctx, ListMultimap<Artifact, DependencyNode> artifactNotFoundMap, Exception e, DependencyNode from) {
-        ArtifactResolutionException artifactResolutionException = findCause(e, ArtifactResolutionException.class);
-        if (artifactResolutionException != null) {
+        List<DependencyNotFoundException> dependencyNotFoundExceptions = ctx.getExceptions(DependencyNotFoundException.class);
+        for (DependencyNotFoundException e : dependencyNotFoundExceptions) {
+            DependencyNode dependencyNode = e.getDependencyNode();
+            Artifact missingArtifact = e.getMissingArtifact();
+            artifactNotFoundMap.put(missingArtifact, dependencyNode);
             ctx.addProcessedException(e);
-            for (ArtifactResult artifactResult : artifactResolutionException.getResults()) {
-                if (!artifactResult.isResolved()) {
-                    artifactNotFoundMap.put(artifactResult.getRequest().getArtifact(), from);
-                }
-            }
         }
     }
 
@@ -90,6 +75,7 @@ public class DependencyNotFoundReporter implements Reporter {
                     out.print(path);
                     out.println();
                 }
+
             }
         }
     }
