@@ -57,31 +57,31 @@ public class TestAppRunner {
     @Test
     public void shouldPrintHelp1() {
         appRunner.run("-h");
-        assertOutputContaints("print help and exit");
+        assertOutputContains("print help and exit");
     }
 
     @Test
     public void shouldPrintHelp2() {
         appRunner.run("--help");
-        assertOutputContaints("print help and exit");
+        assertOutputContains("print help and exit");
     }
 
     @Test
     public void shouldPrintUnrecognizedOption() {
         appRunner.run("--foo", "--bar");
-        assertOutputContaints("Unrecognized option");
+        assertOutputContains("Unrecognized option");
     }
 
     @Test(expected = BeanDefinitionStoreException.class)
     public void shouldPrintUnhandledException1() {
         appRunner.run("-c", "file-does-not-exist.xml");
-        assertOutputContaints("FileNotFoundException: file-does-not-exist.xml");
+        assertOutputContains("FileNotFoundException: file-does-not-exist.xml");
     }
 
     @Test(expected = BeanDefinitionStoreException.class)
     public void shouldPrintUnhandledException2() {
         appRunner.run("--config", "file-does-not-exist.xml");
-        assertOutputContaints("FileNotFoundException: file-does-not-exist.xml");
+        assertOutputContains("FileNotFoundException: file-does-not-exist.xml");
     }
     
     @Test
@@ -199,7 +199,7 @@ public class TestAppRunner {
         appRunner.run("--config", getClass().getResource("/TestAppRunner-defaultReporterStream.xml").getFile());
     }
     
-    private void assertOutputContaints(String s) {
+    private void assertOutputContains(String s) {
         String systemOut = systemOutBuffer.toString();
         if (!systemOut.contains(s)) {
             fail("System output should contains " + s + ", but has content:\n" + systemOut);
