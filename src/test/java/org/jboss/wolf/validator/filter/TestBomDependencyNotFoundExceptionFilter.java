@@ -10,7 +10,7 @@ import org.mockito.Mockito;
 import java.io.File;
 
 public class TestBomDependencyNotFoundExceptionFilter extends AbstractExceptionFilterTest {
-    private static final String MISSING_ARTIFACT_REGEX = "com.acme:finance.*:.*:war";
+    private static final String MISSING_ARTIFACT_REGEX = "com.acme:finance.*:war:.*";
     private static final Artifact DEFAULT_VALIDATED_ARTIFACT = new DefaultArtifact("com.acme", "acme-parent", "pom", "1.0.0");
 
     @Test
@@ -44,7 +44,7 @@ public class TestBomDependencyNotFoundExceptionFilter extends AbstractExceptionF
 
     @Test
     public void shouldIgnoreOnlyExceptionsComingFromSpecifiedPom() {
-        String validatedArtifactRegex = "com.acme:parent:1.0.1:pom";
+        String validatedArtifactRegex = "com.acme:parent:pom:1.0.1";
         BomDependencyNotFoundExceptionFilter filter = new BomDependencyNotFoundExceptionFilter(MISSING_ARTIFACT_REGEX,
                 validatedArtifactRegex);
         Artifact missingArtifact = new DefaultArtifact("com.acme", "finance-stuff", "war", "1.0-redhat-2");

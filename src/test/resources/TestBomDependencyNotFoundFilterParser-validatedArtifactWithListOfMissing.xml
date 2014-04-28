@@ -4,10 +4,10 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         http://wolf-validator.org/schema/exception-filters http://wolf-validator.org/schema/exception-filters.xsd">
 
-    <filter:bom-dependency-not-found validated-artifact="org.kie:kie-parent:.*:pom">
+    <filter:bom-dependency-not-found validated-artifact="org.kie:kie-parent:pom:.*">
         <filter:missing-artifacts>
-            <filter:missing-artifact>org.kie:kie-api:.*:jar</filter:missing-artifact>
-            <filter:missing-artifact>org.kie:kie-internal:.*:jar</filter:missing-artifact>
+            <filter:missing-artifact>org.kie:kie-api:jar:.*</filter:missing-artifact>
+            <filter:missing-artifact>org.kie:kie-internal:jar:.*</filter:missing-artifact>
         </filter:missing-artifacts>
     </filter:bom-dependency-not-found>
 

@@ -4,10 +4,10 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         http://wolf-validator.org/schema/exception-filters http://wolf-validator.org/schema/exception-filters.xsd">
 
-    <filter:dependency-not-found missing-artifact="org.drools:drools-core:.*:jar">
+    <filter:dependency-not-found missing-artifact="org.drools:drools-core:jar:.*">
         <filter:validated-artifacts>
-            <filter:validated-artifact>org.kie:kie-parent:.*:pom</filter:validated-artifact>
-            <filter:validated-artifact>org.acme:acme-parent:.*:pom</filter:validated-artifact>
+            <filter:validated-artifact>org.kie:kie-parent:pom:.*</filter:validated-artifact>
+            <filter:validated-artifact>org.acme:acme-parent:pom:.*</filter:validated-artifact>
         </filter:validated-artifacts>
     </filter:dependency-not-found>
 
