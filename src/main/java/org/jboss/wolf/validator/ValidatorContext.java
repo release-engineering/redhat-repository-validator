@@ -107,6 +107,10 @@ public class ValidatorContext {
     }
 
     public void applyExceptionFilters(ExceptionFilter[] exceptionFilters) {
+        if (exceptionFilters == null) {
+            logger.debug("Skipping the exception filtering as no filters were defined!");
+            return;
+        }
         logger.debug("Applying {} exception filter(s).", exceptionFilters.length);
         for (ExceptionFilter exceptionFilter : exceptionFilters) {
             logger.debug("Applying exception filter " + exceptionFilter);

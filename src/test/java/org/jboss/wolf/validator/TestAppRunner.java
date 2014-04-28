@@ -198,7 +198,20 @@ public class TestAppRunner {
         appRunner = new AssertReportFileRunner(new File("workspace/bar.txt"));
         appRunner.run("--config", getClass().getResource("/TestAppRunner-defaultReporterStream.xml").getFile());
     }
-    
+
+    @Test
+    public void shouldNotFailWhenNoExceptionFiltersDefined() {
+        appRunner = new AppRunner() {
+            @Override
+            protected void runValidation() {
+                // make sure no filters are defined
+                assertTrue(exceptionFilters == null);
+                context.applyExceptionFilters(exceptionFilters);
+            }
+        };
+        appRunner.run();
+    }
+
     private void assertOutputContains(String s) {
         String systemOut = systemOutBuffer.toString();
         if (!systemOut.contains(s)) {
