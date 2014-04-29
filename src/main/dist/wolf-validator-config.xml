@@ -95,25 +95,25 @@
 
     <filter:filename regex="file-prefix.*\.jar" exception="SuspiciousFileException" />
 
-    <filter:dependency-not-found missing-artifact="groupId:artifactId:.*:jar" />
+    <filter:dependency-not-found missing-artifact="groupId:artifactId:jar:.*" />
 
-    <filter:dependency-not-found missing-artifact="groupId:artifactId:.*:jar" validated-artifact="groupId:artifactId:.*:jar"/>
+    <filter:dependency-not-found missing-artifact="groupId:artifactId:jar:.*" validated-artifact="groupId:artifactId:jar:.*"/>
 
-    <filter:dependency-not-found missing-artifact="groupId:artifactId:.*:jar">
+    <filter:dependency-not-found missing-artifact="groupId:artifactId:jar:.*">
         <filter:validated-artifacts>
-            <filter:validated-artifact>groupId:artifactId:.*:jar</filter:validated-artifact>
-            <filter:validated-artifact>groupId:artifactId:.*:jar</filter:validated-artifact>
+            <filter:validated-artifact>groupId:artifactId:jar:.*</filter:validated-artifact>
+            <filter:validated-artifact>groupId:artifactId:jar:.*</filter:validated-artifact>
         </filter:validated-artifacts>
     </filter:dependency-not-found>
 
-    <filter:dependency-not-found validated-artifact="groupId:artifactId:.*:jar">
+    <filter:dependency-not-found validated-artifact="groupId:artifactId:jar:.*">
         <filter:missing-artifacts>
-            <filter:missing-artifact>groupId:artifactId:.*:jar</filter:missing-artifact>
-            <filter:missing-artifact>groupId:artifactId:.*:jar</filter:missing-artifact>
+            <filter:missing-artifact>groupId:artifactId:jar:.*</filter:missing-artifact>
+            <filter:missing-artifact>groupId:artifactId:jar:.*</filter:missing-artifact>
         </filter:missing-artifacts>
     </filter:dependency-not-found>
 
-    <filter:bom-dependency-not-found missing-artifact="groupId:artifactId:.*:jar" />
+    <filter:bom-dependency-not-found missing-artifact="groupId:artifactId:jar:.*" />
 -->
 
 </beans>

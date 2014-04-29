@@ -21,15 +21,13 @@ public class DependencyNotFoundFilterParser extends AbstractExceptionFilterParse
             AbstractBeanDefinition beanDefinition = parseConfigWithoutChildren(element);
             registerBeanDefinitions(parserContext.getRegistry(), beanDefinition);
         }
-        // all beans have been alredy registered, so nothing to return
+        // all beans have been already registered, so nothing to return
         return null;
     }
 
     protected Class<? extends DependencyNotFoundExceptionFilter> getBeanType() {
         return DependencyNotFoundExceptionFilter.class;
     }
-
-
 
     private List<AbstractBeanDefinition> parseConfigWithChildren(Element element) {
         List<AbstractBeanDefinition> beanDefinitions = new ArrayList<AbstractBeanDefinition>();
