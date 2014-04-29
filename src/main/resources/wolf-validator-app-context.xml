@@ -28,7 +28,7 @@
     <bean id="syncContextFactory" class="org.eclipse.aether.internal.impl.DefaultSyncContextFactory" />
     <bean id="repositoryEventDispatcher" class="org.eclipse.aether.internal.impl.DefaultRepositoryEventDispatcher" />
     <bean id="offlineController" class="org.eclipse.aether.internal.impl.DefaultOfflineController" />
-    <bean id="localRepositoryProvider" class="org.eclipse.aether.internal.impl.DefaultLocalRepositoryProvider"></bean>
+    <bean id="localRepositoryProvider" class="org.eclipse.aether.internal.impl.DefaultLocalRepositoryProvider" />
     <bean id="simpleLocalRepositoryManagerFactory" class="org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory" />
     <bean id="enhancedLocalRepositoryManagerFactory" class="org.eclipse.aether.internal.impl.EnhancedLocalRepositoryManagerFactory" />
     <bean id="modelReader" class="org.apache.maven.model.io.DefaultModelReader" />
