@@ -57,11 +57,11 @@ public class FilenameBasedExceptionFilterParser extends AbstractExceptionFilterP
             JarSignedException.class,
             JarUnsignedException.class,
             JarSourcesVerificationException.class,
+            SuspiciousFileException.class,
+            UnknownArtifactTypeException.class,
             VersionAmbiguityException.class,
             VersionOverlapException.class,
             VersionPatternException.class,
-            SuspiciousFileException.class,
-            UnknownArtifactTypeException.class,
             XmlVerificationException.class
     );
 

@@ -4,7 +4,6 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.jboss.wolf.validator.impl.DependencyNotFoundException;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.io.File;
 
