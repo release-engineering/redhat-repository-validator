@@ -22,7 +22,7 @@ public class BomDependencyNotFoundExceptionFilter extends DependencyNotFoundExce
     public String toString() {
         return "BomDependencyNotFoundExceptionFilter{" +
                 "missingArtifactRegex=" + getMissingArtifactRegex() +
-                ", validatedArtifactRegex=" + getMissingArtifactRegex() +
+                ", validatedArtifactRegex=" + getValidatedArtifactRegex() +
                 '}';
     }
 
