@@ -80,6 +80,32 @@ public class TestDependencyNotFoundFilterParser extends AbstractExceptionFilterP
         assertContainsFilter(filters, "com.acme:missing-and-list-of-validated:jar:.*", "com.acme:missing-and-list-of-validated-parent2:pom:.*");
     }
 
+    @Test
+    public void shouldParseConfigWithMissingArtifactAndReferencedListOfValidated() {
+        initAppContext("/TestDependencyNotFoundFilterParser-missingArtifactWithReferencedListOfValidated.xml");
+
+        assertNumberOfBeansWithType(ExceptionFilter.class, 2);
+
+        List<DependencyNotFoundExceptionFilter> filters = getAllMatchingBeans(DependencyNotFoundExceptionFilter.class);
+        assertFalse("No filters with specified type found!", filters.isEmpty());
+        // verify the regexes were not modified during the parsing
+        assertContainsFilter(filters, "org.drools:drools-core:jar:.*", "org.drools:drools-bom:pom:.*");
+        assertContainsFilter(filters, "org.drools:drools-core:jar:.*", "org.jbpm:jbpm-bom:pom:.*");
+    }
+
+    @Test
+    public void shouldParseConfigWithValidateArtifactAndReferencedListOfMissing() {
+        initAppContext("/TestDependencyNotFoundFilterParser-validatedArtifactWithReferencedListOfMissing.xml");
+
+        assertNumberOfBeansWithType(ExceptionFilter.class, 2);
+
+        List<DependencyNotFoundExceptionFilter> filters = getAllMatchingBeans(DependencyNotFoundExceptionFilter.class);
+        assertFalse("No filters with specified type found!", filters.isEmpty());
+
+        assertContainsFilter(filters, "org.drools:drools-core:jar:.*", "org.drools:drools-bom:pom:.*");
+        assertContainsFilter(filters, "org.drools:drools-compiler:jar:.*", "org.drools:drools-bom:pom:.*");
+    }
+
     protected void assertContainsFilter(List<DependencyNotFoundExceptionFilter> filters, String missingArtifactRegex, String validatedArtifactRegex) {
         for (DependencyNotFoundExceptionFilter filter : filters) {
             if (validatedArtifactRegex == null) {

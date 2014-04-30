@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:filter="http://wolf-validator.org/schema/exception-filters"
+       xmlns:util="http://www.springframework.org/schema/util" xmlns:lang="http://www.springframework.org/schema/lang"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://wolf-validator.org/schema/exception-filters http://wolf-validator.org/schema/exception-filters.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd">
+
+
+    <util:list id="droolsjbpm-boms" value-type="java.lang.String">
+        <value>org.drools:drools-bom:pom:.*</value>
+        <value>org.jbpm:jbpm-bom:pom:.*</value>
+    </util:list>
+
+    <filter:bom-dependency-not-found missing-artifact="org.drools:drools-core:jar:.*">
+        <filter:validated-artifacts ref="droolsjbpm-boms" />
+    </filter:bom-dependency-not-found>
+
+</beans>
