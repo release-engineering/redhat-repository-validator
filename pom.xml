@@ -119,7 +119,7 @@
             <version>${version.aether}</version>
         </dependency>
         <dependency>
-            <groupId>io.tesla.maven</groupId>
+            <groupId>org.apache.maven</groupId>
             <artifactId>maven-aether-provider</artifactId>
             <version>${version.maven}</version>
         </dependency>
