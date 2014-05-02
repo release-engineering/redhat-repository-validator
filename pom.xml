@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.jboss</groupId>
     <artifactId>wolf-validator</artifactId>
@@ -41,9 +41,9 @@
         <maven.compiler.target>1.6</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <version.aether>0.9.0.M2</version.aether>
+        <version.aether>0.9.1.v20140329</version.aether>
         <version.maven>3.2.1</version.maven>
-        <version.wagon>2.1</version.wagon> <!-- with higher version: NoSuchMethodError org.apache.maven.wagon.shared.http4.AbstractHttpClientWagon.getReadTimeout() -->
+        <version.wagon>2.6</version.wagon>
         <version.slf4j>1.7.5</version.slf4j>
         <version.logback>1.0.12</version.logback>
         <version.spring>3.2.2.RELEASE</version.spring>
@@ -110,18 +110,28 @@
         </dependency>
         <dependency>
             <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-connector-file</artifactId>
+            <artifactId>aether-connector-basic</artifactId>
             <version>${version.aether}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-connector-asynchttpclient</artifactId>
+            <artifactId>aether-transport-file</artifactId>
             <version>${version.aether}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.aether</groupId>
-            <artifactId>aether-connector-wagon</artifactId>
+            <artifactId>aether-transport-http</artifactId>
             <version>${version.aether}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-transport-wagon</artifactId>
+            <version>${version.aether}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.wagon</groupId>
+            <artifactId>wagon-provider-api</artifactId>
+            <version>${version.wagon}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
@@ -248,6 +258,26 @@
                     <artifactId>surefire-booter</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <!-- Version overrides (needed due to version clashes):
+             Validator indirectly depends on following artifacts which come as transitive dependencies from multiple
+             artifacts. Maven dependency resolver will by default include the lower version which then causes errors
+             due to API changes (e.g. missing classes and methods). Overriding the artifact to the concrete version
+             (usually the highest one) fixes the issue.
+         -->
+        <!-- version coming from aether-transport-http needs to be overriden, because wagon-http uses
+             API methods introduced in httpclient-4.3 -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.3.1</version>
+        </dependency>
+        <!-- maven-aether-provider needs higher version than the default one brought by wagon-provider-api -->
+        <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-utils</artifactId>
+            <version>3.0.15</version>
         </dependency>
 
         <dependency>
