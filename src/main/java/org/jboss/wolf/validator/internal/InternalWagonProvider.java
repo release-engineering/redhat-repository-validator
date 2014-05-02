@@ -7,7 +7,7 @@ import org.apache.maven.wagon.providers.http.HttpWagon;
 import org.apache.maven.wagon.providers.http.LightweightHttpWagon;
 import org.apache.maven.wagon.providers.http.LightweightHttpWagonAuthenticator;
 import org.apache.maven.wagon.providers.http.LightweightHttpsWagon;
-import org.eclipse.aether.connector.wagon.WagonProvider;
+import org.eclipse.aether.transport.wagon.WagonProvider;
 
 public class InternalWagonProvider implements WagonProvider {
 

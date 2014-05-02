@@ -32,7 +32,12 @@
     <bean id="simpleLocalRepositoryManagerFactory" class="org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory" />
     <bean id="enhancedLocalRepositoryManagerFactory" class="org.eclipse.aether.internal.impl.EnhancedLocalRepositoryManagerFactory" />
     <bean id="modelReader" class="org.apache.maven.model.io.DefaultModelReader" />
-    <bean id="repositoryConnectorFactory" class="org.eclipse.aether.connector.wagon.WagonRepositoryConnectorFactory" />
+    <bean id="repositoryConnectorFactory" class="org.eclipse.aether.connector.basic.BasicRepositoryConnectorFactory" />
+    <bean id ="checksumPolicyProvider" class="org.eclipse.aether.internal.impl.DefaultChecksumPolicyProvider" />
+    <bean id="transporterProvider" class="org.eclipse.aether.internal.impl.DefaultTransporterProvider" />
+    <bean id="transporterFactory" class="org.eclipse.aether.transport.wagon.WagonTransporterFactory" />
+    <bean id="repositoryLayoutProvider" class="org.eclipse.aether.internal.impl.DefaultRepositoryLayoutProvider" />
+    <bean id="repositoryLayoutFactory" class="org.eclipse.aether.internal.impl.Maven2RepositoryLayoutFactory" />
     <bean id="internalWagonProvider" class="org.jboss.wolf.validator.internal.InternalWagonProvider" />
     <bean id="internalWagonConfigurator"  class="org.jboss.wolf.validator.internal.InternalWagonConfigurator" />
     <bean id="internalRepositoryListener" class="org.jboss.wolf.validator.internal.InternalRepositoryListener" />

@@ -1,7 +1,7 @@
 package org.jboss.wolf.validator.internal;
 
 import org.apache.maven.wagon.Wagon;
-import org.eclipse.aether.connector.wagon.WagonConfigurator;
+import org.eclipse.aether.transport.wagon.WagonConfigurator;
 
 public class InternalWagonConfigurator implements WagonConfigurator {
 
