@@ -24,6 +24,7 @@ public class ValidatorContext {
     private final List<RemoteRepository> remoteRepositories;
     private final Map<File, List<Exception>> exceptions = new HashMap<File, List<Exception>>();
     private final Set<Exception> processedExceptions = new HashSet<Exception>();
+    private final List<Exception> filteredExceptions = new ArrayList<Exception>();
 
     public ValidatorContext(File validatedRepository, File validatedDistribution, List<RemoteRepository> remoteRepositories) {
         this.validatedRepository = validatedRepository;
@@ -41,6 +42,10 @@ public class ValidatorContext {
 
     public List<RemoteRepository> getRemoteRepositories() {
         return remoteRepositories;
+    }
+
+    public List<Exception> getFilteredExceptions() {
+        return filteredExceptions;
     }
 
     public boolean isSuccess() {
@@ -118,21 +123,22 @@ public class ValidatorContext {
         }
     }
 
-    public void applyExceptionFilter(ExceptionFilter exceptionFilter) {
-        for (Map.Entry<File, List<Exception>> fileToExceptions : exceptions.entrySet()) {
-            File fileInRepo = fileToExceptions.getKey();
-            List<Exception> exceptionList = fileToExceptions.getValue();
-            List<Exception> exceptionsToRemove = new ArrayList<Exception>();
+    private void applyExceptionFilter(ExceptionFilter exceptionFilter) {
+        for (Map.Entry<File, List<Exception>> exceptionsPerFile : exceptions.entrySet()) {
+            File fileInRepo = exceptionsPerFile.getKey();
+            List<Exception> exceptionList = exceptionsPerFile.getValue();
+            List<Exception> currentlyFilteredExceptions = new ArrayList<Exception>();
             for (Exception exception : exceptionList) {
                 if (exceptionFilter.shouldIgnore(exception, fileInRepo)) {
                     logger.debug("Filtering (ignoring) exception: " + exception);
-                    exceptionsToRemove.add(exception);
+                    currentlyFilteredExceptions.add(exception);
                 }
             }
-            // remove the marked exceptions from list and update the exceptions map
-            if (!exceptionsToRemove.isEmpty()) {
-                exceptionList.removeAll(exceptionsToRemove);
+            // remove the marked exceptions from list, update the exceptions map and track the the filtered exceptions
+            if (!currentlyFilteredExceptions.isEmpty()) {
+                exceptionList.removeAll(currentlyFilteredExceptions);
                 exceptions.put(fileInRepo, exceptionList);
+                filteredExceptions.addAll(currentlyFilteredExceptions);
             }
         }
     }

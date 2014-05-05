@@ -1,5 +1,6 @@
 package org.jboss.wolf.validator.impl;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -13,9 +14,14 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.graph.DefaultDependencyNode;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.jboss.wolf.validator.ExceptionFilter;
 import org.jboss.wolf.validator.ValidatorContext;
+import org.jboss.wolf.validator.filter.BomDependencyNotFoundExceptionFilter;
+import org.jboss.wolf.validator.filter.DependencyNotFoundExceptionFilter;
+import org.jboss.wolf.validator.filter.FilenameBasedExceptionFilter;
 import org.jboss.wolf.validator.impl.bom.BomDependencyNotFoundException;
 import org.jboss.wolf.validator.impl.checksum.ChecksumNotExistException;
+import org.jboss.wolf.validator.impl.source.JarSourcesVerificationException;
 import org.jboss.wolf.validator.impl.suspicious.SuspiciousFileException;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -57,11 +63,9 @@ public class TestSurefireXmlReporter {
         File suspiciousFileExceptionReportFile = new File(REPORTS_DIR, "TEST-SuspiciousFileException.xml");
         File checksumNotExistExceptionReportFile = new File(REPORTS_DIR, "TEST-ChecksumNotExistException.xml");
 
-        assertTrue(suspiciousFileExceptionReportFile.exists());
-        assertTrue(suspiciousFileExceptionReportFile.isFile());
+        assertFileExists(suspiciousFileExceptionReportFile);
 
-        assertTrue(checksumNotExistExceptionReportFile.exists());
-        assertTrue(checksumNotExistExceptionReportFile.isFile());
+        assertFileExists(checksumNotExistExceptionReportFile);
 
         String suspiciousFileExceptionReport = FileUtils.readFileToString(suspiciousFileExceptionReportFile);
         String checksumNotExistExceptionReport = FileUtils.readFileToString(checksumNotExistExceptionReportFile);
@@ -93,8 +97,7 @@ public class TestSurefireXmlReporter {
 
         File exceptionReportFile = new File(REPORTS_DIR, "TEST-Exception.xml");
 
-        assertTrue(exceptionReportFile.exists());
-        assertTrue(exceptionReportFile.isFile());
+        assertFileExists(exceptionReportFile);
     }
 
     @Test
@@ -117,8 +120,7 @@ public class TestSurefireXmlReporter {
         reporter.report(ctx);
 
         File depNotFoundReportFile = new File(REPORTS_DIR, "TEST-DependencyNotFoundReport.xml");
-        assertTrue(depNotFoundReportFile.exists());
-        assertTrue(depNotFoundReportFile.isFile());
+        assertFileExists(depNotFoundReportFile);
 
         String depNotFoundReportContent = FileUtils.readFileToString(depNotFoundReportFile);
         assertTrue(depNotFoundReportContent.contains("Miss org:missing:jar:1.0 in ...\n\n" +
@@ -149,8 +151,7 @@ public class TestSurefireXmlReporter {
         reporter.report(ctx);
 
         File depNotFoundReportFile = new File(REPORTS_DIR, "TEST-BomDependencyNotFoundReport.xml");
-        assertTrue(depNotFoundReportFile.exists());
-        assertTrue(depNotFoundReportFile.isFile());
+        assertFileExists(depNotFoundReportFile);
 
         String depNotFoundReportContent = FileUtils.readFileToString(depNotFoundReportFile);
         assertTrue(depNotFoundReportContent.contains("Miss org:missing:jar:1.0 in ...\n\n" +
@@ -159,6 +160,101 @@ public class TestSurefireXmlReporter {
         ));
 
         assertFalse(new File(REPORTS_DIR, "TEST-DependencyNotFoundException.xml").exists());
+    }
+
+    @Test
+    public void shouldReportSimpleFilteredExceptionsAsSkipped() throws IOException {
+        ValidatorContext ctx = new ValidatorContext(VALIDATED_REPO_DIR, null, Collections.<RemoteRepository>emptyList());
+        File validatedFile = new File(VALIDATED_REPO_DIR, "validated");
+        Exception filteredException = new JarSourcesVerificationException(validatedFile);
+        ExceptionFilter filter = new FilenameBasedExceptionFilter(".*validated", JarSourcesVerificationException.class);
+
+        ctx.addException(validatedFile, filteredException);
+        ctx.applyExceptionFilters(new ExceptionFilter[]{filter});
+        SurefireXmlReporter reporter = new SurefireXmlReporter(REPORTS_DIR);
+        reporter.report(ctx);
+
+        File reportFile = new File(REPORTS_DIR, "TEST-JarSourcesVerificationException.xml");
+        assertFileExists(reportFile);
+
+        String reportContent = FileUtils.readFileToString(reportFile);
+        assertTrue(reportContent.contains("classname=\"JarSourcesVerificationException\" time=\"0\">\n    <skipped type=\"\"></skipped>"));
+    }
+
+    @Test
+    public void shouldReportFilteredDependencyNotFoundExceptionAsSkipped() throws IOException {
+        ValidatorContext ctx = new ValidatorContext(VALIDATED_REPO_DIR, null, Collections.<RemoteRepository>emptyList());
+
+        Artifact validatedArtifact1 = new DefaultArtifact("org", "validated", "pom", "1.0");
+        Artifact missing = new DefaultArtifact("org", "missing", "jar", "1.0");
+        DependencyNode depRoot1 = new DefaultDependencyNode(validatedArtifact1);
+        DependencyNotFoundException ex1 = new DependencyNotFoundException(new Exception(), missing, validatedArtifact1, depRoot1);
+        ctx.addException(new File(""), ex1);
+
+        Artifact validatedArtifact2 = new DefaultArtifact("org", "validated2-not-filtered", "pom", "1.1");
+        DependencyNotFoundException ex2 = new DependencyNotFoundException(new Exception(), missing, validatedArtifact2);
+        ctx.addException(new File(""), ex2);
+
+        String missingArtifactRegex = "org:missing:jar:1.0";
+        String validatedArtifactRegex = "org:validated:pom:1.0";
+        ExceptionFilter filter = new DependencyNotFoundExceptionFilter(missingArtifactRegex, validatedArtifactRegex);
+        ctx.applyExceptionFilters(new ExceptionFilter[]{filter});
+
+        assertEquals("Number of filtered exceptions", 1, ctx.getFilteredExceptions().size());
+        assertEquals("Number of non-filtered exceptions", 1, ctx.getExceptions().size());
+
+        SurefireXmlReporter reporter = new SurefireXmlReporter(REPORTS_DIR);
+        reporter.report(ctx);
+
+        File depNotFoundReportFile = new File(REPORTS_DIR, "TEST-DependencyNotFoundReport.xml");
+        assertFileExists(depNotFoundReportFile);
+
+        String depNotFoundReportContent = FileUtils.readFileToString(depNotFoundReportFile);
+        assertTrue(depNotFoundReportContent.contains("<testcase name=\"__Miss org:missing:jar:1.0 in org:validated2-not-filtered:pom:1.1 \"" +
+                " classname=\"DependencyNotFoundReport\" time=\"0\">\n    <error type=\"\"></error>"));
+        assertTrue(depNotFoundReportContent.contains("<testcase name=\"__Miss org:missing:jar:1.0 in org:validated:pom:1.0 \"" +
+                " classname=\"DependencyNotFoundReport\" time=\"0\">\n    <skipped type=\"\"></skipped>"));
+    }
+
+    @Test
+    public void shouldReportFilteredBomDependencyNotFoundExceptionAsSkipped() throws IOException {
+        ValidatorContext ctx = new ValidatorContext(VALIDATED_REPO_DIR, null, Collections.<RemoteRepository>emptyList());
+
+        Artifact validatedArtifact1 = new DefaultArtifact("org", "validated", "pom", "1.0");
+        Artifact missingArtifact = new DefaultArtifact("org", "missing", "jar", "1.0");
+        DependencyNode depRoot1 = new DefaultDependencyNode(validatedArtifact1);
+        DependencyNotFoundException ex1 = new BomDependencyNotFoundException(new Exception(), missingArtifact, validatedArtifact1, depRoot1);
+        ctx.addException(new File(""), ex1);
+
+        Artifact validatedArtifact2 = new DefaultArtifact("org", "validated2-not-filtered", "pom", "1.1");
+        DependencyNode depRoot2 = new DefaultDependencyNode(validatedArtifact2);
+        DependencyNotFoundException ex2 = new BomDependencyNotFoundException(new Exception(), missingArtifact, validatedArtifact2, depRoot2);
+        ctx.addException(new File(""), ex2);
+
+        String missingArtifactRegex = "org:missing:jar:1.0";
+        String validatedArtifactRegex = "org:validated:pom:1.0";
+        ExceptionFilter filter = new BomDependencyNotFoundExceptionFilter(missingArtifactRegex, validatedArtifactRegex);
+        ctx.applyExceptionFilters(new ExceptionFilter[]{filter});
+
+        assertEquals("Number of filtered exceptions", 1, ctx.getFilteredExceptions().size());
+        assertEquals("Number of non-filtered exceptions", 1, ctx.getExceptions().size());
+
+        SurefireXmlReporter reporter = new SurefireXmlReporter(REPORTS_DIR);
+        reporter.report(ctx);
+
+        File depNotFoundReportFile = new File(REPORTS_DIR, "TEST-BomDependencyNotFoundReport.xml");
+        assertFileExists(depNotFoundReportFile);
+
+        String depNotFoundReportContent = FileUtils.readFileToString(depNotFoundReportFile);
+        assertTrue(depNotFoundReportContent.contains("<testcase name=\"__Miss org:missing:jar:1.0 in org:validated2-not-filtered:pom:1.1 \"" +
+                " classname=\"BomDependencyNotFoundReport\" time=\"0\">\n    <error type=\"\"></error>"));
+        assertTrue(depNotFoundReportContent.contains("<testcase name=\"__Miss org:missing:jar:1.0 in org:validated:pom:1.0 \"" +
+                " classname=\"BomDependencyNotFoundReport\" time=\"0\">\n    <skipped type=\"\"></skipped>"));
+    }
+
+    private void assertFileExists(File file) {
+        assertTrue(file.exists());
+        assertTrue(file.isFile());
     }
 
 }
