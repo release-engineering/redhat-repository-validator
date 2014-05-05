@@ -3,7 +3,6 @@ package org.jboss.wolf.validator.impl;
 import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.apache.maven.surefire.report.CategorizedReportEntry.reportEntry;
-import static org.jboss.wolf.validator.internal.Utils.findCause;
 import static org.jboss.wolf.validator.internal.Utils.findPathToDependency;
 import static org.jboss.wolf.validator.internal.Utils.sortArtifacts;
 import static org.jboss.wolf.validator.internal.Utils.sortDependencyNodes;
@@ -25,12 +24,7 @@ import org.apache.maven.surefire.report.ReportEntry;
 import org.apache.maven.surefire.report.SafeThrowable;
 import org.apache.maven.surefire.report.StackTraceWriter;
 import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.collection.DependencyCollectionException;
-import org.eclipse.aether.graph.DefaultDependencyNode;
 import org.eclipse.aether.graph.DependencyNode;
-import org.eclipse.aether.resolution.ArtifactResolutionException;
-import org.eclipse.aether.resolution.ArtifactResult;
-import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.jboss.wolf.validator.Reporter;
 import org.jboss.wolf.validator.ValidatorContext;
 import org.jboss.wolf.validator.impl.bom.BomDependencyNotFoundException;
@@ -80,32 +74,33 @@ public class SurefireXmlReporter implements Reporter {
             FileUtils.forceMkdir(reportsDirectory);
             FileUtils.cleanDirectory(reportsDirectory);
 
-            List<Exception> exceptionList = sortExceptions(ctx.getExceptions());
-            reportDependencyNotFound(exceptionList);
-            reportBomDependencyNotFound(exceptionList);
-            reportExceptions(exceptionList);
+            List<Exception> exceptions = sortExceptions(ctx.getExceptions());
+            List<Exception> filteredExceptions = sortExceptions(ctx.getFilteredExceptions());
+            reportMissingDependencies("DependencyNotFoundReport", DependencyNotFoundException.class, exceptions, filteredExceptions);
+            reportMissingDependencies("BomDependencyNotFoundReport", BomDependencyNotFoundException.class, exceptions, filteredExceptions);
+            reportExceptions(exceptions, filteredExceptions);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void reportDependencyNotFound(List<Exception> exceptionList) {
-        ListMultimap<Artifact, DependencyNode> artifactNotFoundMap = collectDependencyNotFoundData(exceptionList, DependencyNotFoundException.class);
-        reportDependencyNotFound("DependencyNotFoundReport", artifactNotFoundMap);
-    }
-
-    private void reportBomDependencyNotFound(List<Exception> exceptionList) {
-        ListMultimap<Artifact, DependencyNode> artifactNotFoundMap = collectDependencyNotFoundData(exceptionList, BomDependencyNotFoundException.class);
-        reportDependencyNotFound("BomDependencyNotFoundReport", artifactNotFoundMap);
-    }
-
-    private void reportDependencyNotFound(String type, ListMultimap<Artifact, DependencyNode> artifactNotFoundMap) {
+    private void reportMissingDependencies(String type, Class<? extends DependencyNotFoundException> exceptionType,
+            List<Exception> exceptions, List<Exception> filteredExceptions) {
+        ListMultimap<Artifact, DependencyNode> artifactNotFoundMap = collectDependencyNotFoundData(exceptions, exceptionType);
+        ListMultimap<Artifact, DependencyNode> filteredArtifactNotFoundMap = collectDependencyNotFoundData(filteredExceptions, exceptionType);
         TestSetStats testSuite = new TestSetStats(false, false);
+        reportMissingDependencies(type, artifactNotFoundMap, ReportEntryType.error, testSuite);
+        reportMissingDependencies(type, filteredArtifactNotFoundMap, ReportEntryType.skipped, testSuite);
+        reportTestSuite(type, testSuite);
+    }
+
+    private void reportMissingDependencies(String type, ListMultimap<Artifact, DependencyNode> artifactNotFoundMap,
+            ReportEntryType reportEntryType, TestSetStats testSuite) {
         for (Artifact artifact : sortArtifacts(artifactNotFoundMap.keySet())) {
             List<DependencyNode> roots = sortDependencyNodes(artifactNotFoundMap.get(artifact));
             if (roots.size() == 1) {
                 String msg = "Miss " + artifact + " in " + roots.get(0).getArtifact() + " (path " + findPathToDependency(artifact, roots.get(0)) + ")";
-                testSuite.testError(testCase(type, msg, null));
+                reportTestCase(type, reportEntryType, msg, null, testSuite);
             } else {
                 String msg = "Miss " + artifact + " in " + roots.size() + " artifacts ...";
                 StringBuilder dsc = new StringBuilder();
@@ -115,28 +110,43 @@ public class SurefireXmlReporter implements Reporter {
                     dsc.append(root.getArtifact() + " (path " + findPathToDependency(artifact, root) + ")");
                     dsc.append(LINE_SEPARATOR).append(LINE_SEPARATOR);
                 }
-                testSuite.testError(testCase(type, msg, dsc.toString()));
+                reportTestCase(type, reportEntryType, msg, dsc.toString(), testSuite);
             }
         }
-        reportTestSuite(type, testSuite);
     }
 
-    private void reportExceptions(List<Exception> exceptionList) {
+    private void reportTestCase(String type, ReportEntryType reportEntryType, String message, String description, TestSetStats testSuite) {
+        if (reportEntryType == ReportEntryType.error) {
+            testSuite.testError(testCase(type, ReportEntryType.error, message, description == null ? null : description.toString()));
+        } else {
+            testSuite.testSkipped(testCase(type, ReportEntryType.skipped, message, description == null ? null : description.toString()));
+        }
+    }
+
+    private void reportExceptions(List<Exception> exceptionList, List<Exception> ignoredExceptions) {
         Multimap<Class<? extends Exception>, Exception> exceptionMultimap = LinkedListMultimap.create();
         for (Exception exception : exceptionList) {
+            exceptionMultimap.put(exception.getClass(), exception);
+        }
+        for (Exception exception : ignoredExceptions) {
             exceptionMultimap.put(exception.getClass(), exception);
         }
 
         for (Class<? extends Exception> exceptionType : exceptionMultimap.keySet()) {
             TestSetStats testSuiteData = new TestSetStats(false, false);
             for (Exception exception : exceptionMultimap.get(exceptionType)) {
-                testSuiteData.testError(testCase(exception));
+                if (ignoredExceptions.contains(exception)) {
+                    testSuiteData.testSkipped(testCase(exception, ReportEntryType.skipped));
+                } else {
+                    testSuiteData.testError(testCase(exception, ReportEntryType.error));
+                }
             }
             reportTestSuite(exceptionType.getSimpleName(), testSuiteData);
         }
     }
 
-    private ListMultimap<Artifact, DependencyNode> collectDependencyNotFoundData(List<Exception> exceptionList, Class<? extends DependencyNotFoundException> exceptionType) {
+    private ListMultimap<Artifact, DependencyNode> collectDependencyNotFoundData(List<Exception> exceptionList,
+            Class<? extends DependencyNotFoundException> exceptionType) {
         ListMultimap<Artifact, DependencyNode> artifactNotFoundMap = ArrayListMultimap.create();
 
         ListIterator<Exception> exceptionIterator = exceptionList.listIterator();
@@ -152,30 +162,37 @@ public class SurefireXmlReporter implements Reporter {
     }
 
     private void reportTestSuite(String testSuiteName, TestSetStats testSuiteData) {
-        if (testSuiteData.getErrors() > 0) {
-            WrappedReportEntry testSuite = testSuite(testSuiteName);
+        // report entries here are expected to be either "error" or "skipped"
+        if (testSuiteData.getReportEntries().size() > 0) {
+            ReportEntryType reportEntryType;
+            if (testSuiteData.getErrors() > 0) {
+                reportEntryType = ReportEntryType.error;
+            } else {
+                reportEntryType = ReportEntryType.skipped;
+            }
+            WrappedReportEntry testSuite = testSuite(testSuiteName, reportEntryType);
             StatelessXmlReporter reporter = new StatelessXmlReporter(reportsDirectory, null, false);
             reporter.testSetCompleted(testSuite, testSuiteData);
         }
     }
 
-    private WrappedReportEntry testSuite(String testSuiteName) {
+    private WrappedReportEntry testSuite(String testSuiteName, ReportEntryType reportEntryType) {
         ReportEntry reportEntry = reportEntry(testSuiteName, testSuiteName + testSuitePostfix, null, null, 0, null);
-        return wrap(reportEntry);
+        return wrap(reportEntry, reportEntryType);
     }
 
-    private WrappedReportEntry testCase(String type, String message, String description) {
+    private WrappedReportEntry testCase(String type, ReportEntryType reportEntryType, String message, String description) {
         ReportEntry reportEntry = reportEntry(type, testCasePrefix + message, null, new InternalStackTraceWriter(description), 0, "");
-        return wrap(reportEntry);
+        return wrap(reportEntry, reportEntryType);
     }
 
-    private WrappedReportEntry testCase(Exception exception) {
+    private WrappedReportEntry testCase(Exception exception, ReportEntryType reportEntryType) {
         ReportEntry reportEntry = reportEntry(exception.getClass().getSimpleName(), testCasePrefix + exception.getMessage(), null, new InternalStackTraceWriter(exception), 0, "");
-        return wrap(reportEntry);
+        return wrap(reportEntry, reportEntryType);
     }
 
-    private WrappedReportEntry wrap(ReportEntry reportEntry) {
-        return new WrappedReportEntry(reportEntry, ReportEntryType.error, 0, null, null);
+    private WrappedReportEntry wrap(ReportEntry reportEntry, ReportEntryType reportEntryType) {
+        return new WrappedReportEntry(reportEntry, reportEntryType, 0, null, null);
     }
 
     private static class InternalStackTraceWriter implements StackTraceWriter {
