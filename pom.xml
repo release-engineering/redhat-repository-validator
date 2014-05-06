@@ -46,7 +46,7 @@
         <version.wagon>2.6</version.wagon>
         <version.slf4j>1.7.5</version.slf4j>
         <version.logback>1.0.12</version.logback>
-        <version.spring>3.2.2.RELEASE</version.spring>
+        <version.spring>4.0.4.RELEASE</version.spring>
         <version.surefire>2.17</version.surefire>
     </properties>
 
