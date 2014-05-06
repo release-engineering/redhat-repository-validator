@@ -69,7 +69,7 @@ public class DistributionValidator implements Validator {
         findMisnomerFiles(ctx, validatedRepoFilesMap, validatedDistFilesMap);
         
         // find files which have same name like some artifact, but different content
-        findCoruptedFiles(ctx, validatedRepoFilesMap, validatedDistFilesMap);
+        findCorruptedFiles(ctx, validatedRepoFilesMap, validatedDistFilesMap);
     }
 
     private void findMissingFiles(ValidatorContext ctx, ListMultimap<String, File> validatedRepoFilesMap, ListMultimap<String, File> validatedDistFilesMap) {
@@ -126,7 +126,7 @@ public class DistributionValidator implements Validator {
         }
     }
 
-    private void findCoruptedFiles(ValidatorContext ctx, ListMultimap<String, File> validatedRepoFilesMap, ListMultimap<String, File> validatedDistFilesMap) {
+    private void findCorruptedFiles(ValidatorContext ctx, ListMultimap<String, File> validatedRepoFilesMap, ListMultimap<String, File> validatedDistFilesMap) {
         for (Entry<String, File> distFileEntry : validatedDistFilesMap.entries()) {
             for (Entry<String, File> repoFileEntry : validatedRepoFilesMap.entries()) {
                 String distFileHash = distFileEntry.getKey();
