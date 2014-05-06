@@ -3,8 +3,8 @@
        xmlns:util="http://www.springframework.org/schema/util" xmlns:lang="http://www.springframework.org/schema/lang"
        xmlns:filter="http://wolf-validator.org/schema/exception-filters"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
-           http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-3.2.xsd
+           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+           http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang.xsd
            http://wolf-validator.org/schema/exception-filters http://wolf-validator.org/schema/exception-filters.xsd">
 
 <!-- LOCAL REPOSITORY -->

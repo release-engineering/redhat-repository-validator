@@ -44,9 +44,10 @@
         <version.aether>0.9.1.v20140329</version.aether>
         <version.maven>3.2.1</version.maven>
         <version.wagon>2.6</version.wagon>
-        <version.slf4j>1.7.5</version.slf4j>
-        <version.logback>1.0.12</version.logback>
-        <version.spring>3.2.2.RELEASE</version.spring>
+        <version.slf4j>1.7.6</version.slf4j>
+        <version.logback>1.1.2</version.logback>
+        <version.spring>4.0.4.RELEASE</version.spring>
+        <version.surefire>2.17</version.surefire>
     </properties>
 
     <build>
@@ -87,16 +88,21 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.14.1</version>
+                <version>2.17</version>
             </plugin>
         </plugins>
     </build>
 
     <dependencies>
         <dependency>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
-            <version>1</version>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-model</artifactId>
+            <version>${version.maven}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-model-builder</artifactId>
+            <version>${version.maven}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.aether</groupId>
@@ -106,6 +112,11 @@
         <dependency>
             <groupId>org.eclipse.aether</groupId>
             <artifactId>aether-impl</artifactId>
+            <version>${version.aether}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.aether</groupId>
+            <artifactId>aether-util</artifactId>
             <version>${version.aether}</version>
         </dependency>
         <dependency>
@@ -160,6 +171,17 @@
         </dependency>
 
         <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>1</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>jsr250-api</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${version.slf4j}</version>
@@ -173,11 +195,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
             <version>${version.slf4j}</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-            <version>${version.logback}</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -196,11 +213,6 @@
             <version>2.4</version>
         </dependency>
         <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-            <version>3.1</version>
-        </dependency>
-        <dependency>
             <groupId>commons-cli</groupId>
             <artifactId>commons-cli</artifactId>
             <version>1.2</version>
@@ -208,7 +220,12 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>14.0.1</version>
+            <version>17.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>${version.spring}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -216,14 +233,24 @@
             <version>${version.spring}</version>
         </dependency>
         <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>${version.spring}</version>
+        </dependency>
+        <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
-            <version>2.1.6</version>
+            <version>2.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.surefire</groupId>
+            <artifactId>surefire-api</artifactId>
+            <version>${version.surefire}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.surefire</groupId>
             <artifactId>maven-surefire-common</artifactId>
-            <version>2.17</version>
+            <version>${version.surefire}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.maven</groupId>
@@ -262,7 +289,7 @@
 
         <!-- Version overrides (needed due to version clashes):
              Validator indirectly depends on following artifacts which come as transitive dependencies from multiple
-             artifacts. Maven dependency resolver will by default include the lower version which then causes errors
+             artifacts. Maven dependency resolver may include the lower version which then causes errors
              due to API changes (e.g. missing classes and methods). Overriding the artifact to the concrete version
              (usually the highest one) fixes the issue.
          -->
