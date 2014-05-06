@@ -218,11 +218,6 @@
             <version>2.4</version>
         </dependency>
         <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-            <version>3.1</version>
-        </dependency>
-        <dependency>
             <groupId>commons-cli</groupId>
             <artifactId>commons-cli</artifactId>
             <version>1.2</version>
@@ -299,7 +294,7 @@
 
         <!-- Version overrides (needed due to version clashes):
              Validator indirectly depends on following artifacts which come as transitive dependencies from multiple
-             artifacts. Maven dependency resolver will by default include the lower version which then causes errors
+             artifacts. Maven dependency resolver may include the lower version which then causes errors
              due to API changes (e.g. missing classes and methods). Overriding the artifact to the concrete version
              (usually the highest one) fixes the issue.
          -->
