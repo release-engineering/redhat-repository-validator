@@ -86,7 +86,7 @@ public class DistributionValidatorTest extends AbstractTest {
         pom().artifactId("foo").create(repoFooDir);
         
         validationExecutor.execute(ctx);
-        assertExpectedException(DistributionMissingFileException.class, "Distribution doesn't contains file from repository: com/acme/foo/1.0/foo-1.0.jar");
+        assertExpectedException(DistributionMissingFileException.class, "Distribution doesn't contain file from repository: com/acme/foo/1.0/foo-1.0.jar");
     }
 
     @Test

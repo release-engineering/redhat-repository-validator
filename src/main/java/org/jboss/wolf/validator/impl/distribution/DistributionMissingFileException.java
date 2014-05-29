@@ -9,7 +9,7 @@ public class DistributionMissingFileException extends Exception {
     private final File missingFile;
 
     public DistributionMissingFileException(File missingFile) {
-        super("Distribution doesn't contains file from repository: " + missingFile);
+        super("Distribution doesn't contain file from repository: " + missingFile);
         this.missingFile = missingFile;
     }
 

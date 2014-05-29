@@ -53,41 +53,41 @@ public class BestPracticesValidator implements Validator {
             error(ctx, effectiveModel, "contains <pluginRepositories> configuration");
         }
         if (isEmpty(effectiveModel.getModelVersion())) {
-            warning(ctx, effectiveModel, "doesn't contains <modelVersion>");
+            warning(ctx, effectiveModel, "doesn't contain <modelVersion>");
         }
         if (isEmpty(effectiveModel.getArtifactId())) {
-            warning(ctx, effectiveModel, "doesn't contains <artifactId>");
+            warning(ctx, effectiveModel, "doesn't contain <artifactId>");
         }
         if (isEmpty(effectiveModel.getGroupId())) {
-            warning(ctx, effectiveModel, "doesn't contains <groupId>");
+            warning(ctx, effectiveModel, "doesn't contain <groupId>");
         }
         if (isEmpty(effectiveModel.getVersion())) {
-            warning(ctx, effectiveModel, "doesn't contains <version>");
+            warning(ctx, effectiveModel, "doesn't contain <version>");
         }
         if (isEmpty(effectiveModel.getName())) {
-            warning(ctx, effectiveModel, "doesn't contains <name>");
+            warning(ctx, effectiveModel, "doesn't contain <name>");
         }
         if (isEmpty(effectiveModel.getDescription())) {
-            warning(ctx, effectiveModel, "doesn't contains <description>");
+            warning(ctx, effectiveModel, "doesn't contain <description>");
         }
         if (isEmpty(effectiveModel.getUrl())) {
-            warning(ctx, effectiveModel, "doesn't contains <url>");
+            warning(ctx, effectiveModel, "doesn't contain <url>");
         }
         if (isEmpty(effectiveModel.getLicenses())) {
-            warning(ctx, effectiveModel, "doesn't contains <licenses>");
+            warning(ctx, effectiveModel, "doesn't contain <licenses>");
         }
         if (isEmpty(effectiveModel.getDevelopers())) {
-            warning(ctx, effectiveModel, "doesn't contains <developers>");
+            warning(ctx, effectiveModel, "doesn't contain <developers>");
         }
 
         if (effectiveModel.getScm() == null) {
-            warning(ctx, effectiveModel, "doesn't contains <scm>");
+            warning(ctx, effectiveModel, "doesn't contain <scm>");
         } else {
             if (isEmpty(effectiveModel.getScm().getUrl())) {
-                warning(ctx, effectiveModel, "doesn't contains <scm><url>");
+                warning(ctx, effectiveModel, "doesn't contain <scm><url>");
             }
             if (isEmpty(effectiveModel.getScm().getConnection())) {
-                warning(ctx, effectiveModel, "doesn't contains <scm><connection>");
+                warning(ctx, effectiveModel, "doesn't contain <scm><connection>");
             }
         }
     }

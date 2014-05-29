@@ -42,12 +42,12 @@ public class TestBestPracticesValidator extends AbstractTest {
         validationExecutor.execute(ctx);
         assertExpectedException(BestPracticesException.class, "contains <repositories> configuration");
         assertExpectedException(BestPracticesException.class, "contains <pluginRepositories> configuration");
-        assertExpectedException(BestPracticesException.class, "doesn't contains <name>");
-        assertExpectedException(BestPracticesException.class, "doesn't contains <description>");
-        assertExpectedException(BestPracticesException.class, "doesn't contains <url>");
-        assertExpectedException(BestPracticesException.class, "doesn't contains <licenses>");
-        assertExpectedException(BestPracticesException.class, "doesn't contains <developers>");
-        assertExpectedException(BestPracticesException.class, "doesn't contains <scm>");
+        assertExpectedException(BestPracticesException.class, "doesn't contain <name>");
+        assertExpectedException(BestPracticesException.class, "doesn't contain <description>");
+        assertExpectedException(BestPracticesException.class, "doesn't contain <url>");
+        assertExpectedException(BestPracticesException.class, "doesn't contain <licenses>");
+        assertExpectedException(BestPracticesException.class, "doesn't contain <developers>");
+        assertExpectedException(BestPracticesException.class, "doesn't contain <scm>");
     }
 
     @Test
