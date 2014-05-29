@@ -215,7 +215,7 @@ public class TestAppRunner {
     private void assertOutputContains(String s) {
         String systemOut = systemOutBuffer.toString();
         if (!systemOut.contains(s)) {
-            fail("System output should contains " + s + ", but has content:\n" + systemOut);
+            fail("System output should contain " + s + ", but has content:\n" + systemOut);
         }
     }
     

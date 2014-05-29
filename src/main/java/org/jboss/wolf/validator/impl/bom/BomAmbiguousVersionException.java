@@ -15,7 +15,7 @@ public class BomAmbiguousVersionException extends Exception {
     private static final long serialVersionUID = 1L;
 
     private static String formatMessage(String dependencyKey, List<Pair<Dependency, File>> ambiguousDependencies) {
-        String msg = "BOMs contains ambiguous version for dependency " + dependencyKey;
+        String msg = "BOMs contain ambiguous version for dependency " + dependencyKey;
         for (Pair<Dependency, File> pair : ambiguousDependencies) {
             msg += LINE_SEPARATOR;
             msg += "    bom " + pair.getValue() + " defines version " + pair.getKey().getVersion();

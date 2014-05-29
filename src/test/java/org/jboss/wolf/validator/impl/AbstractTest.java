@@ -96,7 +96,7 @@ public abstract class AbstractTest {
     
     protected void assertLocalRepoContains(String filePath) {
         File f = new File(repoLocalDir, filePath);
-        assertTrue("Local repository should contains file: " + filePath, f.exists());
+        assertTrue("Local repository should contain file: " + filePath, f.exists());
     }
     
     protected void assertExpectedException(Class<? extends Exception> exceptionType, String exceptionMessage) {
