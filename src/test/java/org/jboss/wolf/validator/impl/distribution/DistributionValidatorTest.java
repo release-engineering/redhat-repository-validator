@@ -53,12 +53,12 @@ public class DistributionValidatorTest extends AbstractTest {
     }
 
     @Test
-    public void shouldFindCoruptedFiles() throws IOException {
+    public void shouldFindCorruptedFiles() throws IOException {
         pom().artifactId("foo").create(repoFooDir);
         FileUtils.copyFile(new File("target/test-classes/empty-signed-damaged.jar"), distFooJar);
     
         validationExecutor.execute(ctx);
-        assertExpectedException(DistributionCoruptedFileException.class, "File in distribution foo-1.0.jar has same name like file in repository com/acme/foo/1.0/foo-1.0.jar, but has different content");
+        assertExpectedException(DistributionCorruptedFileException.class, "File in distribution foo-1.0.jar has same name like file in repository com/acme/foo/1.0/foo-1.0.jar, but has different content");
     }
 
     @Test

@@ -136,7 +136,7 @@ public class DistributionValidator implements Validator {
 
                 if (distFile.getName().equals(repoFile.getName()) && !distFileHash.equals(repoFileHash) ) {
                     ctx.addException(repoFile,
-                            new DistributionCoruptedFileException(
+                            new DistributionCorruptedFileException(
                                     relativizeFile(ctx.getValidatedRepository(), repoFile),
                                     relativizeFile(ctx.getValidatedDistribution(), distFile)));
                 }

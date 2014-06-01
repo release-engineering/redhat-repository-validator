@@ -28,7 +28,6 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.util.xml.DomUtils;
 import org.w3c.dom.Element;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,7 +47,7 @@ public class FilenameBasedExceptionFilterParser extends AbstractExceptionFilterP
             ChecksumNotExistException.class,
             ChecksumNotMatchException.class,
             DependencyNotFoundException.class,
-            DistributionCoruptedFileException.class,
+            DistributionCorruptedFileException.class,
             DistributionDuplicateFilesException.class,
             DistributionMisnomerFileException.class,
             DistributionMissingFileException.class,
