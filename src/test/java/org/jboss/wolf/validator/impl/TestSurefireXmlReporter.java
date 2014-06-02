@@ -6,9 +6,14 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.maven.model.Dependency;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.graph.DefaultDependencyNode;
@@ -19,6 +24,7 @@ import org.jboss.wolf.validator.ValidatorContext;
 import org.jboss.wolf.validator.filter.BomDependencyNotFoundExceptionFilter;
 import org.jboss.wolf.validator.filter.DependencyNotFoundExceptionFilter;
 import org.jboss.wolf.validator.filter.FilenameBasedExceptionFilter;
+import org.jboss.wolf.validator.impl.bom.BomAmbiguousVersionException;
 import org.jboss.wolf.validator.impl.bom.BomDependencyNotFoundException;
 import org.jboss.wolf.validator.impl.checksum.ChecksumNotExistException;
 import org.jboss.wolf.validator.impl.source.JarSourcesVerificationException;
@@ -51,7 +57,7 @@ public class TestSurefireXmlReporter {
         File fooFile = new File(VALIDATED_REPO_DIR, "foo");
         File barFile = new File(VALIDATED_REPO_DIR, "bar");
 
-        ValidatorContext ctx = new ValidatorContext(VALIDATED_REPO_DIR, null, Collections.<RemoteRepository> emptyList());
+        ValidatorContext ctx = new ValidatorContext(VALIDATED_REPO_DIR, null, Collections.<RemoteRepository>emptyList());
         ctx.addException(fooFile, new SuspiciousFileException(fooFile, "suspicious because foo"));
         ctx.addException(barFile, new SuspiciousFileException(barFile, "suspicious because bar"));
         ctx.addException(fooFile, new ChecksumNotExistException(fooFile, "sha1"));
@@ -88,9 +94,9 @@ public class TestSurefireXmlReporter {
         File f1 = new File(VALIDATED_REPO_DIR, "f1");
         File f2 = new File(VALIDATED_REPO_DIR, "f2");
 
-        ValidatorContext ctx = new ValidatorContext(VALIDATED_REPO_DIR, null, Collections.<RemoteRepository> emptyList());
-        ctx.addException(f1, new Exception((String)null));
-        ctx.addException(f2, new Exception((String)null));
+        ValidatorContext ctx = new ValidatorContext(VALIDATED_REPO_DIR, null, Collections.<RemoteRepository>emptyList());
+        ctx.addException(f1, new Exception((String) null));
+        ctx.addException(f2, new Exception((String) null));
 
         SurefireXmlReporter reporter = new SurefireXmlReporter(REPORTS_DIR);
         reporter.report(ctx);
@@ -252,9 +258,43 @@ public class TestSurefireXmlReporter {
                 " classname=\"BomDependencyNotFoundReport\" time=\"0\">\n    <skipped type=\"\"></skipped>"));
     }
 
+    @Test
+    public void shouldReportDependenciesForBomAmbiguousVersion() throws IOException {
+        ValidatorContext ctx = new ValidatorContext(VALIDATED_REPO_DIR, null, Collections.<RemoteRepository>emptyList());
+        List<Pair<Dependency, File>> ambiguousDependencies = new ArrayList<Pair<Dependency, File>>();
+
+        Dependency dep1 = new Dependency();
+        dep1.setVersion("1.0.Final");
+        ambiguousDependencies.add(Pair.of(dep1, new File("org/some-bom-0.1.pom")));
+
+        Dependency dep2 = new Dependency();
+        dep2.setVersion("2.0.Final");
+        ambiguousDependencies.add(Pair.of(dep2, new File("org/some-other-bom-0.2.pom")));
+
+        BomAmbiguousVersionException ex = new BomAmbiguousVersionException("com.acme:acme-finance:jar", ambiguousDependencies);
+        // report two identical exceptions, they should be "squashed" into single surefire test case entry
+        ctx.addException(new File("some-file-in-repo"), ex);
+        ctx.addException(new File("other-file-in-repo"), ex);
+
+        SurefireXmlReporter reporter = new SurefireXmlReporter(REPORTS_DIR);
+        reporter.report(ctx);
+        File reportFile = new File(REPORTS_DIR, "TEST-BomAmbiguousVersionReport.xml");
+        assertFileExists(reportFile);
+
+        String reportFileContent = FileUtils.readFileToString(reportFile);
+        assertTrue(reportFileContent.contains(
+                "<testcase name=\"__BOMs contain ambiguous version for dependency com.acme:acme-finance:jar\""));
+        assertTrue(reportFileContent.contains(
+                "BOMs contain ambiguous version for dependency com.acme:acme-finance:jar\n\n" +
+                        "BOM org/some-bom-0.1.pom defines version 1.0.Final\n\n" +
+                        "BOM org/some-other-bom-0.2.pom defines version 2.0.Final"));
+        // only single testcase should be created as only one unique exception was reported
+        assertEquals(1, StringUtils.countMatches(reportFileContent, "<testcase"));
+    }
+
     private void assertFileExists(File file) {
-        assertTrue(file.exists());
-        assertTrue(file.isFile());
+        assertTrue("File " + file + " is expected to exist!", file.exists());
+        assertTrue("File " + file + " is expected to be regular file!", file.isFile());
     }
 
 }

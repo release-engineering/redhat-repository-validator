@@ -1,7 +1,5 @@
 package org.jboss.wolf.validator.impl.bom;
 
-import static org.apache.commons.lang3.SystemUtils.LINE_SEPARATOR;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,20 +12,11 @@ public class BomAmbiguousVersionException extends Exception {
 
     private static final long serialVersionUID = 1L;
 
-    private static String formatMessage(String dependencyKey, List<Pair<Dependency, File>> ambiguousDependencies) {
-        String msg = "BOMs contain ambiguous version for dependency " + dependencyKey;
-        for (Pair<Dependency, File> pair : ambiguousDependencies) {
-            msg += LINE_SEPARATOR;
-            msg += "    bom " + pair.getValue() + " defines version " + pair.getKey().getVersion();
-        }
-        return msg;
-    }
-
     private final String dependencyKey;
     private final List<Pair<Dependency, File>> ambiguousDependencies;
 
     public BomAmbiguousVersionException(String dependencyKey, List<Pair<Dependency, File>> ambiguousDependencies) {
-        super(formatMessage(dependencyKey, ambiguousDependencies));
+        super("BOMs contain ambiguous version for dependency " + dependencyKey);
         this.dependencyKey = dependencyKey;
         this.ambiguousDependencies = Collections.unmodifiableList(new ArrayList<Pair<Dependency, File>>(ambiguousDependencies));
     }
@@ -38,6 +27,28 @@ public class BomAmbiguousVersionException extends Exception {
 
     public List<Pair<Dependency, File>> getAmbiguousDependencies() {
         return ambiguousDependencies;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BomAmbiguousVersionException that = (BomAmbiguousVersionException) o;
+
+        if (ambiguousDependencies != null ? !ambiguousDependencies.equals(that.ambiguousDependencies) : that.ambiguousDependencies != null)
+            return false;
+        if (dependencyKey != null ? !dependencyKey.equals(that.dependencyKey) : that.dependencyKey != null)
+            return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = dependencyKey != null ? dependencyKey.hashCode() : 0;
+        result = 31 * result + (ambiguousDependencies != null ? ambiguousDependencies.hashCode() : 0);
+        return result;
     }
 
 }

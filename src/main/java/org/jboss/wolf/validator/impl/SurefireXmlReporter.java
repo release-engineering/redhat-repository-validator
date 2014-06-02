@@ -9,13 +9,18 @@ import static org.jboss.wolf.validator.internal.Utils.sortDependencyNodes;
 import static org.jboss.wolf.validator.internal.Utils.sortExceptions;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
 
 import javax.inject.Named;
 
+import com.google.common.collect.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.surefire.report.ReportEntryType;
 import org.apache.maven.plugin.surefire.report.StatelessXmlReporter;
 import org.apache.maven.plugin.surefire.report.TestSetStats;
@@ -27,12 +32,8 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.DependencyNode;
 import org.jboss.wolf.validator.Reporter;
 import org.jboss.wolf.validator.ValidatorContext;
+import org.jboss.wolf.validator.impl.bom.BomAmbiguousVersionException;
 import org.jboss.wolf.validator.impl.bom.BomDependencyNotFoundException;
-
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Multimap;
 
 @Named
 public class SurefireXmlReporter implements Reporter {
@@ -78,6 +79,9 @@ public class SurefireXmlReporter implements Reporter {
             List<Exception> filteredExceptions = sortExceptions(ctx.getFilteredExceptions());
             reportMissingDependencies("DependencyNotFoundReport", DependencyNotFoundException.class, exceptions, filteredExceptions);
             reportMissingDependencies("BomDependencyNotFoundReport", BomDependencyNotFoundException.class, exceptions, filteredExceptions);
+            List<BomAmbiguousVersionException> bomAmbiguousVersionsExs = ctx.getExceptions(BomAmbiguousVersionException.class);
+            reportAmbiguousDependencyVersionInBoms(bomAmbiguousVersionsExs);
+            exceptions.removeAll(bomAmbiguousVersionsExs);
             reportExceptions(exceptions, filteredExceptions);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -115,12 +119,27 @@ public class SurefireXmlReporter implements Reporter {
         }
     }
 
-    private void reportTestCase(String type, ReportEntryType reportEntryType, String message, String description, TestSetStats testSuite) {
-        if (reportEntryType == ReportEntryType.error) {
-            testSuite.testError(testCase(type, ReportEntryType.error, message, description == null ? null : description.toString()));
-        } else {
-            testSuite.testSkipped(testCase(type, ReportEntryType.skipped, message, description == null ? null : description.toString()));
+    private void reportAmbiguousDependencyVersionInBoms(List<BomAmbiguousVersionException> exceptions) {
+        TestSetStats testSuite = new TestSetStats(false, false);
+        // the list may contain duplicates, because the exception is inserted for each BOM in the repo
+        // e.g. if there are there boms declaring different version for some artifact, there will be three
+        // identical exceptions in the list
+        Set<BomAmbiguousVersionException> uniqueExceptions = new HashSet<BomAmbiguousVersionException>(exceptions);
+        for (BomAmbiguousVersionException ex : uniqueExceptions) {
+            String description = ex.getMessage() + "\n\n" + formatAmbiguousDependencies(ex.getAmbiguousDependencies());
+            reportTestCase("BomAmbiguousVersionReport", ReportEntryType.error, ex.getMessage(), description, testSuite);
         }
+        reportTestSuite("BomAmbiguousVersionReport", testSuite);
+    }
+
+    private String formatAmbiguousDependencies(List<Pair<Dependency, File>> ambiguousDependencies) {
+        StringBuilder msgSb = new StringBuilder();
+        for (Pair<Dependency, File> pair : ambiguousDependencies) {
+            msgSb.append("BOM " + pair.getValue() + " defines version " + pair.getKey().getVersion());
+            msgSb.append(LINE_SEPARATOR);
+            msgSb.append(LINE_SEPARATOR);
+        }
+        return msgSb.toString();
     }
 
     private void reportExceptions(List<Exception> exceptionList, List<Exception> ignoredExceptions) {
@@ -145,6 +164,7 @@ public class SurefireXmlReporter implements Reporter {
         }
     }
 
+
     private ListMultimap<Artifact, DependencyNode> collectDependencyNotFoundData(List<Exception> exceptionList,
             Class<? extends DependencyNotFoundException> exceptionType) {
         ListMultimap<Artifact, DependencyNode> artifactNotFoundMap = ArrayListMultimap.create();
@@ -159,6 +179,14 @@ public class SurefireXmlReporter implements Reporter {
             }
         }
         return artifactNotFoundMap;
+    }
+
+    private void reportTestCase(String type, ReportEntryType reportEntryType, String message, String description, TestSetStats testSuite) {
+        if (reportEntryType == ReportEntryType.error) {
+            testSuite.testError(testCase(type, ReportEntryType.error, message, description == null ? null : description.toString()));
+        } else {
+            testSuite.testSkipped(testCase(type, ReportEntryType.skipped, message, description == null ? null : description.toString()));
+        }
     }
 
     private void reportTestSuite(String testSuiteName, TestSetStats testSuiteData) {
