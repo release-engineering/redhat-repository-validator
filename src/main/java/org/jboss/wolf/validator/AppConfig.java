@@ -345,6 +345,8 @@ public class AppConfig {
         registry.add(new DefaultArtifactType("par", "par", "", "java", false, true));
         registry.add(new DefaultArtifactType("bundle", "jar", "", "java"));
         registry.add(new DefaultArtifactType("zip", "zip", "", ""));
+        registry.add(new DefaultArtifactType("aar", "aar", "", "java"));
+        registry.add(new DefaultArtifactType("apklib", "apklib", "", "java"));
         return registry;
     }
 
