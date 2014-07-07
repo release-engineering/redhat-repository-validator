@@ -2,7 +2,6 @@ package org.jboss.wolf.validator.impl;
 
 import static org.apache.commons.lang3.ObjectUtils.notEqual;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
-import static org.jboss.wolf.validator.internal.Utils.findCause;
 import static org.jboss.wolf.validator.internal.Utils.findPathToDependency;
 import static org.jboss.wolf.validator.internal.Utils.sortArtifacts;
 import static org.jboss.wolf.validator.internal.Utils.sortDependencyNodes;
@@ -14,12 +13,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.collection.DependencyCollectionException;
-import org.eclipse.aether.graph.DefaultDependencyNode;
 import org.eclipse.aether.graph.DependencyNode;
-import org.eclipse.aether.resolution.ArtifactResolutionException;
-import org.eclipse.aether.resolution.ArtifactResult;
-import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.jboss.wolf.validator.Reporter;
 import org.jboss.wolf.validator.ValidatorContext;
 import org.springframework.core.annotation.Order;

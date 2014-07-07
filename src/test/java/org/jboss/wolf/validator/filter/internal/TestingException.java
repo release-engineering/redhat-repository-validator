@@ -6,4 +6,6 @@ package org.jboss.wolf.validator.filter.internal;
  */
 public class TestingException extends Exception {
 
+    private static final long serialVersionUID = 1L;
+
 }

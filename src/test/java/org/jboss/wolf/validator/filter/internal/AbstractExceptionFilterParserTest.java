@@ -40,10 +40,10 @@ abstract public class AbstractExceptionFilterParserTest {
         return new ArrayList<T>(beans.values());
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     protected void assertNumberOfBeansWithType(Class beanType, int expectedNrOfBeans) {
         Map<String, Class> filters = appCtx.getBeansOfType(beanType);
         assertEquals("Number of created filters.", expectedNrOfBeans, filters.size());
     }
-
 
 }

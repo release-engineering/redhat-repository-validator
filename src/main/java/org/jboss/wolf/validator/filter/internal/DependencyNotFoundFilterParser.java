@@ -111,6 +111,7 @@ public class DependencyNotFoundFilterParser extends AbstractExceptionFilterParse
         Object value = listBean.getPropertyValues().getPropertyValue("sourceList").getValue();
         List<String> regexs = new ArrayList<String>();
         if (value instanceof ManagedList) {
+            @SuppressWarnings("rawtypes")
             ManagedList regexList = (ManagedList) value;
             for (int i = 0; i < regexList.size(); i++) {
                 Object obj = regexList.get(i);

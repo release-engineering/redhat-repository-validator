@@ -2,7 +2,6 @@ package org.jboss.wolf.validator.impl.bom;
 
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.DependencyNode;
-import org.eclipse.aether.resolution.DependencyResolutionException;
 import org.jboss.wolf.validator.impl.DependencyNotFoundException;
 
 public class BomDependencyNotFoundException extends DependencyNotFoundException {

@@ -1,6 +1,7 @@
 package org.jboss.wolf.validator.filter.internal;
 
 import com.google.common.collect.Lists;
+
 import org.jboss.wolf.validator.filter.FilenameBasedExceptionFilter;
 import org.jboss.wolf.validator.impl.DependencyNotFoundException;
 import org.jboss.wolf.validator.impl.UnknownArtifactTypeException;
@@ -38,6 +39,7 @@ public class FilenameBasedExceptionFilterParser extends AbstractExceptionFilterP
      * <p/>
      * Keep the order when adding new exceptions.
      */
+    @SuppressWarnings("unchecked")
     public static final List<Class<? extends Exception>> KNOWN_EXCEPTIONS = Lists.newArrayList(
             BestPracticesException.class,
             BomAmbiguousVersionException.class,
@@ -105,6 +107,7 @@ public class FilenameBasedExceptionFilterParser extends AbstractExceptionFilterP
         return exceptions;
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     private Class<? extends Exception> determineExceptionTypeFromString(String exceptionTypeString) {
         for (Class<? extends Exception> exceptionType : KNOWN_EXCEPTIONS) {
             if (exceptionType.getSimpleName().equals(exceptionTypeString)) {
