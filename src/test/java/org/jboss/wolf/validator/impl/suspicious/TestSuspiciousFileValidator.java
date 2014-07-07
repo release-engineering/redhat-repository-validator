@@ -47,6 +47,7 @@ public class TestSuspiciousFileValidator extends AbstractTest {
         touch("com/acme/foo/1.0/foo-1.0.pom.md5");
         touch("com/acme/foo/1.0/foo-1.0.pom.sha1");
         touch("com/acme/foo/1.0/foo-1.0.jar");
+        touch("com/acme/foo/1.0/foo-1.0.war");
         touch("com/acme/foo/1.0/foo-1.0.jar.md5");
         touch("com/acme/foo/1.0/foo-1.0.jar.sha1");
         touch("com/acme/foo/1.0/foo-1.0-sources.jar");
@@ -105,13 +106,6 @@ public class TestSuspiciousFileValidator extends AbstractTest {
         assertExpectedException(SuspiciousFileException.class, "File com/acme/bar/1.0/bar-1.0-sources.jar is artifact sources.jar without primary jar file");
     }
 
-    @Test
-    public void shouldFindSuspiciousWar() throws IOException {
-        touch("com/acme/foo/1.0/foo-1.0.war");
-        validationExecutor.execute(ctx);
-        assertExpectedException(SuspiciousFileException.class, "File com/acme/foo/1.0/foo-1.0.war is suspicious");
-    }
-    
     @Test
     public void shouldFindSuspiciousClassifiers() {
         touch("com/acme/foo/1.0/foo-1.0-native.jar");
