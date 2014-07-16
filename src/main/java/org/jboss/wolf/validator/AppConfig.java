@@ -1,6 +1,7 @@
 package org.jboss.wolf.validator;
 
 import static org.apache.commons.io.filefilter.FileFilterUtils.and;
+import static org.apache.commons.io.filefilter.FileFilterUtils.falseFileFilter;
 import static org.apache.commons.io.filefilter.FileFilterUtils.notFileFilter;
 import static org.apache.commons.io.filefilter.FileFilterUtils.trueFileFilter;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
@@ -261,6 +262,11 @@ public class AppConfig {
     @Bean
     public IOFileFilter versionPatternValidatorFilter() {
         return defaultFilter();
+    }
+    
+    @Bean
+    public IOFileFilter osgiVersionValidatorFilter() {
+        return falseFileFilter();
     }
 
     @Bean
