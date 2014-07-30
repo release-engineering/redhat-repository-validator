@@ -5,9 +5,7 @@ import static org.jboss.wolf.validator.internal.Utils.relativize;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.aether.repository.RemoteRepository;
 import org.slf4j.Logger;
@@ -23,7 +21,6 @@ public class ValidatorContext {
     private final List<ExceptionFilter> exceptionFilters;
     private final List<ValidationError> errors = new ArrayList<ValidationError>();
     private final List<ValidationError> ignoredErrors = new ArrayList<ValidationError>();
-    private final Set<Exception> processedExceptions = new HashSet<Exception>();
 
     public ValidatorContext(File validatedRepository, File validatedDistribution, List<RemoteRepository> remoteRepositories) {
         this(validatedRepository, validatedDistribution, remoteRepositories, null);
@@ -117,20 +114,4 @@ public class ValidatorContext {
         return Collections.unmodifiableList(result);
     }
     
-    // TODO remove
-    public void addProcessedException(Exception e) {
-        processedExceptions.add(e);
-    }
-
-    // TODO remove
-    public List<Exception> getUnprocessedExceptions() {
-        List<Exception> unprocessedExceptions = new ArrayList<Exception>();
-        for (Exception exception : getExceptions()) {
-            if (!processedExceptions.contains(exception)) {
-                unprocessedExceptions.add(exception);
-            }
-        }
-        return Collections.unmodifiableList(unprocessedExceptions);
-    }
-
 }
