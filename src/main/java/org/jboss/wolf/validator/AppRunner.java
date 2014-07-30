@@ -16,7 +16,6 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
@@ -50,8 +49,6 @@ public class AppRunner {
     protected ValidationExecutor validationExecutor;
     @Inject
     protected ReportingExecutor reportingExecutor;
-    @Autowired(required = false)
-    protected ExceptionFilter[] exceptionFilters;
 
     public void run(String... arguments) {
         Options options = new Options();
@@ -104,7 +101,6 @@ public class AppRunner {
     protected void runValidation() {
         initializer.initialize(context);
         validationExecutor.execute(context);
-        context.applyExceptionFilters(exceptionFilters);
         reportingExecutor.execute(context);
     }
 

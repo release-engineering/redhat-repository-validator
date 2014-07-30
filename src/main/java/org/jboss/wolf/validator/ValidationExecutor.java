@@ -28,7 +28,7 @@ public class ValidationExecutor {
                 validator.validate(ctx);
             } catch (RuntimeException e) {
                 logger.error("validator " + validator.getClass().getSimpleName() + " ended with unexpected exception!", e);
-                ctx.addException(ctx.getValidatedRepository(), e);
+                ctx.addError(null, ctx.getValidatedRepository(), e);
             }
         }
     }

@@ -93,11 +93,11 @@ public class BestPracticesValidator implements Validator {
     }
 
     private void error(ValidatorContext ctx, Model model, String msg) {
-        ctx.addException(model.getPomFile(), new BestPracticesException("Error: artifact " + model.getId() + " " + msg));
+        ctx.addError(this, model.getPomFile(), new BestPracticesException("Error: artifact " + model.getId() + " " + msg));
     }
 
     private void warning(ValidatorContext ctx, Model model, String msg) {
-        ctx.addException(model.getPomFile(), new BestPracticesException("Warning: artifact " + model.getId() + " " + msg));
+        ctx.addError(this, model.getPomFile(), new BestPracticesException("Warning: artifact " + model.getId() + " " + msg));
     }
 
 }

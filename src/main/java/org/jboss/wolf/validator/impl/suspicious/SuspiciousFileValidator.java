@@ -120,7 +120,7 @@ public class SuspiciousFileValidator implements Validator {
     }
     
     private void fail(ValidatorContext ctx, File file, String msg) {
-        ctx.addException(file, new SuspiciousFileException(relativize(ctx, file), msg));
+        ctx.addError(this, file, new SuspiciousFileException(relativize(ctx, file), msg));
     }
     
     private boolean endsOnKnownFileExtension(final String fileName) {

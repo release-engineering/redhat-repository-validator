@@ -53,7 +53,7 @@ public class VersionPatternValidator implements Validator {
     private void validateVersionPattern(ValidatorContext ctx, Model model) {
         if (!pattern.matcher(model.getVersion()).matches()) {
             Exception e = new VersionPatternException(model.getId(), pattern.pattern());
-            ctx.addException(model.getPomFile(), e);
+            ctx.addError(this, model.getPomFile(), e);
         }
     }
 

@@ -53,11 +53,11 @@ public class XmlFileValidator implements Validator {
             javax.xml.validation.Validator validator = schema.newValidator();
             validator.validate(xmlSource);
         } catch (SAXParseException e) {
-            ctx.addException(xmlFile, new XmlVerificationException(relativize(ctx, xmlFile), formatException(e)));
+            ctx.addError(this, xmlFile, new XmlVerificationException(relativize(ctx, xmlFile), formatException(e)));
         } catch (SAXException e) {
-            ctx.addException(xmlFile, new XmlVerificationException(relativize(ctx, xmlFile), e));
+            ctx.addError(this, xmlFile, new XmlVerificationException(relativize(ctx, xmlFile), e));
         } catch (IOException e) {
-            ctx.addException(xmlFile, new XmlVerificationException(relativize(ctx, xmlFile), e));
+            ctx.addError(this, xmlFile, new XmlVerificationException(relativize(ctx, xmlFile), e));
         }
     }
 

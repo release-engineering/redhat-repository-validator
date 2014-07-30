@@ -58,10 +58,10 @@ public class TestSurefireXmlReporter {
         File barFile = new File(VALIDATED_REPO_DIR, "bar");
 
         ValidatorContext ctx = new ValidatorContext(VALIDATED_REPO_DIR, null, Collections.<RemoteRepository>emptyList());
-        ctx.addException(fooFile, new SuspiciousFileException(fooFile, "suspicious because foo"));
-        ctx.addException(barFile, new SuspiciousFileException(barFile, "suspicious because bar"));
-        ctx.addException(fooFile, new ChecksumNotExistException(fooFile, "sha1"));
-        ctx.addException(barFile, new ChecksumNotExistException(barFile, "sha1"));
+        ctx.addError(null, fooFile, new SuspiciousFileException(fooFile, "suspicious because foo"));
+        ctx.addError(null, barFile, new SuspiciousFileException(barFile, "suspicious because bar"));
+        ctx.addError(null, fooFile, new ChecksumNotExistException(fooFile, "sha1"));
+        ctx.addError(null, barFile, new ChecksumNotExistException(barFile, "sha1"));
 
         SurefireXmlReporter reporter = new SurefireXmlReporter(REPORTS_DIR);
         reporter.report(ctx);
@@ -95,8 +95,8 @@ public class TestSurefireXmlReporter {
         File f2 = new File(VALIDATED_REPO_DIR, "f2");
 
         ValidatorContext ctx = new ValidatorContext(VALIDATED_REPO_DIR, null, Collections.<RemoteRepository>emptyList());
-        ctx.addException(f1, new Exception((String) null));
-        ctx.addException(f2, new Exception((String) null));
+        ctx.addError(null, f1, new Exception((String) null));
+        ctx.addError(null, f2, new Exception((String) null));
 
         SurefireXmlReporter reporter = new SurefireXmlReporter(REPORTS_DIR);
         reporter.report(ctx);
@@ -114,13 +114,13 @@ public class TestSurefireXmlReporter {
         Artifact missing = new DefaultArtifact("org", "missing", "jar", "1.0");
         DependencyNode depRoot1 = new DefaultDependencyNode(validated1);
         DependencyNotFoundException ex1 = new DependencyNotFoundException(new Exception(), missing, validated1, depRoot1);
-        ctx.addException(validatedFile1, ex1);
+        ctx.addError(null, validatedFile1, ex1);
 
         // second exception without provided dependency node (default one should be created under the hood)
         File validatedFile2 = new File(VALIDATED_REPO_DIR, "validated2");
         Artifact validated2 = new DefaultArtifact("org", "validated2", "pom", "1.0");
         DependencyNotFoundException ex2 = new DependencyNotFoundException(new Exception(), missing, validated2);
-        ctx.addException(validatedFile2, ex2);
+        ctx.addError(null, validatedFile2, ex2);
 
         SurefireXmlReporter reporter = new SurefireXmlReporter(REPORTS_DIR);
         reporter.report(ctx);
@@ -145,13 +145,13 @@ public class TestSurefireXmlReporter {
         Artifact missing = new DefaultArtifact("org", "missing", "jar", "1.0");
         DependencyNode depRoot1 = new DefaultDependencyNode(validated1);
         BomDependencyNotFoundException ex1 = new BomDependencyNotFoundException(new Exception(), missing, validated1, depRoot1);
-        ctx.addException(validatedFile1, ex1);
+        ctx.addError(null, validatedFile1, ex1);
 
         File validatedFile2 = new File(VALIDATED_REPO_DIR, "validated2");
         Artifact validated2 = new DefaultArtifact("org", "validated2", "pom", "1.0");
         DependencyNode depRoot2 = new DefaultDependencyNode(validated2);
         BomDependencyNotFoundException ex2 = new BomDependencyNotFoundException(new Exception(), missing, validated2, depRoot2);
-        ctx.addException(validatedFile2, ex2);
+        ctx.addError(null, validatedFile2, ex2);
 
         SurefireXmlReporter reporter = new SurefireXmlReporter(REPORTS_DIR);
         reporter.report(ctx);
@@ -170,13 +170,12 @@ public class TestSurefireXmlReporter {
 
     @Test
     public void shouldReportSimpleFilteredExceptionsAsSkipped() throws IOException {
-        ValidatorContext ctx = new ValidatorContext(VALIDATED_REPO_DIR, null, Collections.<RemoteRepository>emptyList());
+        ExceptionFilter filter = new FilenameBasedExceptionFilter(".*validated", JarSourcesVerificationException.class);
+        ValidatorContext ctx = new ValidatorContext(VALIDATED_REPO_DIR, null, Collections.<RemoteRepository>emptyList(), Collections.singletonList(filter));
         File validatedFile = new File(VALIDATED_REPO_DIR, "validated");
         Exception filteredException = new JarSourcesVerificationException(validatedFile);
-        ExceptionFilter filter = new FilenameBasedExceptionFilter(".*validated", JarSourcesVerificationException.class);
 
-        ctx.addException(validatedFile, filteredException);
-        ctx.applyExceptionFilters(new ExceptionFilter[]{filter});
+        ctx.addError(null, validatedFile, filteredException);
         SurefireXmlReporter reporter = new SurefireXmlReporter(REPORTS_DIR);
         reporter.report(ctx);
 
@@ -189,24 +188,22 @@ public class TestSurefireXmlReporter {
 
     @Test
     public void shouldReportFilteredDependencyNotFoundExceptionAsSkipped() throws IOException {
-        ValidatorContext ctx = new ValidatorContext(VALIDATED_REPO_DIR, null, Collections.<RemoteRepository>emptyList());
+        String missingArtifactRegex = "org:missing:jar:1.0";
+        String validatedArtifactRegex = "org:validated:pom:1.0";
+        ExceptionFilter filter = new DependencyNotFoundExceptionFilter(missingArtifactRegex, validatedArtifactRegex);
+        ValidatorContext ctx = new ValidatorContext(VALIDATED_REPO_DIR, null, Collections.<RemoteRepository>emptyList(), Collections.singletonList(filter));
 
         Artifact validatedArtifact1 = new DefaultArtifact("org", "validated", "pom", "1.0");
         Artifact missing = new DefaultArtifact("org", "missing", "jar", "1.0");
         DependencyNode depRoot1 = new DefaultDependencyNode(validatedArtifact1);
         DependencyNotFoundException ex1 = new DependencyNotFoundException(new Exception(), missing, validatedArtifact1, depRoot1);
-        ctx.addException(new File(""), ex1);
+        ctx.addError(null, new File(""), ex1);
 
         Artifact validatedArtifact2 = new DefaultArtifact("org", "validated2-not-filtered", "pom", "1.1");
         DependencyNotFoundException ex2 = new DependencyNotFoundException(new Exception(), missing, validatedArtifact2);
-        ctx.addException(new File(""), ex2);
+        ctx.addError(null, new File(""), ex2);
 
-        String missingArtifactRegex = "org:missing:jar:1.0";
-        String validatedArtifactRegex = "org:validated:pom:1.0";
-        ExceptionFilter filter = new DependencyNotFoundExceptionFilter(missingArtifactRegex, validatedArtifactRegex);
-        ctx.applyExceptionFilters(new ExceptionFilter[]{filter});
-
-        assertEquals("Number of filtered exceptions", 1, ctx.getFilteredExceptions().size());
+        assertEquals("Number of filtered exceptions", 1, ctx.getIgnoredExceptions().size());
         assertEquals("Number of non-filtered exceptions", 1, ctx.getExceptions().size());
 
         SurefireXmlReporter reporter = new SurefireXmlReporter(REPORTS_DIR);
@@ -224,25 +221,23 @@ public class TestSurefireXmlReporter {
 
     @Test
     public void shouldReportFilteredBomDependencyNotFoundExceptionAsSkipped() throws IOException {
-        ValidatorContext ctx = new ValidatorContext(VALIDATED_REPO_DIR, null, Collections.<RemoteRepository>emptyList());
+        String missingArtifactRegex = "org:missing:jar:1.0";
+        String validatedArtifactRegex = "org:validated:pom:1.0";
+        ExceptionFilter filter = new BomDependencyNotFoundExceptionFilter(missingArtifactRegex, validatedArtifactRegex);
+        ValidatorContext ctx = new ValidatorContext(VALIDATED_REPO_DIR, null, Collections.<RemoteRepository>emptyList(), Collections.singletonList(filter));
 
         Artifact validatedArtifact1 = new DefaultArtifact("org", "validated", "pom", "1.0");
         Artifact missingArtifact = new DefaultArtifact("org", "missing", "jar", "1.0");
         DependencyNode depRoot1 = new DefaultDependencyNode(validatedArtifact1);
         DependencyNotFoundException ex1 = new BomDependencyNotFoundException(new Exception(), missingArtifact, validatedArtifact1, depRoot1);
-        ctx.addException(new File(""), ex1);
+        ctx.addError(null, new File(""), ex1);
 
         Artifact validatedArtifact2 = new DefaultArtifact("org", "validated2-not-filtered", "pom", "1.1");
         DependencyNode depRoot2 = new DefaultDependencyNode(validatedArtifact2);
         DependencyNotFoundException ex2 = new BomDependencyNotFoundException(new Exception(), missingArtifact, validatedArtifact2, depRoot2);
-        ctx.addException(new File(""), ex2);
+        ctx.addError(null, new File(""), ex2);
 
-        String missingArtifactRegex = "org:missing:jar:1.0";
-        String validatedArtifactRegex = "org:validated:pom:1.0";
-        ExceptionFilter filter = new BomDependencyNotFoundExceptionFilter(missingArtifactRegex, validatedArtifactRegex);
-        ctx.applyExceptionFilters(new ExceptionFilter[]{filter});
-
-        assertEquals("Number of filtered exceptions", 1, ctx.getFilteredExceptions().size());
+        assertEquals("Number of filtered exceptions", 1, ctx.getIgnoredExceptions().size());
         assertEquals("Number of non-filtered exceptions", 1, ctx.getExceptions().size());
 
         SurefireXmlReporter reporter = new SurefireXmlReporter(REPORTS_DIR);
@@ -273,8 +268,8 @@ public class TestSurefireXmlReporter {
 
         BomAmbiguousVersionException ex = new BomAmbiguousVersionException("com.acme:acme-finance:jar", ambiguousDependencies);
         // report two identical exceptions, they should be "squashed" into single surefire test case entry
-        ctx.addException(new File("some-file-in-repo"), ex);
-        ctx.addException(new File("other-file-in-repo"), ex);
+        ctx.addError(null, new File("some-file-in-repo"), ex);
+        ctx.addError(null, new File("other-file-in-repo"), ex);
 
         SurefireXmlReporter reporter = new SurefireXmlReporter(REPORTS_DIR);
         reporter.report(ctx);

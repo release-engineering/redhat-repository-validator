@@ -62,10 +62,10 @@ public class ChecksumValidator implements Validator {
                 String checksum1 = checksums.get(checksumAlgorithm.getKey()).toString();
                 String checksum2 = ChecksumUtils.read(new File(file.getPath() + checksumAlgorithm.getValue()));
                 if (!equalsIgnoreCase(checksum1, checksum2)) {
-                    ctx.addException(file, new ChecksumNotMatchException(relativize(ctx, file), checksumAlgorithm.getKey(), checksum1, checksum2));
+                    ctx.addError(this, file, new ChecksumNotMatchException(relativize(ctx, file), checksumAlgorithm.getKey(), checksum1, checksum2));
                 }
             } catch (IOException e) {
-                ctx.addException(file, new ChecksumNotExistException(relativize(ctx, file), checksumAlgorithm.getKey()));
+                ctx.addError(this, file, new ChecksumNotExistException(relativize(ctx, file), checksumAlgorithm.getKey()));
             }
         }
     }

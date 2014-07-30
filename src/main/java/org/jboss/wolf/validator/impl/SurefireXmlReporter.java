@@ -76,7 +76,7 @@ public class SurefireXmlReporter implements Reporter {
             FileUtils.cleanDirectory(reportsDirectory);
 
             List<Exception> exceptions = sortExceptions(ctx.getExceptions());
-            List<Exception> filteredExceptions = sortExceptions(ctx.getFilteredExceptions());
+            List<Exception> filteredExceptions = sortExceptions(ctx.getIgnoredExceptions());
             reportMissingDependencies("DependencyNotFoundReport", DependencyNotFoundException.class, exceptions, filteredExceptions);
             reportMissingDependencies("BomDependencyNotFoundReport", BomDependencyNotFoundException.class, exceptions, filteredExceptions);
             List<BomAmbiguousVersionException> bomAmbiguousVersionsExs = ctx.getExceptions(BomAmbiguousVersionException.class);

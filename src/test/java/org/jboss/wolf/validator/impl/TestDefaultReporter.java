@@ -19,11 +19,11 @@ public class TestDefaultReporter extends AbstractReporterTest {
 
     @Test
     public void shouldReportExceptionCount() {
-        ctx.addException(f1, new SuspiciousFileException(f1, "foo"));
-        ctx.addException(f2, new SuspiciousFileException(f2, "foo"));
-        ctx.addException(f1, new ChecksumNotExistException(f1, "sha1"));
-        ctx.addException(f2, new ChecksumNotExistException(f2, "sha1"));
-        ctx.addException(f3, new ChecksumNotExistException(f3, "sha1"));
+        ctx.addError(null, f1, new SuspiciousFileException(f1, "foo"));
+        ctx.addError(null, f2, new SuspiciousFileException(f2, "foo"));
+        ctx.addError(null, f1, new ChecksumNotExistException(f1, "sha1"));
+        ctx.addError(null, f2, new ChecksumNotExistException(f2, "sha1"));
+        ctx.addError(null, f3, new ChecksumNotExistException(f3, "sha1"));
         
         reportingExecutor.execute(ctx);
 
@@ -41,9 +41,9 @@ public class TestDefaultReporter extends AbstractReporterTest {
     @Test
     public void shouldReportOnlyDistinctException() {
         SuspiciousFileException suspiciousFileException = new SuspiciousFileException(f1, "foo");
-        ctx.addException(f1, suspiciousFileException);
-        ctx.addException(f2, suspiciousFileException);
-        ctx.addException(f3, suspiciousFileException);
+        ctx.addError(null, f1, suspiciousFileException);
+        ctx.addError(null, f2, suspiciousFileException);
+        ctx.addError(null, f3, suspiciousFileException);
 
         reportingExecutor.execute(ctx);
 
@@ -52,10 +52,10 @@ public class TestDefaultReporter extends AbstractReporterTest {
 
     @Test
     public void shouldSortExceptionsByType() {
-        ctx.addException(f1, new ChecksumNotExistException(f1, "sha1"));
-        ctx.addException(f2, new ChecksumNotExistException(f2, "sha1"));
-        ctx.addException(f1, new ChecksumNotMatchException(f1, "sha1", "0", "1"));
-        ctx.addException(f2, new ChecksumNotMatchException(f2, "sha1", "0", "1"));
+        ctx.addError(null, f1, new ChecksumNotExistException(f1, "sha1"));
+        ctx.addError(null, f2, new ChecksumNotExistException(f2, "sha1"));
+        ctx.addError(null, f1, new ChecksumNotMatchException(f1, "sha1", "0", "1"));
+        ctx.addError(null, f2, new ChecksumNotMatchException(f2, "sha1", "0", "1"));
 
         reportingExecutor.execute(ctx);
 
@@ -72,9 +72,9 @@ public class TestDefaultReporter extends AbstractReporterTest {
 
     @Test
     public void shouldSortExceptionsByMessage() {
-        ctx.addException(f3, new ChecksumNotExistException(f3, "sha1"));
-        ctx.addException(f2, new ChecksumNotExistException(f2, "sha1"));
-        ctx.addException(f1, new ChecksumNotExistException(f1, "sha1"));
+        ctx.addError(null, f3, new ChecksumNotExistException(f3, "sha1"));
+        ctx.addError(null, f2, new ChecksumNotExistException(f2, "sha1"));
+        ctx.addError(null, f1, new ChecksumNotExistException(f1, "sha1"));
 
         reportingExecutor.execute(ctx);
 
@@ -89,7 +89,7 @@ public class TestDefaultReporter extends AbstractReporterTest {
     
     @Test
     public void shouldNotCrashWhenExceptionHasNullMessage() {
-        ctx.addException(f1, new Exception((String)null));
+        ctx.addError(null, f1, new Exception((String)null));
         
         reportingExecutor.execute(ctx);
         

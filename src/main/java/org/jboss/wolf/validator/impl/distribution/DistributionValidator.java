@@ -76,8 +76,8 @@ public class DistributionValidator implements Validator {
         Set<String> missingFileHashSet = Sets.difference(validatedRepoFilesMap.keySet(), validatedDistFilesMap.keySet());
         for (String missingFileHash : missingFileHashSet) {
             File missingFile = validatedRepoFilesMap.get(missingFileHash).get(0);
-            ctx.addException(missingFile, 
-                    new DistributionMissingFileException(relativize(ctx, missingFile)));
+            ctx.addError(this, 
+                    missingFile, new DistributionMissingFileException(relativize(ctx, missingFile)));
         }
     }
 
@@ -89,8 +89,8 @@ public class DistributionValidator implements Validator {
                 continue;
             }
             File redundantFile = validatedDistFilesMap.get(redundantFileHash).get(0);
-            ctx.addException(redundantFile, 
-                    new DistributionRedundantFileException(relativizeFile(ctx.getValidatedDistribution(), redundantFile)));
+            ctx.addError(this, 
+                    redundantFile, new DistributionRedundantFileException(relativizeFile(ctx.getValidatedDistribution(), redundantFile)));
         }
     }
 
@@ -102,8 +102,8 @@ public class DistributionValidator implements Validator {
                     duplicateFiles.add(relativizeFile(ctx.getValidatedDistribution(), distFile));
                 }
                 duplicateFiles = sortFiles(duplicateFiles);
-                ctx.addException(duplicateFiles.get(0), 
-                        new DistributionDuplicateFilesException(duplicateFiles.toArray(new File[] {})));
+                ctx.addError(this, 
+                        duplicateFiles.get(0), new DistributionDuplicateFilesException(duplicateFiles.toArray(new File[] {})));
             }
         }
     }
@@ -117,8 +117,8 @@ public class DistributionValidator implements Validator {
                 File repoFile = repoFileEntry.getValue();
 
                 if (distFileHash.equals(repoFileHash) && !distFile.getName().equals(repoFile.getName())) {
-                    ctx.addException(repoFile,
-                            new DistributionMisnomerFileException(
+                    ctx.addError(this,
+                            repoFile, new DistributionMisnomerFileException(
                                     relativizeFile(ctx.getValidatedRepository(), repoFile),
                                     relativizeFile(ctx.getValidatedDistribution(), distFile)));
                 }
@@ -135,8 +135,8 @@ public class DistributionValidator implements Validator {
                 File repoFile = repoFileEntry.getValue();
 
                 if (distFile.getName().equals(repoFile.getName()) && !distFileHash.equals(repoFileHash) ) {
-                    ctx.addException(repoFile,
-                            new DistributionCorruptedFileException(
+                    ctx.addError(this,
+                            repoFile, new DistributionCorruptedFileException(
                                     relativizeFile(ctx.getValidatedRepository(), repoFile),
                                     relativizeFile(ctx.getValidatedDistribution(), distFile)));
                 }

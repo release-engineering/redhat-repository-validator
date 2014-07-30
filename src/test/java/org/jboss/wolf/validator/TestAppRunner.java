@@ -173,9 +173,9 @@ public class TestAppRunner {
                 
                 validationExecutor.execute(context);
                 
-                List<Exception> exceptions = context.getExceptions(context.getValidatedRepository());
-                assertEquals(exceptions.size(), 1);
-                assertEquals(exceptions.get(0).getMessage(), "stubValidator");
+                List<ValidationError> errors = context.getErrors(context.getValidatedRepository());
+                assertEquals(errors.size(), 1);
+                assertEquals(errors.get(0).getException().getMessage(), "stubValidator");
             };
         };
         appRunner.run("--config", getClass().getResource("/TestAppRunner-stubValidatorAdditionally.xml").getFile());
@@ -197,19 +197,6 @@ public class TestAppRunner {
     public void shouldRedirectDefaultReportToCustomFile2() throws IOException {
         appRunner = new AssertReportFileRunner(new File("workspace/bar.txt"));
         appRunner.run("--config", getClass().getResource("/TestAppRunner-defaultReporterStream.xml").getFile());
-    }
-
-    @Test
-    public void shouldNotFailWhenNoExceptionFiltersDefined() {
-        appRunner = new AppRunner() {
-            @Override
-            protected void runValidation() {
-                // make sure no filters are defined
-                assertTrue(exceptionFilters == null);
-                context.applyExceptionFilters(exceptionFilters);
-            }
-        };
-        appRunner.run();
     }
 
     private void assertOutputContains(String s) {
@@ -286,7 +273,7 @@ public class TestAppRunner {
 
         @Override
         protected void runValidation() {
-            context.addException(new File("foo"), new ChecksumNotExistException(new File("foo"), "SHA-1"));
+            context.addError(null, new File("foo"), new ChecksumNotExistException(new File("foo"), "SHA-1"));
             reportingExecutor.execute(context);
             
             try {

@@ -46,7 +46,7 @@ public class JarSourcesValidator implements Validator {
         }
         File sourcesFile = new File(jarDir, removeExtension(jarName) + "-sources.jar");
         if (!sourcesFile.exists() || !sourcesFile.isFile()) {
-            ctx.addException(file, new JarSourcesVerificationException(relativize(ctx, file)));
+            ctx.addError(this, file, new JarSourcesVerificationException(relativize(ctx, file)));
         }
     }
 

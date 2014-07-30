@@ -48,7 +48,7 @@ public class BomUnmanagedVersionValidator implements Validator {
     private void collectData(ValidatorContext ctx, Map<String, File> projectGavToFileMap, ListMultimap<String, String> dependencyGavToBomGavMap) {
         Collection<File> pomFiles = listPomFiles(ctx.getValidatedRepository(), fileFilter);
         for (File pomFile : pomFiles) {
-            if (!ctx.getExceptions(pomFile).isEmpty()) {
+            if (!ctx.getErrors(pomFile).isEmpty()) {
                 logger.debug("skipping `{}`, because already contains exceptions", pomFile);
                 continue;
             }
@@ -75,7 +75,7 @@ public class BomUnmanagedVersionValidator implements Validator {
         for (String projectGav : projectGavToFileMap.keySet()) {
             List<String> bomGavList = dependencyGavToBomGavMap.get(projectGav);
             if (bomGavList.isEmpty()) {
-                ctx.addException(projectGavToFileMap.get(projectGav), new BomUnmanagedVersionException(projectGav));
+                ctx.addError(this, projectGavToFileMap.get(projectGav), new BomUnmanagedVersionException(projectGav));
             } else {
                 if (logger.isDebugEnabled()) {
                     logger.debug("project `{}` is managed in boms: `{}`", projectGav, dependencyGavToBomGavMap.get(projectGav));

@@ -103,7 +103,7 @@ public class DependenciesValidator implements Validator {
         try {
             return modelReader.read(pomFile, null);
         } catch (IOException e) {
-            ctx.addException(pomFile, e);
+            ctx.addError(this, pomFile, e);
             return null;
         }
     }
@@ -128,7 +128,7 @@ public class DependenciesValidator implements Validator {
             ArtifactType artifactType = artifactTypeRegistry.get(model.getPackaging());
             
             if (artifactType == null) {
-                ctx.addException(pomFile, new UnknownArtifactTypeException(model.getPackaging(), relativize(ctx, pomFile)));
+                ctx.addError(this, pomFile, new UnknownArtifactTypeException(model.getPackaging(), relativize(ctx, pomFile)));
                 return false;
             }
 
@@ -189,8 +189,8 @@ public class DependenciesValidator implements Validator {
             artifactException = Utils.findCause(e, ArtifactResolutionException.class);
         }
         for (Artifact missingArtifact : Utils.collectMissingArtifacts(artifactException)) {
-            ctx.addException(pomFile,
-                    new DependencyNotFoundException(artifactException, missingArtifact, validatedArtifact, rootDepNode));
+            ctx.addError(this,
+                    pomFile, new DependencyNotFoundException(artifactException, missingArtifact, validatedArtifact, rootDepNode));
         }
     }
 

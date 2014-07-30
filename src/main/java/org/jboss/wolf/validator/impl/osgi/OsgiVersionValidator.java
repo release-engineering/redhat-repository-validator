@@ -41,7 +41,7 @@ public class OsgiVersionValidator implements Validator {
         try {
             new OsgiVersion(model.getVersion());
         } catch (Exception e) {
-            ctx.addException(model.getPomFile(), new OsgiVersionException(model.getId(), e));
+            ctx.addError(this, model.getPomFile(), new OsgiVersionException(model.getId(), e));
         }
     }
 

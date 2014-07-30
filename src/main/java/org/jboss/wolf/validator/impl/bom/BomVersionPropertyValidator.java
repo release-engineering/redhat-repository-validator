@@ -36,7 +36,7 @@ public class BomVersionPropertyValidator implements Validator {
     public void validate(ValidatorContext ctx) {
         Collection<File> pomFiles = listPomFiles(ctx.getValidatedRepository(), fileFilter);
         for (File pomFile : pomFiles) {
-            if (!ctx.getExceptions(pomFile).isEmpty()) {
+            if (!ctx.getErrors(pomFile).isEmpty()) {
                 logger.debug("skipping `{}`, because already contains exceptions", pomFile);
                 continue;
             }
@@ -62,7 +62,7 @@ public class BomVersionPropertyValidator implements Validator {
         }
         
         if( !bomDependenciesWithoutVersionProperty.isEmpty() ) {
-            ctx.addException(pomFile, new BomVersionPropertyException(bomGav, bomDependenciesWithoutVersionProperty.toArray(new String[]{})));
+            ctx.addError(this, pomFile, new BomVersionPropertyException(bomGav, bomDependenciesWithoutVersionProperty.toArray(new String[]{})));
         }
     }
 

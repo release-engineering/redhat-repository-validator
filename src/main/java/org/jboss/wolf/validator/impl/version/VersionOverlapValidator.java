@@ -71,7 +71,7 @@ public class VersionOverlapValidator implements Validator {
             request.addRepository(remoteRepository);
             try {
                 repositorySystem.resolveArtifact(tmpSession, request);
-                ctx.addException(model.getPomFile(), new VersionOverlapException(model.getId(), remoteRepository));
+                ctx.addError(this, model.getPomFile(), new VersionOverlapException(model.getId(), remoteRepository));
             } catch (ArtifactResolutionException e) {
                 // noop
             }

@@ -51,7 +51,7 @@ public class VersionAmbiguityValidator implements Validator {
             if (versions.size() > 1) {
                 Exception e = new VersionAmbiguityException(ga, versions.toArray(new String[] {}));
                 for (File pomFile : ga2filesMap.get(ga)) {
-                    ctx.addException(pomFile, e);
+                    ctx.addError(this, pomFile, e);
                 }
             }
         }

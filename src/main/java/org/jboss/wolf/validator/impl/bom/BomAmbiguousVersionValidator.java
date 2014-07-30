@@ -48,7 +48,7 @@ public class BomAmbiguousVersionValidator implements Validator {
                 }
                 Exception ambiguousVersionException = new BomAmbiguousVersionException(ambiguousDependencies.get(0).getKey().getManagementKey(), ambiguousDependencies);
                 for (Pair<Dependency, File> ambiguousDependency : ambiguousDependencies) {
-                    ctx.addException(ambiguousDependency.getValue(), ambiguousVersionException);
+                    ctx.addError(this, ambiguousDependency.getValue(), ambiguousVersionException);
                 }
             }
         }

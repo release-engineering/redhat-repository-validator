@@ -58,19 +58,19 @@ public class JarSignatureValidator implements Validator {
             String output = IOUtils.toString(p.getInputStream());
             if (p.exitValue() == 0 && output.contains("jar is unsigned")) {
                 if (mode == VERIFY_JAR_IS_SIGNED) {
-                    ctx.addException(file, new JarUnsignedException(fileRelative));
+                    ctx.addError(this, file, new JarUnsignedException(fileRelative));
                 }
             } else if (p.exitValue() == 0 && output.contains("jar verified")) {
                 if (mode == VERIFY_JAR_IS_UNSIGNED) {
-                    ctx.addException(file, new JarSignedException(fileRelative));
+                    ctx.addError(this, file, new JarSignedException(fileRelative));
                 }
             } else {
-                ctx.addException(file, new JarSignatureVerificationException(fileRelative, output));
+                ctx.addError(this, file, new JarSignatureVerificationException(fileRelative, output));
             }
         } catch (InterruptedException e) {
-            ctx.addException(file, new JarSignatureVerificationException(fileRelative, e));
+            ctx.addError(this, file, new JarSignatureVerificationException(fileRelative, e));
         } catch (IOException e) {
-            ctx.addException(file, new JarSignatureVerificationException(fileRelative, e));
+            ctx.addError(this, file, new JarSignatureVerificationException(fileRelative, e));
         }
     }
 

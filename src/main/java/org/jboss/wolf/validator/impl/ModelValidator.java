@@ -39,7 +39,7 @@ public class ModelValidator implements Validator {
         Collection<File> pomFiles = listPomFiles(ctx.getValidatedRepository(), fileFilter);
         for (File pomFile : pomFiles) {
             logger.trace("validating {}", relativize(ctx, pomFile));
-            if (!ctx.getExceptions(pomFile).isEmpty()) {
+            if (!ctx.getErrors(pomFile).isEmpty()) {
                 logger.debug("skipping `{}`, because already contains exceptions", relativize(ctx, pomFile));
                 continue;
             }
@@ -55,7 +55,7 @@ public class ModelValidator implements Validator {
         try {
             modelBuilder.build(request);
         } catch (ModelBuildingException e) {
-            ctx.addException(pomFile, e);
+            ctx.addError(this, pomFile, e);
         }
     }
 

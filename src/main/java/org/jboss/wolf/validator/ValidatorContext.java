@@ -5,10 +5,8 @@ import static org.jboss.wolf.validator.internal.Utils.relativize;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.aether.repository.RemoteRepository;
@@ -22,14 +20,20 @@ public class ValidatorContext {
     private final File validatedRepository;
     private final File validatedDistribution;
     private final List<RemoteRepository> remoteRepositories;
-    private final Map<File, List<Exception>> exceptions = new HashMap<File, List<Exception>>();
+    private final List<ExceptionFilter> exceptionFilters;
+    private final List<ValidationError> errors = new ArrayList<ValidationError>();
+    private final List<ValidationError> ignoredErrors = new ArrayList<ValidationError>();
     private final Set<Exception> processedExceptions = new HashSet<Exception>();
-    private final List<Exception> filteredExceptions = new ArrayList<Exception>();
 
     public ValidatorContext(File validatedRepository, File validatedDistribution, List<RemoteRepository> remoteRepositories) {
+        this(validatedRepository, validatedDistribution, remoteRepositories, null);
+    }
+
+    public ValidatorContext(File validatedRepository, File validatedDistribution, List<RemoteRepository> remoteRepositories, List<ExceptionFilter> exceptionFilters) {
         this.validatedRepository = validatedRepository;
         this.validatedDistribution = validatedDistribution; 
-        this.remoteRepositories = Collections.unmodifiableList(new ArrayList<RemoteRepository>(remoteRepositories));
+        this.remoteRepositories = remoteRepositories;
+        this.exceptionFilters = exceptionFilters;
     }
 
     public File getValidatedRepository() {
@@ -44,63 +48,81 @@ public class ValidatorContext {
         return remoteRepositories;
     }
 
-    public List<Exception> getFilteredExceptions() {
-        return filteredExceptions;
-    }
-
     public boolean isSuccess() {
-        return exceptions.isEmpty();
+        return errors.isEmpty();
     }
 
-    public void addException(File file, Exception e) {
-        logger.debug("for `{}` register exception `{}: {}`", relativize(this, file), e.getClass().getSimpleName(), e.getMessage());
-
-        List<Exception> exceptionList = exceptions.get(file);
-        if (exceptionList == null) {
-            exceptionList = new ArrayList<Exception>();
-            exceptions.put(file, exceptionList);
+    public void addError(Validator validator, File file, Exception e) {
+        if( isIgnored(validator, file, e) ) {
+            logger.debug("ignoring exception `{}: {}`", e.getClass().getSimpleName(), e.getMessage());
+            ignoredErrors.add(new ValidationError(validator, e, file));
+        } else {
+            logger.debug("for `{}` register exception `{}: {}`", relativize(this, file), e.getClass().getSimpleName(), e.getMessage());
+            errors.add(new ValidationError(validator, e, file));
         }
-        exceptionList.add(e);
     }
     
-    public void addProcessedException(Exception e) {
-        processedExceptions.add(e);
+    private boolean isIgnored(Validator validator, File file, Exception e) {
+        if (exceptionFilters != null) {
+            for (ExceptionFilter exceptionFilter : exceptionFilters) {
+                if (exceptionFilter.shouldIgnore(e, file)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
+    public List<ValidationError> getErrors() {
+        return Collections.unmodifiableList(errors);
+    }
+
+    public List<ValidationError> getErrors(File pomFile) {
+        List<ValidationError> result = new ArrayList<ValidationError>();
+        for(ValidationError error : errors) {
+            if( pomFile.equals(error.getFile()) ) {
+                result.add(error);
+            }
+        }
+        return Collections.unmodifiableList(result);
+    }
+    
     public List<Exception> getExceptions() {
         List<Exception> result = new ArrayList<Exception>();
-        for (List<Exception> exceptionList : exceptions.values()) {
-            result.addAll(exceptionList);
+        for (ValidationError error : errors) {
+            result.add(error.getException());
         }
         return Collections.unmodifiableList(result);
     }
 
-    public List<Exception> getExceptions(File pomFile) {
-        if (exceptions.containsKey(pomFile)) {
-            return Collections.unmodifiableList(exceptions.get(pomFile));
-        } else {
-            return Collections.emptyList();
-        }
-    }
-
     public <E extends Exception> List<E> getExceptions(Class<E> exceptionType) {
-        return filterExceptions(getExceptions(), exceptionType);
-    }
-
-    public <E extends Exception> List<E> getExceptions(File pomFile, Class<E> exceptionType) {
-        return filterExceptions(getExceptions(pomFile), exceptionType);
-    }
-
-    private <E extends Exception> List<E> filterExceptions(List<Exception> exceptions, Class<E> exceptionType) {
         List<E> result = new ArrayList<E>();
-        for (Exception exception : exceptions) {
+        for (Exception exception : getExceptions()) {
             if (exceptionType.isInstance(exception)) {
                 result.add(exceptionType.cast(exception));
             }
         }
         return Collections.unmodifiableList(result);
     }
+    
+    public List<ValidationError> getIgnoredErrors() {
+        return Collections.unmodifiableList(ignoredErrors);
+    }
+    
+    public List<Exception> getIgnoredExceptions() {
+        List<Exception> result = new ArrayList<Exception>();
+        for (ValidationError ignoredError : ignoredErrors) {
+            result.add(ignoredError.getException());
+        }
+        return Collections.unmodifiableList(result);
+    }
+    
+    // TODO remove
+    public void addProcessedException(Exception e) {
+        processedExceptions.add(e);
+    }
 
+    // TODO remove
     public List<Exception> getUnprocessedExceptions() {
         List<Exception> unprocessedExceptions = new ArrayList<Exception>();
         for (Exception exception : getExceptions()) {
@@ -109,38 +131,6 @@ public class ValidatorContext {
             }
         }
         return Collections.unmodifiableList(unprocessedExceptions);
-    }
-
-    public void applyExceptionFilters(ExceptionFilter[] exceptionFilters) {
-        if (exceptionFilters == null) {
-            logger.debug("Skipping the exception filtering as no filters were defined!");
-            return;
-        }
-        logger.debug("Applying {} exception filter(s).", exceptionFilters.length);
-        for (ExceptionFilter exceptionFilter : exceptionFilters) {
-            logger.debug("Applying exception filter " + exceptionFilter);
-            applyExceptionFilter(exceptionFilter);
-        }
-    }
-
-    private void applyExceptionFilter(ExceptionFilter exceptionFilter) {
-        for (Map.Entry<File, List<Exception>> exceptionsPerFile : exceptions.entrySet()) {
-            File fileInRepo = exceptionsPerFile.getKey();
-            List<Exception> exceptionList = exceptionsPerFile.getValue();
-            List<Exception> currentlyFilteredExceptions = new ArrayList<Exception>();
-            for (Exception exception : exceptionList) {
-                if (exceptionFilter.shouldIgnore(exception, fileInRepo)) {
-                    logger.debug("Filtering (ignoring) exception: " + exception);
-                    currentlyFilteredExceptions.add(exception);
-                }
-            }
-            // remove the marked exceptions from list, update the exceptions map and track the the filtered exceptions
-            if (!currentlyFilteredExceptions.isEmpty()) {
-                exceptionList.removeAll(currentlyFilteredExceptions);
-                exceptions.put(fileInRepo, exceptionList);
-                filteredExceptions.addAll(currentlyFilteredExceptions);
-            }
-        }
     }
 
 }

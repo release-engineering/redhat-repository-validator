@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
@@ -84,7 +85,9 @@ public class AppConfig {
 
     @Value("#{systemProperties['wolf-remoteRepositories']?.split(';')}")
     private String[] remoteRepositories;
-
+    
+    @Autowired(required = false)
+    private ExceptionFilter[] exceptionFilters;
 
     @Bean
     public ValidationExecutor validationExecutor(Validator[] validators) {
@@ -143,7 +146,8 @@ public class AppConfig {
         return new ValidatorContext(
                   new File(validatedRepository),
                   new File(validatedDistribution),
-                  effectiveRemoteRepositories());
+                  effectiveRemoteRepositories(),
+                  Arrays.asList(exceptionFilters != null ? exceptionFilters : new ExceptionFilter[]{}));
     }
 
     @Bean
