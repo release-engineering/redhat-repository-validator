@@ -112,7 +112,7 @@ public class TestSuspiciousFileValidator extends AbstractTest {
     public void shouldFindSuspiciousSources() throws IOException {
         touch("com/acme/bar/1.0/bar-1.0-sources.jar");
         validationExecutor.execute(ctx);
-        assertExpectedException(SuspiciousFileException.class, "File com/acme/bar/1.0/bar-1.0-sources.jar is artifact sources.jar without primary jar file");
+        assertExpectedException(SuspiciousFileException.class, "File com/acme/bar/1.0/bar-1.0-sources.jar is artifact sources.jar without primary artifact");
     }
 
     @Test

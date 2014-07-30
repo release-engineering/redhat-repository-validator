@@ -92,7 +92,7 @@ public class SuspiciousFileValidator implements Validator {
         for (String attachedArtifactType : attachedArtifactTypes) {
             if (fileName.endsWith(attachedArtifactType)) {
                 if (!existPrimaryArtifact(fileDir, fileName, attachedArtifactType)) {
-                    fail(ctx, file, "artifact " + removeStart(attachedArtifactType, "-") + " without primary jar file");
+                    fail(ctx, file, "artifact " + removeStart(attachedArtifactType, "-") + " without primary artifact");
                 }
                 return;
             }
