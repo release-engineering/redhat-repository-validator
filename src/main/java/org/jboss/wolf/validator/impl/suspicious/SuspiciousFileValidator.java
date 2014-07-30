@@ -89,11 +89,10 @@ public class SuspiciousFileValidator implements Validator {
             }
         }
 
-        for (String attachedArtifact : attachedArtifactTypes) {
-            if (fileName.endsWith(attachedArtifact)) {
-                File primaryArtifact = new File(fileDir, removeEnd(fileName, attachedArtifact) + ".jar");
-                if (!primaryArtifact.isFile()) {
-                    fail(ctx, file, "artifact " + removeStart(attachedArtifact, "-") + " without primary jar file");
+        for (String attachedArtifactType : attachedArtifactTypes) {
+            if (fileName.endsWith(attachedArtifactType)) {
+                if (!existPrimaryArtifact(fileDir, fileName, attachedArtifactType)) {
+                    fail(ctx, file, "artifact " + removeStart(attachedArtifactType, "-") + " without primary jar file");
                 }
                 return;
             }
@@ -118,7 +117,7 @@ public class SuspiciousFileValidator implements Validator {
 
         fail(ctx, file, "suspicious");
     }
-    
+
     private void fail(ValidatorContext ctx, File file, String msg) {
         ctx.addError(this, file, new SuspiciousFileException(relativize(ctx, file), msg));
     }
@@ -135,4 +134,16 @@ public class SuspiciousFileValidator implements Validator {
 
         return endsOnKnownFileExtension;
     }
+    
+    private boolean existPrimaryArtifact(String fileDir, String fileName, String attachedArtifactType) {
+        String fileNameWithoutExtension = removeEnd(fileName, attachedArtifactType);
+        for (String allowedArtifactFileExtension : allowedArtifactFileExtensions) {
+            File primaryArtifact = new File(fileDir, fileNameWithoutExtension + "." + allowedArtifactFileExtension);
+            if (primaryArtifact.isFile()) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
 }

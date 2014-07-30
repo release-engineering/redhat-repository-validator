@@ -69,6 +69,15 @@ public class TestSuspiciousFileValidator extends AbstractTest {
         validationExecutor.execute(ctx);
         assertSuccess();
     }
+    
+    @Test
+    public void shouldSuccessWhenPrimaryArtifactIsWar() throws IOException {
+        FileUtils.forceDelete(new File(repoFooDir, "com/acme/foo/1.0/foo-1.0.jar"));
+        FileUtils.forceDelete(new File(repoFooDir, "com/acme/foo/1.0/foo-1.0.jar.md5"));
+        FileUtils.forceDelete(new File(repoFooDir, "com/acme/foo/1.0/foo-1.0.jar.sha1"));
+        validationExecutor.execute(ctx);
+        assertSuccess();
+    }
 
     @Test
     public void shouldFindSuspiciousRootFile() {
