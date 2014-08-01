@@ -7,13 +7,16 @@ import static org.jboss.wolf.validator.internal.Utils.sortArtifacts;
 import static org.jboss.wolf.validator.internal.Utils.sortDependencyNodes;
 import static org.jboss.wolf.validator.internal.Utils.sortExceptions;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -22,6 +25,7 @@ import org.eclipse.aether.graph.DependencyNode;
 import org.jboss.wolf.validator.Reporter;
 import org.jboss.wolf.validator.ValidatorContext;
 import org.jboss.wolf.validator.impl.bom.BomDependencyNotFoundException;
+import org.jboss.wolf.validator.internal.LogOutputStream;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.LinkedListMultimap;
@@ -31,15 +35,28 @@ import com.google.common.collect.Multimap;
 @Named
 public class DefaultReporter implements Reporter {
 
-    @Inject
-    @Named("defaultReporterStream")
-    private PrintStream out;
+    public static enum Mode {
+        
+        ONE_FILE_FOR_ALL,
+        ONE_FILE_PER_EXCEPTION_TYPE
+        
+    }
+    
+    private final Mode mode;
+    
+    public DefaultReporter() {
+        this(Mode.ONE_FILE_FOR_ALL);
+    }
+
+    public DefaultReporter(Mode mode) {
+        this.mode = mode;
+    }
 
     @Override
     public void report(ValidatorContext ctx) {
-        List<Exception> exceptions = new ArrayList<Exception>();
-        List<DependencyNotFoundException> dependencyNotFoundExceptions = new ArrayList<DependencyNotFoundException>();
         List<BomDependencyNotFoundException> bomDependencyNotFoundExceptions = new ArrayList<BomDependencyNotFoundException>();
+        List<DependencyNotFoundException> dependencyNotFoundExceptions = new ArrayList<DependencyNotFoundException>();
+        List<Exception> exceptions = new ArrayList<Exception>();
 
         for (Exception e : ctx.getExceptions()) {
             if (e instanceof BomDependencyNotFoundException) {
@@ -56,48 +73,51 @@ public class DefaultReporter implements Reporter {
         reportExceptions(exceptions);
     }
 
-    private void reportBomDependencyNotFoundExceptions(List<BomDependencyNotFoundException> bomDependencyNotFoundExceptions) {
-        ListMultimap<Artifact, DependencyNode> artifactNotFoundMap = collectMissingDependencies(bomDependencyNotFoundExceptions);
-        if (!artifactNotFoundMap.isEmpty()) {
-            out.println("--- BOM DEPENDENCY NOT FOUND REPORT ---");
-            out.println("Found " + artifactNotFoundMap.keySet().size() + " missing BOM dependencies.");
-            reportMissingDependencies(artifactNotFoundMap);
-            out.println();
-            out.flush();
-        }
-    }
-
     private void reportDependencyNotFoundExceptions(List<DependencyNotFoundException> dependencyNotFoundExceptions) {
         ListMultimap<Artifact, DependencyNode> artifactNotFoundMap = collectMissingDependencies(dependencyNotFoundExceptions);
-        if (!artifactNotFoundMap.isEmpty()) {
-            out.println("--- DEPENDENCY NOT FOUND REPORT ---");
-            out.println("Found " + artifactNotFoundMap.keySet().size() + " missing dependencies.");
-            reportMissingDependencies(artifactNotFoundMap);
-            out.println();
-            out.flush();
+        if (artifactNotFoundMap.isEmpty()) {
+            return;
+        }
+        try (PrintStream ps = openStream(DependencyNotFoundException.class)) {
+            reportMissingDependencies(ps, artifactNotFoundMap, false);
         }
     }
 
-    private void reportMissingDependencies(ListMultimap<Artifact, DependencyNode> artifactNotFoundMap) {
+    private void reportBomDependencyNotFoundExceptions(List<BomDependencyNotFoundException> bomDependencyNotFoundExceptions) {
+        ListMultimap<Artifact, DependencyNode> artifactNotFoundMap = collectMissingDependencies(bomDependencyNotFoundExceptions);
+        if (artifactNotFoundMap.isEmpty()) {
+            return;
+        }
+        try (PrintStream ps = openStream(BomDependencyNotFoundException.class)) {
+            reportMissingDependencies(ps, artifactNotFoundMap, true);
+        }
+    }
+    
+    private void reportMissingDependencies(PrintStream ps, ListMultimap<Artifact, DependencyNode> artifactNotFoundMap, boolean isBom) {
+        ps.print("--- ");
+        ps.print(isBom ? BomDependencyNotFoundException.class.getSimpleName() : DependencyNotFoundException.class.getSimpleName());
+        ps.print(" (found " + artifactNotFoundMap.keySet().size() + " missing dependencies)");
+        ps.println(" ---");
+        
         for (Artifact artifact : sortArtifacts(artifactNotFoundMap.keySet())) {
-            out.println("miss: " + artifact);
+            ps.println("miss: " + artifact);
             List<DependencyNode> roots = sortDependencyNodes(artifactNotFoundMap.get(artifact));
             for (DependencyNode root : roots) {
-                out.println("    from: " + root.getArtifact());
+                ps.println("    from: " + root.getArtifact());
                 String path = findPathToDependency(artifact, root);
                 String simplePath = root.getArtifact() + " > " + artifact;
                 if (isNotEmpty(path) && notEqual(path, simplePath)) {
-                    out.print("        path: ");
-                    out.print(path);
-                    out.println();
+                    ps.print("        path: ");
+                    ps.print(path);
+                    ps.println();
                 }
-
             }
         }
+        ps.println();
+        ps.flush();
     }
 
-    private ListMultimap<Artifact, DependencyNode> collectMissingDependencies(
-            List<? extends DependencyNotFoundException> dependencyNotFoundExceptions) {
+    private ListMultimap<Artifact, DependencyNode> collectMissingDependencies(List<? extends DependencyNotFoundException> dependencyNotFoundExceptions) {
         ListMultimap<Artifact, DependencyNode> artifactNotFoundMap = ArrayListMultimap.create();
         for (DependencyNotFoundException e : dependencyNotFoundExceptions) {
             DependencyNode dependencyNode = e.getDependencyNode();
@@ -118,19 +138,19 @@ public class DefaultReporter implements Reporter {
             exceptionMultimap.put(exception.getClass(), exception);
         }
 
-        out.println("--- EXCEPTIONS REPORT ---");
         for (Class<? extends Exception> exceptionType : exceptionMultimap.keySet()) {
-            out.println();
-            out.println(exceptionType.getSimpleName() + " (total count " + exceptionMultimap.get(exceptionType).size() + ")");
-            for (Exception exception : exceptionMultimap.get(exceptionType)) {
-                reportException(exception, 0);
+            try (PrintStream ps = openStream(exceptionType)) {
+                ps.println("--- " + exceptionType.getSimpleName() + " (total count " + exceptionMultimap.get(exceptionType).size() + ") ---");
+                for (Exception exception : exceptionMultimap.get(exceptionType)) {
+                    reportException(ps, exception, 0);
+                }
+                ps.println();
+                ps.flush();
             }
         }
-        out.println();
-        out.flush();
     }
 
-    private void reportException(Throwable e, int depth) {
+    private void reportException(PrintStream ps, Throwable e, int depth) {
         StringBuilder msg = new StringBuilder();
         if (depth > 0) {
             msg.append(StringUtils.repeat(" ", depth * 4));
@@ -146,10 +166,36 @@ public class DefaultReporter implements Reporter {
             msg.append(SystemUtils.LINE_SEPARATOR);
         }
 
-        out.println(msg.toString());
+        ps.println(msg.toString());
 
         if (e.getCause() != null) {
-            reportException(e.getCause(), depth + 1);
+            reportException(ps, e.getCause(), depth + 1);
+        }
+    }
+    
+    private PrintStream openStream(Class<? extends Exception> exceptionType) {
+        String reportFileName;
+        switch(mode) {
+            case ONE_FILE_FOR_ALL:
+                reportFileName = "workspace/report.txt";
+                break;
+            case ONE_FILE_PER_EXCEPTION_TYPE:
+                reportFileName = "workspace/report-"+exceptionType.getSimpleName()+".txt";
+                break;
+            default:
+                throw new IllegalArgumentException();
+        }
+        
+        try {
+            File reportFile = new File(reportFileName);
+            FileUtils.forceMkdir(reportFile.getParentFile());
+            FileUtils.touch(reportFile);
+            FileOutputStream fileOutputStream = new FileOutputStream(reportFile, mode == Mode.ONE_FILE_FOR_ALL);
+            LogOutputStream logOutputStream = new LogOutputStream(Reporter.class.getSimpleName(), fileOutputStream);
+            PrintStream printStream = new PrintStream(logOutputStream);
+            return printStream;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 

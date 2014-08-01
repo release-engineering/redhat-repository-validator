@@ -28,12 +28,12 @@ public class TestDefaultReporter extends AbstractReporterTest {
         reportingExecutor.execute(ctx);
 
         assertReportContains(
-                  "ChecksumNotExistException (total count 3)\n"
+                  "--- ChecksumNotExistException (total count 3) ---\n"
                 + "Checksum sha1 for file f1 not exist\n"
                 + "Checksum sha1 for file f2 not exist\n"
                 + "Checksum sha1 for file f3 not exist\n"
                 + "\n"
-                + "SuspiciousFileException (total count 2)\n"
+                + "--- SuspiciousFileException (total count 2) ---\n"
                 + "File f1 is foo\n"
                 + "File f2 is foo");
     }
@@ -47,7 +47,7 @@ public class TestDefaultReporter extends AbstractReporterTest {
 
         reportingExecutor.execute(ctx);
 
-        assertEquals(1, StringUtils.countMatches(out.toString(), "File f1 is foo"));
+        assertEquals(1, StringUtils.countMatches(readReport(), "File f1 is foo"));
     }
 
     @Test
@@ -59,7 +59,7 @@ public class TestDefaultReporter extends AbstractReporterTest {
 
         reportingExecutor.execute(ctx);
 
-        String report = out.toString();
+        String report = readReport();
         int index1 = report.indexOf("Checksum sha1 for file f1 not exist");
         int index2 = report.indexOf("Checksum sha1 for file f2 not exist");
         int index3 = report.indexOf("Checksum sha1 for file f1 not match");
@@ -78,7 +78,7 @@ public class TestDefaultReporter extends AbstractReporterTest {
 
         reportingExecutor.execute(ctx);
 
-        String report = out.toString();
+        String report = readReport();
         int index1 = report.indexOf("Checksum sha1 for file f1 not exist");
         int index2 = report.indexOf("Checksum sha1 for file f2 not exist");
         int index3 = report.indexOf("Checksum sha1 for file f3 not exist");
@@ -94,7 +94,7 @@ public class TestDefaultReporter extends AbstractReporterTest {
         reportingExecutor.execute(ctx);
         
         assertReportContains(
-                "Exception (total count 1)\n"
+                "--- Exception (total count 1) ---\n"
               + "java.lang.Exception\n"
               + "\tat org.jboss.wolf.validator.impl.TestDefaultReporter.shouldNotCrashWhenExceptionHasNullMessage(");
     }

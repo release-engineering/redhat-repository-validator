@@ -7,9 +7,6 @@ import static org.apache.commons.io.filefilter.FileFilterUtils.trueFileFilter;
 import static org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,7 +15,6 @@ import java.util.Properties;
 
 import javax.inject.Named;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.AbstractFileFilter;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.lang3.ArrayUtils;
@@ -50,7 +46,6 @@ import org.jboss.wolf.validator.impl.bom.BomFilter;
 import org.jboss.wolf.validator.impl.bom.BomFilterSimple;
 import org.jboss.wolf.validator.internal.DepthOneOptionalDependencySelector;
 import org.jboss.wolf.validator.internal.LocalRepositoryModelResolver;
-import org.jboss.wolf.validator.internal.LogOutputStream;
 import org.jboss.wolf.validator.internal.LogRepositoryListener;
 import org.jboss.wolf.validator.internal.LogTransferListener;
 import org.springframework.beans.factory.BeanFactory;
@@ -70,9 +65,6 @@ public class AppConfig {
 
     @Autowired
     private BeanFactory beanFactory;
-
-    @Value("#{systemProperties['wolf-reportFile']?:'workspace/report.txt'}")
-    private String reportFileName;
 
     @Value("#{systemProperties['wolf-validatedRepository']?:'workspace/validated-repository'}")
     private String validatedRepository;
@@ -271,21 +263,6 @@ public class AppConfig {
     @Bean
     public IOFileFilter osgiVersionValidatorFilter() {
         return falseFileFilter();
-    }
-
-    @Bean
-    public PrintStream defaultReporterStream() {
-        try {
-            File reportFile = new File(reportFileName);
-            FileUtils.forceMkdir(reportFile.getParentFile());
-            FileUtils.touch(reportFile);
-            FileOutputStream fileOutputStream = new FileOutputStream(reportFile);
-            LogOutputStream logOutputStream = new LogOutputStream(Reporter.class.getSimpleName(), fileOutputStream);
-            PrintStream printStream = new PrintStream(logOutputStream);
-            return printStream;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Bean

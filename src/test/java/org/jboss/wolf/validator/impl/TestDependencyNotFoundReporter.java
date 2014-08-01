@@ -16,7 +16,7 @@ public class TestDependencyNotFoundReporter extends AbstractReporterTest {
         reportingExecutor.execute(ctx);
 
         assertReportContains(
-                  "Found 1 missing dependencies.\n"
+                  "--- DependencyNotFoundException (found 1 missing dependencies) ---\n"
                 + "miss: com.acme:foo-api:jar:1.0\n"
                 + "    from: com.acme:foo-impl:pom:1.0");
     }
@@ -33,7 +33,7 @@ public class TestDependencyNotFoundReporter extends AbstractReporterTest {
         reportingExecutor.execute(ctx);
 
         assertReportContains(
-                  "Found 2 missing dependencies.\n"
+                  "--- DependencyNotFoundException (found 2 missing dependencies) ---\n"
                 + "miss: com.acme:bar-api:jar:1.0\n"
                 + "    from: com.acme:foo-impl:pom:1.0\n"
                 + "        path: com.acme:foo-impl:pom:1.0 > com.acme:bar-impl:jar:1.0 > com.acme:bar-api:jar:1.0\n"
@@ -51,7 +51,7 @@ public class TestDependencyNotFoundReporter extends AbstractReporterTest {
         reportingExecutor.execute(ctx);
 
         assertReportContains(
-                  "Found 1 missing dependencies.\n"
+                  "--- DependencyNotFoundException (found 1 missing dependencies) ---\n"
                 + "miss: com.acme:foo-parent:pom:1.0\n"
                 + "    from: com.acme:foo-api:pom:1.0\n"
                 + "");
@@ -66,7 +66,7 @@ public class TestDependencyNotFoundReporter extends AbstractReporterTest {
         reportingExecutor.execute(ctx);
 
         assertReportContains(
-                  "Found 1 missing dependencies.\n"
+                  "--- DependencyNotFoundException (found 1 missing dependencies) ---\n"
                 + "miss: com.acme:foo-api:jar:1.0\n"
                 + "    from: com.acme:foo-impl:pom:1.0\n"
                 + "");

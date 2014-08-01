@@ -35,7 +35,6 @@ public class AppRunner {
     private final Option validatedDistributionOption = createOption("vd", "validated-distribution", "validate given distribution, verify if current distribution is valid, \ndefault value is `workspace/validated-distribution`", "dir");
     private final Option localRepositoryOption = createOption("lr", "local-repository", "use given local repository, \ndefault value is `workspace/local-repository`", "dir");
     private final Option remoteRepositoryOption = createOption("rr", "remote-repository", "use given remote repository, this option can be used multiple times, \ndefault remote repository is only maven central", "url");
-    private final Option reportFileOption = createOption("r", "report", "write generated report into this file, \ndefault location for reports is in `workspace/report.txt`", "file");
     private final Option configOption = createOption("c", "config", "use given configuration file, \ndefault value is `wolf-validator-config.xml`", "file");
     private final Option helpOption = createOption("h", "help", "print help and exit", null);
 
@@ -56,7 +55,6 @@ public class AppRunner {
         options.addOption(validatedDistributionOption);
         options.addOption(localRepositoryOption);
         options.addOption(remoteRepositoryOption);
-        options.addOption(reportFileOption);
         options.addOption(configOption);
         options.addOption(helpOption);
         
@@ -105,13 +103,11 @@ public class AppRunner {
     }
 
     private void initApplicationContext(CommandLine line) {
-        String reportFile = line.getOptionValue(reportFileOption.getOpt(), "workspace/report.txt");
         String validatedRepo = line.getOptionValue(validatedRepositoryOption.getOpt(), "workspace/validated-repository");
         String validatedDist = line.getOptionValue(validatedDistributionOption.getOpt(), "workspace/validated-distribution");
         String localRepo = line.getOptionValue(localRepositoryOption.getOpt(), "workspace/local-repository");
         String[] remoteRepos = line.getOptionValues(remoteRepositoryOption.getOpt());
 
-        System.setProperty("wolf-reportFile", reportFile);
         System.setProperty("wolf-validatedRepository", validatedRepo);
         System.setProperty("wolf-validatedDistribution", validatedDist);
         System.setProperty("wolf-localRepository", localRepo);

@@ -16,7 +16,9 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.jboss.wolf.validator.impl.DefaultReporter;
 import org.jboss.wolf.validator.impl.checksum.ChecksumNotExistException;
+import org.jboss.wolf.validator.impl.version.VersionPatternException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -183,20 +185,14 @@ public class TestAppRunner {
     
     @Test
     public void shouldReportToFileByDefault() {
-        appRunner = new AssertReportFileRunner(new File("workspace/report.txt"));
+        appRunner = new AssertReportFileRunner(DefaultReporter.Mode.ONE_FILE_FOR_ALL);
         appRunner.run();
     }
 
     @Test
-    public void shouldRedirectDefaultReportToCustomFile1() throws IOException {
-        appRunner = new AssertReportFileRunner(new File("workspace/foo.txt"));
-        appRunner.run("--report", "workspace/foo.txt");
-    }
-
-    @Test
-    public void shouldRedirectDefaultReportToCustomFile2() throws IOException {
-        appRunner = new AssertReportFileRunner(new File("workspace/bar.txt"));
-        appRunner.run("--config", getClass().getResource("/TestAppRunner-defaultReporterStream.xml").getFile());
+    public void shouldReportToFilePerExceptionType() throws IOException {
+        appRunner = new AssertReportFileRunner(DefaultReporter.Mode.ONE_FILE_PER_EXCEPTION_TYPE);
+        appRunner.run("--config", getClass().getResource("/TestAppRunner-reportToFilePerExceptionType.xml").getFile());
     }
 
     private void assertOutputContains(String s) {
@@ -265,24 +261,48 @@ public class TestAppRunner {
     
     private static class AssertReportFileRunner extends AppRunner {
         
-        private final File reportFile;
+        private final DefaultReporter.Mode mode;
         
-        public AssertReportFileRunner(File reportFile) {
-            this.reportFile = reportFile;
+        public AssertReportFileRunner(DefaultReporter.Mode mode) {
+            this.mode = mode;
         }
 
         @Override
         protected void runValidation() {
             context.addError(null, new File("foo"), new ChecksumNotExistException(new File("foo"), "SHA-1"));
+            context.addError(null, new File("bar"), new VersionPatternException("barGav", "barPattern"));
             reportingExecutor.execute(context);
             
             try {
-                assertTrue(reportFile.exists());
-                assertTrue(reportFile.isFile());
-                
-                String reportContent = FileUtils.readFileToString(reportFile);
-                assertTrue(reportContent.contains("ChecksumNotExistException (total count 1)"));
-                assertTrue(reportContent.contains("Checksum SHA-1 for file foo not exist"));
+                switch(mode) {
+                    case ONE_FILE_FOR_ALL:
+                        File reportFile = new File("workspace/report.txt");
+                        assertTrue(reportFile.exists());
+                        assertTrue(reportFile.isFile());
+    
+                        String reportContent = FileUtils.readFileToString(reportFile);
+                        assertTrue(reportContent.contains("--- ChecksumNotExistException (total count 1) ---"));
+                        assertTrue(reportContent.contains("--- VersionPatternException (total count 1) ---"));
+    
+                        break;
+                    case ONE_FILE_PER_EXCEPTION_TYPE:
+                        File reportFile1 = new File("workspace/report-ChecksumNotExistException.txt");
+                        assertTrue(reportFile1.exists());
+                        assertTrue(reportFile1.isFile());
+    
+                        File reportFile2 = new File("workspace/report-VersionPatternException.txt");
+                        assertTrue(reportFile2.exists());
+                        assertTrue(reportFile2.isFile());
+    
+                        String reportContent1 = FileUtils.readFileToString(reportFile1);
+                        String reportContent2 = FileUtils.readFileToString(reportFile2);
+                        assertTrue(reportContent1.contains("--- ChecksumNotExistException (total count 1) ---"));
+                        assertTrue(reportContent2.contains("--- VersionPatternException (total count 1) ---"));
+    
+                        break;
+                    default:
+                        throw new IllegalArgumentException();
+                    }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

@@ -27,7 +27,7 @@ Here is help output:
 
     Wolf-validator is a tool used to validate the internal consistency of a maven artifact repository.
     
-    Usage: wolf-validator [-c <file>] [-h] [-lr <dir>] [-rr <url>] [-vr <dir>] [-vd <dir>] [-r <file>]
+    Usage: wolf-validator [-c <file>] [-h] [-lr <dir>] [-rr <url>] [-vr <dir>] [-vd <dir>]
         -c,--config <file>                 use given configuration file,
                                            default value is `wolf-validator-config.xml`
         -h,--help                          print help and exit
@@ -39,8 +39,7 @@ Here is help output:
                                            default value is `workspace/validated-repository`
         -vd,--validated-distribution <dir> validate given distribution, verify if current distribution is valid
                                            default value is `workspace/validated-distribution`
-        -r,--report <file>                 write generated report into this file,
-                                           default location for reports is in `workspace/report.txt`                                           
+    
     Example: 
         to run against a given validated repository directory, use: 
         $ wolf-validator -vr ~/myrepository
@@ -71,7 +70,7 @@ Validators
 Reporters
 ---------
 
-- `DefaultReporter`, `DependencyNotFoundReporter` and `BomDependencyNotFoundReporter` produces simple text reports, which are writen by default into log and into file `workspace/report.txt`
+- `DefaultReporter` produces simple text reports, which are writen by default into log and into file `workspace/report.txt`
 - `SurefireXmlReporter` produces xml files in same format like maven surefire plugin, which can be consumed by tools like Jenkins, default output directory is `workspace/surefire-reports`
 
 
