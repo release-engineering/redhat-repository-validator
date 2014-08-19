@@ -82,13 +82,6 @@
 -->
 
 
-<!-- REPORT TO FILE -->
-<!--
-     <bean id="defaultReporterStream" class="java.io.PrintStream">
-        <constructor-arg name="fileName" value="workspace/report.txt" />
-    </bean>
--->
-
 <!-- FILTER (IGNORE) SPECIFIED FAILURES -->
 <!--
     <filter:filename regex="file-prefix.*\.jar"/>
@@ -114,6 +107,16 @@
     </filter:dependency-not-found>
 
     <filter:bom-dependency-not-found missing-artifact="groupId:artifactId:jar:.*" />
+-->
+
+
+<!-- REMOTE REPOSITORY COMPARE VALIDATOR CONFIGURATION -->
+<!-- 
+    <bean id="remoteRepositoryCompareValidator"	class="org.jboss.wolf.validator.impl.remoterepository.RemoteRepositoryCompareValidator">
+        <constructor-arg name="remoteRepositoryUrl" value="TODO-remote-repository-url" />
+        <constructor-arg name="compareStrategy" ref="remoteRepositoryCompareStrategy" />
+    </bean>
+    <bean id="remoteRepositoryCompareStrategy" class="org.jboss.wolf.validator.impl.remoterepository.RemoteRepositoryCompareStrategyNexus" />
 -->
 
 </beans>

@@ -65,6 +65,7 @@ Validators
 - `XmlFileValidator` try to find xml files and then verify if they are valid
 - `DistributionValidator` try to validate artifacts in distribution against validated repository
 - `OsgiVersionValidator` try to find artifacts, which version doesn't match OSGI pattern (by default disabled, via filter configuration)
+- `RemoteRepositoryCompareValidator` try to ensure that every artifact in validated repository is available online and is binary same (it has to be explicitly enabled via configuration, it needs remote repository url and comparing strategy)  
 
 
 Reporters

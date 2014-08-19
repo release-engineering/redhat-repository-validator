@@ -3,6 +3,7 @@ package org.jboss.wolf.validator.internal;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,6 +11,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -19,6 +21,7 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.util.ChecksumUtils;
 import org.eclipse.aether.util.filter.PatternInclusionsDependencyFilter;
 import org.eclipse.aether.util.graph.visitor.PathRecordingDependencyVisitor;
 import org.jboss.wolf.validator.ValidatorContext;
@@ -136,6 +139,15 @@ public class Utils {
             }
         }
         return missingArtifacts;
+    }
+    
+    public static String calculateChecksum(File file, String algorithm) {
+        try {
+            Map<String, Object> checksums = ChecksumUtils.calc(file, Collections.singleton(algorithm));
+            return (String) checksums.get(algorithm);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
