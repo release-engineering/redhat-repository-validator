@@ -287,6 +287,15 @@ public class TestSurefireXmlReporter {
         assertEquals(1, StringUtils.countMatches(reportFileContent, "<testcase"));
     }
 
+    @Test
+    public void shouldCreateDummySuccessfulTestReportWhenNoExceptionsReported() {
+        ValidatorContext ctx = new ValidatorContext(VALIDATED_REPO_DIR, null, Collections.<RemoteRepository>emptyList());
+        SurefireXmlReporter reporter = new SurefireXmlReporter(REPORTS_DIR);
+        reporter.report(ctx);
+        File reportFile = new File(REPORTS_DIR, "TEST-NoErrorsOrWarningsFound.xml");
+        assertFileExists(reportFile);
+    }
+
     private void assertFileExists(File file) {
         assertTrue("File " + file + " is expected to exist!", file.exists());
         assertTrue("File " + file + " is expected to be regular file!", file.isFile());

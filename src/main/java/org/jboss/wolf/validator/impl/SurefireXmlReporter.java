@@ -77,6 +77,14 @@ public class SurefireXmlReporter implements Reporter {
 
             List<Exception> exceptions = sortExceptions(ctx.getExceptions());
             List<Exception> filteredExceptions = sortExceptions(ctx.getIgnoredExceptions());
+            // in case no exceptions were reported, create dummy successful test suite,
+            // fixes https://github.com/thradec/wolf-validator/issues/12
+            if (exceptions.isEmpty() && filteredExceptions.isEmpty()) {
+                TestSetStats testSuite = new TestSetStats(false, false);
+                testSuite.testSucceeded(testCase("NoErrorsOrWarningsFound", ReportEntryType.success,
+                        "No errors or warnings have been found during the validation.", null));
+                reportTestSuite("NoErrorsOrWarningsFound", testSuite);
+            }
             reportMissingDependencies("DependencyNotFoundReport", DependencyNotFoundException.class, exceptions, filteredExceptions);
             reportMissingDependencies("BomDependencyNotFoundReport", BomDependencyNotFoundException.class, exceptions, filteredExceptions);
             List<BomAmbiguousVersionException> bomAmbiguousVersionsExs = ctx.getExceptions(BomAmbiguousVersionException.class);
@@ -190,13 +198,15 @@ public class SurefireXmlReporter implements Reporter {
     }
 
     private void reportTestSuite(String testSuiteName, TestSetStats testSuiteData) {
-        // report entries here are expected to be either "error" or "skipped"
+        // report entries here are expected to be either "error", "skipped" or "success"
         if (testSuiteData.getReportEntries().size() > 0) {
             ReportEntryType reportEntryType;
             if (testSuiteData.getErrors() > 0) {
                 reportEntryType = ReportEntryType.error;
-            } else {
+            } else if (testSuiteData.getSkipped() > 0) {
                 reportEntryType = ReportEntryType.skipped;
+            } else {
+                reportEntryType = ReportEntryType.success;
             }
             WrappedReportEntry testSuite = testSuite(testSuiteName, reportEntryType);
             StatelessXmlReporter reporter = new StatelessXmlReporter(reportsDirectory, null, false);
