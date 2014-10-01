@@ -66,7 +66,7 @@ public class TestBestPracticesValidator extends AbstractTest {
 
         PomBuilder pomBuilder = pom();
         pomBuilder.model().setName("foo-name");
-        pomBuilder.model().setDescription("foo-description");
+        pomBuilder.model().setDescription(""); // empty description is allowed, see WOLF-69
         pomBuilder.model().setUrl("foo-url");
         pomBuilder.model().addLicense(license);
         pomBuilder.model().addDeveloper(developer);

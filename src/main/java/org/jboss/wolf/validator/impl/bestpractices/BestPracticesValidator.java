@@ -18,6 +18,7 @@ import org.jboss.wolf.validator.internal.ValidatorSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// https://docs.sonatype.org/display/Repository/Central+Sync+Requirements
 @Named
 public class BestPracticesValidator implements Validator {
 
@@ -67,7 +68,7 @@ public class BestPracticesValidator implements Validator {
         if (isEmpty(effectiveModel.getName())) {
             warning(ctx, effectiveModel, "doesn't contain <name>");
         }
-        if (isEmpty(effectiveModel.getDescription())) {
+        if (effectiveModel.getDescription() == null) { // empty description is allowed, see WOLF-69
             warning(ctx, effectiveModel, "doesn't contain <description>");
         }
         if (isEmpty(effectiveModel.getUrl())) {
