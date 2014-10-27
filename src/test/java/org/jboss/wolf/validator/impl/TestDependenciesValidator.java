@@ -10,6 +10,7 @@ import static org.jboss.wolf.validator.impl.TestUtil.toArtifactFile;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.maven.model.Activation;
 import org.apache.maven.model.Build;
@@ -17,6 +18,7 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Profile;
+import org.eclipse.aether.resolution.VersionRangeResolutionException;
 import org.eclipse.aether.transfer.ArtifactNotFoundException;
 import org.junit.Test;
 import org.springframework.context.annotation.Bean;
@@ -296,6 +298,46 @@ public class TestDependenciesValidator extends AbstractTest {
         assertLocalRepoContains("com/acme/foo/1.0/foo-1.0.pom");
         assertLocalRepoContains("com/acme/foo/1.0/foo-1.0.jar");
     }
+    
+    @Test
+    public void shouldResolveVersionRange() throws IOException {
+        pom().artifactId("bar-api").version("2.6").create(repoBarDir);
+        Model barApi27 = pom().artifactId("bar-api").version("2.7").create(repoBarDir);
+        
+        FileUtils.write(new File(repoBarDir, "/com/acme/bar-api/maven-metadata.xml"), ""
+                        + "<metadata>"
+                        + "  <groupId>com.acme</groupId>"
+                        + "  <artifactId>bar-api</artifactId>"
+                        + "  <versioning>"
+                        + "    <latest>2.7</latest>"
+                        + "    <release>2.7</release>"
+                        + "    <versions>"
+                        + "      <version>2.7</version>"
+                        + "      <version>2.6</version>"
+                        + "    </versions>"
+                        + "    <lastUpdated>20140925075717</lastUpdated>"
+                        + "  </versioning>"
+                        + "</metadata>");
+        
+        Model fooApi = pom().artifactId("foo-api").dependency(dependency().artifactId("bar-api").version("[1.0,)").build()).create(repoFooDir);
+
+        validationExecutor.execute(ctx);
+
+        assertSuccess();
+        assertLocalRepoContains(fooApi);
+        assertLocalRepoContains(barApi27);
+    }
+    
+    @Test
+    public void shouldNotResolveVersionRangeWithoutMetadata() {
+        pom().artifactId("bar-api").version("2.6").create(repoBarDir);
+        pom().artifactId("bar-api").version("2.7").create(repoBarDir);
+        pom().artifactId("foo-api").dependency(dependency().artifactId("bar-api").version("[1.0,)").build()).create(repoFooDir);
+
+        validationExecutor.execute(ctx);
+
+        assertExpectedException(VersionRangeResolutionException.class, "No versions available for com.acme:bar-api:jar:[1.0,)");
+    }    
     
     @Test // bug WOLF-51
     public void shouldResolveMavenArchetypePackaging() throws IOException {

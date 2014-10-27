@@ -182,15 +182,19 @@ public class DependenciesValidator implements Validator {
 
     private void collectAndReportMissingArtifacts(ValidatorContext ctx, Exception e, File pomFile,
                                                   Artifact validatedArtifact, DependencyNode rootDepNode) {
-        ArtifactResolutionException artifactException;
+        ArtifactResolutionException are;
         if (e instanceof ArtifactResolutionException) {
-            artifactException = (ArtifactResolutionException) e;
+            are = (ArtifactResolutionException) e;
         } else {
-            artifactException = Utils.findCause(e, ArtifactResolutionException.class);
+            are = Utils.findCause(e, ArtifactResolutionException.class);
         }
-        for (Artifact missingArtifact : Utils.collectMissingArtifacts(artifactException)) {
-            ctx.addError(this,
-                    pomFile, new DependencyNotFoundException(artifactException, missingArtifact, validatedArtifact, rootDepNode));
+        
+        if( are == null ) {
+            ctx.addError(this, pomFile, e);
+        } else {
+            for (Artifact missingArtifact : Utils.collectMissingArtifacts(are)) {
+                ctx.addError(this, pomFile, new DependencyNotFoundException(are, missingArtifact, validatedArtifact, rootDepNode));
+            }
         }
     }
 

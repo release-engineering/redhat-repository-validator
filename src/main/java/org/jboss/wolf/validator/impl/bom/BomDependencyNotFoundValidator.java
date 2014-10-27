@@ -81,12 +81,15 @@ public class BomDependencyNotFoundValidator implements Validator {
         try {
             repositorySystem.resolveDependencies(repositorySystemSession, dependencyRequest);
         } catch (DependencyResolutionException e) {
-            DependencyNode dependencyNode = e.getResult().getRoot();
-            Artifact validatedArtifact = new DefaultArtifact(bom.getGroupId(), bom.getArtifactId(), bom.getPackaging(),
-                    bom.getVersion());
-            for (Artifact missingArtifact : Utils.collectMissingArtifacts(findCause(e, ArtifactResolutionException.class))) {
-                ctx.addError(this, bom.getPomFile(), new BomDependencyNotFoundException(e, missingArtifact, validatedArtifact,
-                        dependencyNode));
+            ArtifactResolutionException are = findCause(e, ArtifactResolutionException.class);
+            if( are == null ) {
+                ctx.addError(this, bom.getPomFile(), e);
+            } else {
+                DependencyNode dependencyNode = e.getResult().getRoot();
+                Artifact validatedArtifact = new DefaultArtifact(bom.getGroupId(), bom.getArtifactId(), bom.getPackaging(), bom.getVersion());
+                for (Artifact missingArtifact : Utils.collectMissingArtifacts(are)) {
+                    ctx.addError(this, bom.getPomFile(), new BomDependencyNotFoundException(e, missingArtifact, validatedArtifact, dependencyNode));                
+                }
             }
         }
     }
