@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -19,6 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.NameFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.eclipse.aether.util.ChecksumUtils;
 import org.jboss.wolf.validator.Validator;
@@ -32,9 +34,14 @@ public class ChecksumValidator implements Validator {
     private static final Logger logger = LoggerFactory.getLogger(ChecksumValidator.class);
 
     private static final Map<String, String> checksumAlgorithms = new HashMap<String, String>();
+    
+    private static final List<String> excludedFiles = new ArrayList<String>();
+    
     static {
         checksumAlgorithms.put("MD5", ".md5");
         checksumAlgorithms.put("SHA-1", ".sha1");
+
+        excludedFiles.add(".maven-repository");
     }
 
     @Inject @Named("checksumValidatorFilter")
@@ -71,8 +78,9 @@ public class ChecksumValidator implements Validator {
     }
 
     private Collection<File> findFiles(ValidatorContext ctx) {
+        IOFileFilter excludedChecksumFiles = notFileFilter(new NameFileFilter(excludedFiles));
         IOFileFilter filterChecksumFiles = notFileFilter(new SuffixFileFilter(new ArrayList<String>(checksumAlgorithms.values())));
-        Collection<File> files = listFiles(ctx.getValidatedRepository(), and(fileFilter, filterChecksumFiles), trueFileFilter());
+        Collection<File> files = listFiles(ctx.getValidatedRepository(), and(fileFilter, filterChecksumFiles, excludedChecksumFiles), trueFileFilter());
         return files;
     }
 
