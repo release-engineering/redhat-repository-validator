@@ -153,7 +153,8 @@ public class AppConfig {
                 "example-settings.xml",
                 "readme.txt",
                 "readme.md",
-                "jbosseula.txt"};
+                "jbosseula.txt",
+                ".maven-repository"};
     }
 
     @Bean

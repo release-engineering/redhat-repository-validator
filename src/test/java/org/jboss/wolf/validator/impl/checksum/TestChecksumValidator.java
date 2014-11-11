@@ -85,10 +85,11 @@ public class TestChecksumValidator extends AbstractTest {
     }
     
     @Test
-    public void shouldIgnoreReadmeAndExampleSettings() throws IOException {
+    public void shouldIgnoreReadmeAndExampleSettingsAndMavenRepository() throws IOException {
         FileUtils.touch(new File(repoFooDir, "example-settings.xml"));
         FileUtils.touch(new File(repoFooDir, "readme.txt"));
         FileUtils.touch(new File(repoFooDir, "readme.md"));
+        FileUtils.touch(new File(repoFooDir, ".maven-repository"));
         
         validationExecutor.execute(ctx);
         assertSuccess();
