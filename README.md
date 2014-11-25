@@ -163,7 +163,7 @@ Please consult the sample `wolf-validator-config.xml` for more examples of the f
 ##### Filtering (bom) dependency not found exceptions
 `DependencyNotFoundException`s and `BomDependencyNotFoundException`s can be filterd out based on the information about
 the missing artifact and the validated artifact (e.g. the pom file that references the missing artifact).
-The artifact regular expressions have format `groupId:artifactId:version:extension` and use the standard Java regular
+The artifact regular expressions have format `groupId:artifactId:extension:[classifier]:version` and use the standard Java regular
 expression syntax.
 Following example shows filtering of the `DependencyNotFoundExcepiton` for the specified missing artifact referenced
 from the artifact matching the validated-artifact regex.
@@ -172,4 +172,4 @@ from the artifact matching the validated-artifact regex.
 <filter:dependency-not-found missing-artifact="com.acme:finance:.*:jar" validated-artifact="com.acme:parent:.*:pom" />
 ...
 ```
-Please consult the sample `wolf-validator-config.xml` for more examples of the (bom-)dependency-not-found filters.
+Please consult the sample `wolf-validator-config.xml` for more examples of the `(bom-)dependency-not-found` filters.
