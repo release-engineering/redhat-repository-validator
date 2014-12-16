@@ -1,1 +1,16 @@
-java -Xmx1024m -Dlogback.configurationFile=wolf-validator-logback.xml -classpath "wolf-validator.jar:lib/*" org.jboss.wolf.validator.AppRunner "$@"
+#! /bin/sh
+
+# Setup the JVM
+if [ "x$JAVA" = "x" ]; then
+    if [ "x$JAVA_HOME" != "x" ]; then
+        JAVA="$JAVA_HOME/bin/java"
+    else
+        JAVA="java"
+    fi
+fi
+
+echo "Running wolf-validator with this java environment:"
+echo "JAVA="${JAVA}
+echo "JAVA_HOME="${JAVA_HOME}
+
+"$JAVA" -Xmx1024m -Dlogback.configurationFile=wolf-validator-logback.xml -classpath "wolf-validator.jar:lib/*" org.jboss.wolf.validator.AppRunner "$@"
