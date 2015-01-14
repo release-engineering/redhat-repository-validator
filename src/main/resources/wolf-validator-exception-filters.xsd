@@ -60,7 +60,27 @@
                     </xs:complexType>
                 </xs:element>
             </xs:sequence>
-            <xs:attribute type="xs:string" name="regex" use="required"/>
+			<xs:attribute type="xs:string" name="name-regex" use="optional">
+				<xs:annotation>
+					<xs:documentation>
+						Regexp for file name match check.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute type="xs:string" name="path-regex" use="optional">
+				<xs:annotation>
+					<xs:documentation>
+						Regexp for file path match check.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+            <xs:attribute type="xs:string" name="regex" use="optional">
+				<xs:annotation>
+					<xs:documentation>
+						Deprecated. Use name-regex or path-regex.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
             <xs:attribute type="xs:string" name="exception" use="optional"/>
         </xs:complexType>
     </xs:element>

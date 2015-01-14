@@ -4,7 +4,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         http://wolf-validator.org/schema/exception-filters http://wolf-validator.org/schema/exception-filters.xsd">
 
-  <filter:filename regex="regex-and-list-of-exceptions-.*\.jar">
+  <filter:filename name-regex="regex-and-list-of-exceptions-.*\.jar">
       <filter:exceptions>
           <filter:exception>SuspiciousFileException</filter:exception>
           <filter:exception>org.jboss.wolf.validator.filter.internal.TestingException</filter:exception>
