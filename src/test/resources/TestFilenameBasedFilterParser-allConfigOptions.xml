@@ -4,11 +4,26 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         http://wolf-validator.org/schema/exception-filters http://wolf-validator.org/schema/exception-filters.xsd">
 
-    <filter:filename regex="regex-only-.*\.jar"/>
+	<filter:filename regex="deprecated-regex-only-.*\.jar"/> <!-- only for test backward compatibility -->
 
-    <filter:filename regex="regex-and-exception.*\.jar" exception="SuspiciousFileException"/>
+    <filter:filename name-regex="regex-only-.*\.jar"/>
 
-    <filter:filename regex="regex-and-list-of-exceptions-.*\.jar">
+    <filter:filename path-regex="/path/regex/only/.*\.jar"/>
+
+    <filter:filename regex="deprecated-regex-and-exception.*\.jar" exception="SuspiciousFileException"/> <!-- only for test backward compatibility -->
+
+    <filter:filename name-regex="regex-and-exception.*\.jar" exception="SuspiciousFileException"/>
+
+    <filter:filename path-regex="/path/regex/and/exception/.*\.jar" exception="SuspiciousFileException"/>
+
+    <filter:filename name-regex="regex-and-list-of-exceptions-.*\.jar">
+        <filter:exceptions>
+            <filter:exception>SuspiciousFileException</filter:exception>
+            <filter:exception>org.jboss.wolf.validator.filter.internal.TestingException</filter:exception>
+        </filter:exceptions>
+    </filter:filename>
+
+    <filter:filename path-regex="/path/regex/and/list/of/exceptions/.*\.jar">
         <filter:exceptions>
             <filter:exception>SuspiciousFileException</filter:exception>
             <filter:exception>org.jboss.wolf.validator.filter.internal.TestingException</filter:exception>
