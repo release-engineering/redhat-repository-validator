@@ -170,7 +170,7 @@ public class TestSurefireXmlReporter {
 
     @Test
     public void shouldReportSimpleFilteredExceptionsAsSkipped() throws IOException {
-        ExceptionFilter filter = new FilenameBasedExceptionFilter(".*validated", JarSourcesVerificationException.class);
+        ExceptionFilter filter = new FilenameBasedExceptionFilter(".*validated", null, JarSourcesVerificationException.class);
         ValidatorContext ctx = new ValidatorContext(VALIDATED_REPO_DIR, null, Collections.<RemoteRepository>emptyList(), Collections.singletonList(filter));
         File validatedFile = new File(VALIDATED_REPO_DIR, "validated");
         Exception filteredException = new JarSourcesVerificationException(validatedFile);

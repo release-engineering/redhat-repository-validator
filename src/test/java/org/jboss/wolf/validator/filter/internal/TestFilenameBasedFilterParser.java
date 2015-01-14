@@ -17,7 +17,7 @@ public class TestFilenameBasedFilterParser extends AbstractExceptionFilterParser
         assertNumberOfBeansWithType(ExceptionFilter.class, 1);
 
         FilenameBasedExceptionFilter filter = getFirstMatchingBean(FilenameBasedExceptionFilter.class);
-        assertFilter(filter, "regex-only-.*\\.jar", null);
+        assertFilter(filter, "regex-only-.*\\.jar", null, null);
     }
 
     @Test
@@ -26,7 +26,7 @@ public class TestFilenameBasedFilterParser extends AbstractExceptionFilterParser
         assertNumberOfBeansWithType(ExceptionFilter.class, 1);
 
         FilenameBasedExceptionFilter filter = getFirstMatchingBean(FilenameBasedExceptionFilter.class);
-        assertFilter(filter, "regex-and-exception.*\\.jar", SuspiciousFileException.class);
+        assertFilter(filter, "regex-and-exception.*\\.jar", null, SuspiciousFileException.class);
     }
 
     @Test
@@ -35,38 +35,45 @@ public class TestFilenameBasedFilterParser extends AbstractExceptionFilterParser
         assertNumberOfBeansWithType(ExceptionFilter.class, 2);
 
         List<FilenameBasedExceptionFilter> filters = getAllMatchingBeans(FilenameBasedExceptionFilter.class);
-        assertContainsFilter(filters, "regex-and-list-of-exceptions-.*\\.jar", SuspiciousFileException.class);
-        assertContainsFilter(filters, "regex-and-list-of-exceptions-.*\\.jar", TestingException.class);
+        assertContainsFilter(filters, "regex-and-list-of-exceptions-.*\\.jar", null, SuspiciousFileException.class);
+        assertContainsFilter(filters, "regex-and-list-of-exceptions-.*\\.jar", null, TestingException.class);
     }
 
     @Test
     public void shouldParseConfigWithAllOptionsInOneFile() {
         initAppContext("/TestFilenameBasedFilterParser-allConfigOptions.xml");
-        assertNumberOfBeansWithType(ExceptionFilter.class, 4);
+        assertNumberOfBeansWithType(ExceptionFilter.class, 10);
 
         List<FilenameBasedExceptionFilter> filters = getAllMatchingBeans(FilenameBasedExceptionFilter.class);
 
-        assertContainsFilter(filters, "regex-only-.*\\.jar", null);
-        assertContainsFilter(filters, "regex-and-exception.*\\.jar", SuspiciousFileException.class);
-        assertContainsFilter(filters, "regex-and-list-of-exceptions-.*\\.jar", SuspiciousFileException.class);
-        assertContainsFilter(filters, "regex-and-list-of-exceptions-.*\\.jar", TestingException.class);
+        assertContainsFilter(filters, "regex-only-.*\\.jar", null, null);
+        assertContainsFilter(filters, "deprecated-regex-only-.*\\.jar", null, null);
+        assertContainsFilter(filters, null, "/path/regex/only/.*\\.jar", null);
+        assertContainsFilter(filters, "regex-and-exception.*\\.jar", null, SuspiciousFileException.class);
+        assertContainsFilter(filters, "deprecated-regex-and-exception.*\\.jar", null, SuspiciousFileException.class);
+        assertContainsFilter(filters, null, "/path/regex/and/exception/.*\\.jar", SuspiciousFileException.class);
+        assertContainsFilter(filters, "regex-and-list-of-exceptions-.*\\.jar", null, SuspiciousFileException.class);
+        assertContainsFilter(filters, "regex-and-list-of-exceptions-.*\\.jar", null, TestingException.class);
+        assertContainsFilter(filters, null, "/path/regex/and/list/of/exceptions/.*\\.jar", SuspiciousFileException.class);
+        assertContainsFilter(filters, null, "/path/regex/and/list/of/exceptions/.*\\.jar", TestingException.class);
     }
 
-    private void assertFilter(FilenameBasedExceptionFilter filter, String filenameRegex, Class<? extends Exception> exceptionType) {
+    private void assertFilter(FilenameBasedExceptionFilter filter, String filenameRegex, String filepathRegex, Class<? extends Exception> exceptionType) {
         assertNotNull("Provided filter is null!", filter);
-        FilenameBasedExceptionFilter expectedFilter = new FilenameBasedExceptionFilter(filenameRegex, exceptionType);
+        FilenameBasedExceptionFilter expectedFilter = new FilenameBasedExceptionFilter(filenameRegex, filepathRegex, exceptionType);
         assertEquals(filter, expectedFilter);
     }
 
-    protected void assertContainsFilter(List<FilenameBasedExceptionFilter> filters, String filenameRegex, Class<? extends Exception> exceptionType) {
-        FilenameBasedExceptionFilter expectedFilter = new FilenameBasedExceptionFilter(filenameRegex, exceptionType);
+    protected void assertContainsFilter(List<FilenameBasedExceptionFilter> filters, String filenameRegex, String filepathRegex, Class<? extends Exception> exceptionType) {
+        FilenameBasedExceptionFilter expectedFilter = new FilenameBasedExceptionFilter(filenameRegex, filepathRegex, exceptionType);
         for (FilenameBasedExceptionFilter filter : filters) {
             if (filter.equals(expectedFilter)) {
                 return;
             }
         }
-        fail("Filter with filename regex='" + filenameRegex + "' and exception type='" +
-                exceptionType.getCanonicalName() + "' not found!");
+        fail("Filter with filename name-regex='" + filenameRegex
+				+ "' and path-regex='" + filepathRegex + "' and exception type='"
+				+ (exceptionType != null ? exceptionType.getCanonicalName() : null) + "' not found!");
     }
 
 }

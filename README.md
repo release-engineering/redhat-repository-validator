@@ -151,13 +151,24 @@ Wolf-validator allows filtering (ignoring) of the exceptions using one of the fo
 configuration is XML based and needs to be added into the `wolf-validator-config.xml`. Such filtered exceptions will not
 be passed to the reporters.
 
-##### Filtering exceptions based on filename regex
+##### Filtering exceptions based on filename or filepath regex
 Following example shows filtering of the `SuspiciousFileException` for all files ending with `.xsd`:
+
 ```xml
 ...
-<filter:filename regex=".*\.xsd" exception="SuspiciousFileException" />
+<filter:filename name-regex=".*\.xsd" exception="SuspiciousFileException" />
 ...
 ```
+
+Following example shows filtering of the `DistributionRedundantFileException` for all files ending with `.jar` 
+and have `/modules/system/layers/base/` in path:
+
+```xml
+...
+<filter:filename path-regex=".*/modules/system/layers/base/.*\.jar" exception="DistributionRedundantFileException" />
+...
+```
+
 Please consult the sample `wolf-validator-config.xml` for more examples of the filename based filters.
 
 ##### Filtering (bom) dependency not found exceptions

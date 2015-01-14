@@ -84,9 +84,11 @@
 
 <!-- FILTER (IGNORE) SPECIFIED FAILURES -->
 <!--
-    <filter:filename regex="file-prefix.*\.jar"/>
+    <filter:filename name-regex="file-prefix.*\.jar"/>
 
-    <filter:filename regex="file-prefix.*\.jar" exception="SuspiciousFileException" />
+    <filter:filename name-regex="file-prefix.*\.jar" exception="SuspiciousFileException" />
+
+    <filter:filename path-regex=".*/modules/system/layers/base/.*\.jar" exception="DistributionRedundantFileException" />
 
     <filter:dependency-not-found missing-artifact="groupId:artifactId:jar:.*" />
 

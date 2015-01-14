@@ -14,7 +14,7 @@ public class TestValidatorContext {
 
     @Test
     public void shouldStoreFilteredExceptions() {
-        ExceptionFilter filter = new FilenameBasedExceptionFilter("some-file.jar", JarSourcesVerificationException.class);
+        ExceptionFilter filter = new FilenameBasedExceptionFilter("some-file.jar", null, JarSourcesVerificationException.class);
         ValidatorContext ctx = new ValidatorContext(new File(""), new File(""), Collections.<RemoteRepository>emptyList(), Collections.singletonList(filter));
         Exception exception = new Exception();
         ctx.addError(null, new File(""), exception);
