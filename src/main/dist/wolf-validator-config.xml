@@ -84,9 +84,20 @@
 
 <!-- FILTER (IGNORE) SPECIFIED FAILURES -->
 <!--
-    <filter:filename regex="file-prefix.*\.jar"/>
+    <filter:file name-regex="file-prefix.*\.jar"/>
 
-    <filter:filename regex="file-prefix.*\.jar" exception="SuspiciousFileException" />
+    <filter:file name-regex="file-prefix.*\.jar" exception="SuspiciousFileException" />
+
+    <filter:file path-regex=".*/modules/system/layers/base/.*\.jar" exception="DistributionRedundantFileException" />
+
+    <filter:file path-regex=".*/modules/system/layers/base/.*\.jar" exception="DistributionRedundantFileException" exception-msg-regex=".*foobar.*"/>
+
+    <filter:file name-regex="file-prefix.*\.jar">
+        <filter:exceptions>
+            <filter:exception>SuspiciousFileException</filter:exception>
+            <filter:exception exception-msg-regex=".*foobar.*">DistributionRedundantFileException</filter:exception>
+        </filter:exceptions>
+    </filter:file>
 
     <filter:dependency-not-found missing-artifact="groupId:artifactId:jar:.*" />
 
@@ -112,7 +123,7 @@
 
 <!-- REMOTE REPOSITORY COMPARE VALIDATOR CONFIGURATION -->
 <!-- 
-    <bean id="remoteRepositoryCompareValidator"	class="org.jboss.wolf.validator.impl.remoterepository.RemoteRepositoryCompareValidator">
+    <bean id="remoteRepositoryCompareValidator" class="org.jboss.wolf.validator.impl.remoterepository.RemoteRepositoryCompareValidator">
         <constructor-arg name="remoteRepositoryUrl" value="TODO-remote-repository-url" />
         <constructor-arg name="compareStrategy" ref="remoteRepositoryCompareStrategy" />
     </bean>
