@@ -36,7 +36,7 @@ import java.util.List;
 
 public class FilenameBasedExceptionFilterParser extends AbstractExceptionFilterParser {
 
-    private static final Logger LOG = LoggerFactory.getLogger(FilenameBasedExceptionFilterParser.class);
+    private static final Logger logger = LoggerFactory.getLogger(FilenameBasedExceptionFilterParser.class);
 
     /**
      * List of exceptions known to the validator in alphabetical order.
@@ -72,7 +72,7 @@ public class FilenameBasedExceptionFilterParser extends AbstractExceptionFilterP
 
     @Override
     protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
-        LOG.warn("Using DEPRECATED filter 'filename'. Please, use filter 'file' instead.");
+        logger.warn("Using DEPRECATED filter 'filename'. Please, use filter 'file' instead.");
         final BeanDefinitionRegistry registry = parserContext.getRegistry();
         // the regex attribute is enforced by the XSD
         String filenameRegex = element.getAttribute("regex");

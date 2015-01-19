@@ -36,7 +36,7 @@ import java.util.List;
 
 public class FileBasedExceptionFilterParser extends AbstractExceptionFilterParser {
 
-    private static final Logger LOG = LoggerFactory.getLogger(FileBasedExceptionFilterParser.class);
+    private static final Logger logger = LoggerFactory.getLogger(FileBasedExceptionFilterParser.class);
 
     /**
      * List of exceptions known to the validator in alphabetical order.
@@ -142,7 +142,7 @@ public class FileBasedExceptionFilterParser extends AbstractExceptionFilterParse
             return clazz;
         } else {
             throw new RuntimeException("The specified exception class '" + clazz.getCanonicalName() + "' needs to" +
-                    "extends the java.lang.Exception!");
+                    " extends the java.lang.Exception!");
         }
     }
 

@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 public class FileBasedExceptionFilter implements ExceptionFilter {
 
-    private static final Logger LOG = LoggerFactory.getLogger(FileBasedExceptionFilter.class);
+    private static final Logger logger = LoggerFactory.getLogger(FileBasedExceptionFilter.class);
 
     private final Pattern filenamePattern;
 
@@ -23,7 +23,7 @@ public class FileBasedExceptionFilter implements ExceptionFilter {
                                     String exceptionMsgRegex) {
         if (nameRegex == null && pathRegex == null) {
             final IllegalArgumentException e = new IllegalArgumentException("nameRegex or pathRegex must be defined");
-            LOG.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
             throw e;
         }
         this.filenamePattern = nameRegex != null ? Pattern.compile(nameRegex) : null;
