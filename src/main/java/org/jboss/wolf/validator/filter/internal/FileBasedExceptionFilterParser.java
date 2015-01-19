@@ -1,8 +1,7 @@
 package org.jboss.wolf.validator.filter.internal;
 
 import com.google.common.collect.Lists;
-
-import org.jboss.wolf.validator.filter.FilenameBasedExceptionFilter;
+import org.jboss.wolf.validator.filter.FileBasedExceptionFilter;
 import org.jboss.wolf.validator.impl.DependencyNotFoundException;
 import org.jboss.wolf.validator.impl.UnknownArtifactTypeException;
 import org.jboss.wolf.validator.impl.bestpractices.BestPracticesException;
@@ -34,9 +33,10 @@ import org.w3c.dom.Element;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FilenameBasedExceptionFilterParser extends AbstractExceptionFilterParser {
 
-    private static final Logger logger = LoggerFactory.getLogger(FilenameBasedExceptionFilterParser.class);
+public class FileBasedExceptionFilterParser extends AbstractExceptionFilterParser {
+
+    private static final Logger logger = LoggerFactory.getLogger(FileBasedExceptionFilterParser.class);
 
     /**
      * List of exceptions known to the validator in alphabetical order.
@@ -72,38 +72,49 @@ public class FilenameBasedExceptionFilterParser extends AbstractExceptionFilterP
 
     @Override
     protected AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
-        logger.warn("Using DEPRECATED filter 'filename'. Please, use filter 'file' instead.");
         final BeanDefinitionRegistry registry = parserContext.getRegistry();
-        // the regex attribute is enforced by the XSD
-        String filenameRegex = element.getAttribute("regex");
+        final String nameRegex = notEmptyTrimmedStringOrNull(element.getAttribute("name-regex"));
+        final String pathRegex = notEmptyTrimmedStringOrNull(element.getAttribute("path-regex"));
+        final String filterExceptionMsgRegex = notEmptyTrimmedStringOrNull(element.getAttribute("exception-msg-regex"));
         if (element.hasChildNodes()) {
             List<AbstractBeanDefinition> filterBeans = new ArrayList<AbstractBeanDefinition>();
-            for (Class<? extends Exception> exceptionType : parseListOfExceptions(element)) {
-                filterBeans.add(createBeanDef(filenameRegex, exceptionType));
+            for (ExceptionType exceptionType : parseListOfExceptions(element)) {
+                Class<? extends Exception> exception = exceptionType.getException();
+                final String itemExceptionMsgRegex = exceptionType.getExceptionMsgRegex();
+                final String exceptionMsgRegex = itemExceptionMsgRegex != null ? itemExceptionMsgRegex : filterExceptionMsgRegex;
+                filterBeans.add(createBeanDef(nameRegex, pathRegex, exception, exceptionMsgRegex));
             }
             registerBeanDefinitions(registry, filterBeans);
         } else {
             // no children artifacts, only attributes set
             if (element.hasAttribute("exception")) {
-                Class<? extends Exception> exceptionType = determineExceptionTypeFromString(element.getAttribute("exception"));
-                registerBeanDefinitions(registry, createBeanDef(filenameRegex, exceptionType));
+                Class<? extends Exception> exception = determineExceptionTypeFromString(element.getAttribute("exception"));
+                registerBeanDefinitions(registry, createBeanDef(nameRegex, pathRegex, exception, filterExceptionMsgRegex));
             } else {
-                registerBeanDefinitions(registry, createBeanDef(filenameRegex));
+                registerBeanDefinitions(registry, createBeanDef(nameRegex, pathRegex, filterExceptionMsgRegex));
             }
 
         }
         return null;
     }
 
-    private List<Class<? extends Exception>> parseListOfExceptions(Element element) {
-        List<Class<? extends Exception>> exceptions = new ArrayList<Class<? extends Exception>>();
+    private String notEmptyTrimmedStringOrNull(final String str) {
+        if (str == null || str.trim().isEmpty()) {
+            return null;
+        }
+        return str.trim();
+    }
+
+    private List<ExceptionType> parseListOfExceptions(Element element) {
+        List<ExceptionType> exceptions = new ArrayList<ExceptionType>();
         List<Element> exceptionsRootElements = DomUtils.getChildElementsByTagName(element, "exceptions");
         if (exceptionsRootElements.size() == 1) {
             Element rootValidatedArtifacts = exceptionsRootElements.get(0);
             List<Element> exceptionElements = DomUtils.getChildElementsByTagName(rootValidatedArtifacts, "exception");
             for (Element exceptionElement : exceptionElements) {
-                Class<? extends Exception> exceptionType = determineExceptionTypeFromString(exceptionElement.getTextContent());
-                exceptions.add(exceptionType);
+                Class<? extends Exception> exception = determineExceptionTypeFromString(exceptionElement.getTextContent());
+                final String exceptionMsgRegex = notEmptyTrimmedStringOrNull(exceptionElement.getAttribute("exception-msg-regex"));
+                exceptions.add(new ExceptionType(exception, exceptionMsgRegex));
             }
         } else {
             throw new RuntimeException("Exactly one instance of 'exceptions' element needs to be defined in case" +
@@ -131,23 +142,43 @@ public class FilenameBasedExceptionFilterParser extends AbstractExceptionFilterP
             return clazz;
         } else {
             throw new RuntimeException("The specified exception class '" + clazz.getCanonicalName() + "' needs to" +
-                    "extends the java.lang.Exception!");
+                    " extends the java.lang.Exception!");
         }
     }
 
-    private AbstractBeanDefinition createBeanDef(String filenameRegex) {
+    private AbstractBeanDefinition createBeanDef(String nameRegex, String pathRegex, String exceptionMsgRegex) {
         return BeanDefinitionBuilder.
-                rootBeanDefinition(FilenameBasedExceptionFilter.class).
-                addConstructorArgValue(filenameRegex).
+                rootBeanDefinition(FileBasedExceptionFilter.class).
+                addConstructorArgValue(nameRegex).
+                addConstructorArgValue(pathRegex).
+                addConstructorArgValue(exceptionMsgRegex).
                 getBeanDefinition();
     }
 
-    private AbstractBeanDefinition createBeanDef(String filenameRegex, Class<? extends Exception> exceptionType) {
+    private AbstractBeanDefinition createBeanDef(String nameRegex, String pathRegex,
+                                                 Class<? extends Exception> exceptionType, String exceptionMsgRegex) {
         return BeanDefinitionBuilder.
-                rootBeanDefinition(FilenameBasedExceptionFilter.class).
-                addConstructorArgValue(filenameRegex).
+                rootBeanDefinition(FileBasedExceptionFilter.class).
+                addConstructorArgValue(nameRegex).
+                addConstructorArgValue(pathRegex).
                 addConstructorArgValue(exceptionType).
+                addConstructorArgValue(exceptionMsgRegex).
                 getBeanDefinition();
+    }
+
+    private final class ExceptionType {
+        private final Class<? extends Exception> exception;
+        private final String exceptionMsgRegex;
+        private ExceptionType(Class<? extends Exception> exception, String exceptionMsgRegex) {
+            this.exception = exception;
+            this.exceptionMsgRegex = exceptionMsgRegex;
+        }
+        public Class<? extends Exception> getException() {
+            return exception;
+        }
+        public String getExceptionMsgRegex() {
+            return exceptionMsgRegex;
+        }
     }
 
 }
