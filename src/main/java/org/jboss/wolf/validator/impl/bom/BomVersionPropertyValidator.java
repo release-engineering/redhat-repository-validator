@@ -45,11 +45,9 @@ public class BomVersionPropertyValidator implements Validator {
             ModelBuildingResult result = validatorSupport.buildModel(pomFile);
             Model rawModel = result.getRawModel();
             Model effectiveModel = result.getEffectiveModel();
-            if (effectiveModel.getPackaging().equals("pom")) {
-                if (bomFilter.isBom(effectiveModel)) {
-                    validateBomDependenciesVersionProperty(ctx, pomFile, rawModel, effectiveModel);
-                }
-            }        
+            if (bomFilter.isBom(effectiveModel)) {
+                validateBomDependenciesVersionProperty(ctx, pomFile, rawModel, effectiveModel);
+            }
         }
     }
 
@@ -57,11 +55,13 @@ public class BomVersionPropertyValidator implements Validator {
         String bomGav = gav(effectiveModel);
         
         List<String> bomDependenciesWithoutVersionProperty = new ArrayList<String>();
-        for (Dependency bomDependency : rawModel.getDependencyManagement().getDependencies()) {
-            if (!(bomDependency.getVersion() != null && bomDependency.getVersion().startsWith("${") && bomDependency.getVersion().endsWith("}"))) {
-                String bomDependencyGav = gav(bomDependency);
-                bomDependenciesWithoutVersionProperty.add(bomDependencyGav);
-            }                        
+        if( rawModel.getDependencyManagement() != null && rawModel.getDependencyManagement().getDependencies() != null ) {
+            for (Dependency bomDependency : rawModel.getDependencyManagement().getDependencies()) {
+                if (!(bomDependency.getVersion() != null && bomDependency.getVersion().startsWith("${") && bomDependency.getVersion().endsWith("}"))) {
+                    String bomDependencyGav = gav(bomDependency);
+                    bomDependenciesWithoutVersionProperty.add(bomDependencyGav);
+                }
+            }
         }
         
         if( !bomDependenciesWithoutVersionProperty.isEmpty() ) {
