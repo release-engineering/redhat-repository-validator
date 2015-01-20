@@ -14,6 +14,7 @@ import javax.inject.Named;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.building.ModelBuildingResult;
 import org.jboss.wolf.validator.Validator;
 import org.jboss.wolf.validator.ValidatorContext;
 import org.jboss.wolf.validator.internal.ValidatorSupport;
@@ -41,20 +42,22 @@ public class BomVersionPropertyValidator implements Validator {
                 continue;
             }
             
-            Model model = validatorSupport.buildModel(pomFile).getRawModel();
-            if (model.getPackaging().equals("pom")) {
-                if (bomFilter.isBom(model)) {
-                    validateBomDependenciesVersionProperty(ctx, pomFile, model);
+            ModelBuildingResult result = validatorSupport.buildModel(pomFile);
+            Model rawModel = result.getRawModel();
+            Model effectiveModel = result.getEffectiveModel();
+            if (effectiveModel.getPackaging().equals("pom")) {
+                if (bomFilter.isBom(effectiveModel)) {
+                    validateBomDependenciesVersionProperty(ctx, pomFile, rawModel, effectiveModel);
                 }
             }        
         }
     }
 
-    private void validateBomDependenciesVersionProperty(ValidatorContext ctx, File pomFile, Model model) {
-        String bomGav = gav(model);
+    private void validateBomDependenciesVersionProperty(ValidatorContext ctx, File pomFile, Model rawModel, Model effectiveModel) {
+        String bomGav = gav(effectiveModel);
         
         List<String> bomDependenciesWithoutVersionProperty = new ArrayList<String>();
-        for (Dependency bomDependency : model.getDependencyManagement().getDependencies()) {
+        for (Dependency bomDependency : rawModel.getDependencyManagement().getDependencies()) {
             if (!(bomDependency.getVersion() != null && bomDependency.getVersion().startsWith("${") && bomDependency.getVersion().endsWith("}"))) {
                 String bomDependencyGav = gav(bomDependency);
                 bomDependenciesWithoutVersionProperty.add(bomDependencyGav);
