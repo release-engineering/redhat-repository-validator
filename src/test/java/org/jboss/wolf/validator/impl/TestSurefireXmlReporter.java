@@ -214,9 +214,9 @@ public class TestSurefireXmlReporter {
 
         String depNotFoundReportContent = FileUtils.readFileToString(depNotFoundReportFile);
         assertTrue(depNotFoundReportContent.contains("<testcase name=\"__Miss org:missing:jar:1.0 in org:validated2-not-filtered:pom:1.1 \"" +
-                " classname=\"DependencyNotFoundReport\" time=\"0\">\n    <error type=\"\"></error>"));
+                " classname=\"DependencyNotFoundReport\" time=\"0\">\n    <error type=\"path org\">path org:validated2-not-filtered:pom:1.1</error>"));
         assertTrue(depNotFoundReportContent.contains("<testcase name=\"__Miss org:missing:jar:1.0 in org:validated:pom:1.0 \"" +
-                " classname=\"DependencyNotFoundReport\" time=\"0\">\n    <skipped type=\"\"></skipped>"));
+                " classname=\"DependencyNotFoundReport\" time=\"0\">\n    <skipped type=\"path org\">path org:validated:pom:1.0</skipped>"));
     }
 
     @Test
@@ -248,9 +248,9 @@ public class TestSurefireXmlReporter {
 
         String depNotFoundReportContent = FileUtils.readFileToString(depNotFoundReportFile);
         assertTrue(depNotFoundReportContent.contains("<testcase name=\"__Miss org:missing:jar:1.0 in org:validated2-not-filtered:pom:1.1 \"" +
-                " classname=\"BomDependencyNotFoundReport\" time=\"0\">\n    <error type=\"\"></error>"));
+                " classname=\"BomDependencyNotFoundReport\" time=\"0\">\n    <error type=\"path org\">path org:validated2-not-filtered:pom:1.1</error>"));
         assertTrue(depNotFoundReportContent.contains("<testcase name=\"__Miss org:missing:jar:1.0 in org:validated:pom:1.0 \"" +
-                " classname=\"BomDependencyNotFoundReport\" time=\"0\">\n    <skipped type=\"\"></skipped>"));
+                " classname=\"BomDependencyNotFoundReport\" time=\"0\">\n    <skipped type=\"path org\">path org:validated:pom:1.0</skipped>"));
     }
 
     @Test
