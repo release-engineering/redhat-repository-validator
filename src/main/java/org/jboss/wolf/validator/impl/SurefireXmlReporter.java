@@ -111,8 +111,9 @@ public class SurefireXmlReporter implements Reporter {
         for (Artifact artifact : sortArtifacts(artifactNotFoundMap.keySet())) {
             List<DependencyNode> roots = sortDependencyNodes(artifactNotFoundMap.get(artifact));
             if (roots.size() == 1) {
-                String msg = "Miss " + artifact + " in " + roots.get(0).getArtifact() + " (path " + findPathToDependency(artifact, roots.get(0)) + ")";
-                reportTestCase(type, reportEntryType, msg, null, testSuite);
+                String path = "path " + findPathToDependency(artifact, roots.get(0));
+                String msg = "Miss " + artifact + " in " + roots.get(0).getArtifact() + " (" + path + ")";
+                reportTestCase(type, reportEntryType, msg, path, testSuite);
             } else {
                 String msg = "Miss " + artifact + " in " + roots.size() + " artifacts ...";
                 StringBuilder dsc = new StringBuilder();
