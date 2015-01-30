@@ -125,7 +125,7 @@
 <!-- 
     <bean id="remoteRepositoryCompareValidator" class="org.jboss.wolf.validator.impl.remoterepository.RemoteRepositoryCompareValidator">
         <constructor-arg name="remoteRepositoryUrl" value="TODO-remote-repository-url" />
-        <constructor-arg name="compareStrategy" ref="remoteRepositoryCompareStrategy" />
+        <constructor-arg name="checksumProvider" ref="remoteRepositoryChecksumProvider" />
     </bean>
     <bean id="remoteRepositoryChecksumProvider" class="org.jboss.wolf.validator.impl.remoterepository.ChecksumProviderNexus" />
 -->
