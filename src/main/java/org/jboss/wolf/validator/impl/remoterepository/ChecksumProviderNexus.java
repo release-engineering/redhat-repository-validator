@@ -8,10 +8,10 @@ import java.net.URI;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 
-public class RemoteRepositoryCompareStrategyNexus extends RemoteRepositoryCompareStrategyAbstract {
+public class ChecksumProviderNexus implements ChecksumProvider {
 
     @Override
-    protected String getRemoteArtifactHash(URI remoteArtifact, HttpResponse httpResponse) {
+    public String getRemoteArtifactChecksum(URI remoteArtifact, HttpResponse httpResponse) {
         Header etagHeader = httpResponse.getFirstHeader("ETag");
         if (etagHeader != null) {
             String etagValue = etagHeader.getValue();
@@ -20,11 +20,11 @@ public class RemoteRepositoryCompareStrategyNexus extends RemoteRepositoryCompar
                 return sha1;
             }
         }
-        return null;
+        throw new ChecksumProviderException("Remote repository returned unknown headers, it is not possible to parse artifact hash for " + remoteArtifact);
     }
 
     @Override
-    protected String getLocalArtifactHash(URI localArtifact) {
+    public String getLocalArtifactChecksum(URI localArtifact) {
         return calculateChecksum(new File(localArtifact), "sha1");
     }
     

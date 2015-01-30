@@ -13,15 +13,15 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 
-public class RemoteRepositoryCompareValidator extends RemoteRepositoryAbstractValidator {
-
+public class RemoteRepositoryCollisionValidator extends RemoteRepositoryAbstractValidator {
+    
     private final ChecksumProvider checksumProvider;
 
-    public RemoteRepositoryCompareValidator(String remoteRepositoryUrl, ChecksumProvider checksumProvider) {
+    public RemoteRepositoryCollisionValidator(String remoteRepositoryUrl, ChecksumProvider checksumProvider) {
         this(remoteRepositoryUrl, checksumProvider, FileFilterUtils.trueFileFilter(), 20);
     }
 
-    public RemoteRepositoryCompareValidator(String remoteRepositoryUrl, ChecksumProvider checksumProvider, IOFileFilter fileFilter, int maxConnTotal) {
+    public RemoteRepositoryCollisionValidator(String remoteRepositoryUrl, ChecksumProvider checksumProvider, IOFileFilter fileFilter, int maxConnTotal) {
         super(remoteRepositoryUrl, fileFilter, maxConnTotal);
         this.checksumProvider = checksumProvider;
     }
@@ -37,16 +37,16 @@ public class RemoteRepositoryCompareValidator extends RemoteRepositoryAbstractVa
                 String localArtifactHash = checksumProvider.getLocalArtifactChecksum(localArtifact);
 
                 if (!equalsIgnoreCase(remoteArtifactHash, localArtifactHash)) {
-                    throw new RemoteRepositoryCompareException("Remote repository [" + remoteRepositoryUrl + "] contains different binary data for artifact " + remoteArtifact);
+                    throw new RemoteRepositoryCollisionException("Remote repository [" + remoteRepositoryUrl + "] contains already artifact " + remoteArtifact + " with different content");
                 }
 
             } else if (httpStatusCode == HttpStatus.SC_NOT_FOUND) {
-                throw new RemoteRepositoryCompareException("Remote repository [" + remoteRepositoryUrl + "] doesn't contains artifact " + remoteArtifact);
+                // OK
             } else {
-                throw new RemoteRepositoryCompareException("Remote repository [" + remoteRepositoryUrl + "] returned " + httpResponse.getStatusLine().toString() + " for artifact " + remoteArtifact);
+                throw new RemoteRepositoryCollisionException("Remote repository [" + remoteRepositoryUrl + "] returned " + httpResponse.getStatusLine().toString() + " for artifact " + remoteArtifact);
             }
         } catch (IOException e) {
-            throw new RemoteRepositoryCompareException("Remote repository [" + remoteRepositoryUrl + "] request failed for artifact " + remoteArtifact, e);
+            throw new RemoteRepositoryCollisionException("Remote repository [" + remoteRepositoryUrl + "] request failed for artifact " + remoteArtifact, e);
         }
     }
 

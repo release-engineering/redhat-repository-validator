@@ -23,11 +23,11 @@ public class ValidationExecutor {
     public void execute(ValidatorContext ctx) {
         logValidatorNames();
         for (Validator validator : validators) {
-            logger.debug("starting {}", validator.getClass().getSimpleName());
+            logger.debug("starting {}", validator);
             try {
                 validator.validate(ctx);
             } catch (RuntimeException e) {
-                logger.error("validator " + validator.getClass().getSimpleName() + " ended with unexpected exception!", e);
+                logger.error("validator " + validator + " ended with unexpected exception!", e);
                 ctx.addError(null, ctx.getValidatedRepository(), e);
             }
         }

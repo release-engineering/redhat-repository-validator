@@ -44,6 +44,9 @@ import org.eclipse.aether.util.graph.transformer.SimpleOptionalitySelector;
 import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
 import org.jboss.wolf.validator.impl.bom.BomFilter;
 import org.jboss.wolf.validator.impl.bom.BomFilterSimple;
+import org.jboss.wolf.validator.impl.remoterepository.ChecksumProviderNexus;
+import org.jboss.wolf.validator.impl.remoterepository.ChecksumProviderNginx;
+import org.jboss.wolf.validator.impl.remoterepository.RemoteRepositoryCollisionValidator;
 import org.jboss.wolf.validator.internal.DepthOneOptionalDependencySelector;
 import org.jboss.wolf.validator.internal.LocalRepositoryModelResolver;
 import org.jboss.wolf.validator.internal.LogRepositoryListener;
@@ -174,6 +177,26 @@ public class AppConfig {
         };
 
         return expectedRootFileFilter;
+    }
+    
+    @Bean
+    public RemoteRepositoryCollisionValidator collisionValidatorMavenCentral() {
+        return new RemoteRepositoryCollisionValidator("http://repo1.maven.org/maven2/", new ChecksumProviderNginx(), collisionValidatorMavenCentralFilter(), 20);
+    }
+    
+    @Bean
+    public RemoteRepositoryCollisionValidator collisionValidatorJBossNexus() {
+        return new RemoteRepositoryCollisionValidator("https://repository.jboss.org/nexus/content/groups/public-jboss/", new ChecksumProviderNexus(), collisionValidatorJBossNexusFilter(), 20);
+    }
+    
+    @Bean
+    public IOFileFilter collisionValidatorMavenCentralFilter() {
+        return defaultFilter();
+    }
+
+    @Bean
+    public IOFileFilter collisionValidatorJBossNexusFilter() {
+        return defaultFilter();
     }
 
     @Bean

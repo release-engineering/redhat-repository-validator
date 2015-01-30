@@ -8,19 +8,19 @@ import java.net.URI;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 
-public class RemoteRepositoryCompareStrategyArtifactory extends RemoteRepositoryCompareStrategyAbstract {
+public class ChecksumProviderArtifactory implements ChecksumProvider {
 
     @Override
-    protected String getRemoteArtifactHash(URI remoteArtifact, HttpResponse httpResponse) {
+    public String getRemoteArtifactChecksum(URI remoteArtifact, HttpResponse httpResponse) {
         Header xchecksumSh1Header = httpResponse.getFirstHeader("X-Checksum-Sha1");
         if (xchecksumSh1Header != null) {
             return xchecksumSh1Header.getValue();
         }
-        return null;
+        throw new ChecksumProviderException("Remote repository returned unknown headers, it is not possible to parse artifact hash for " + remoteArtifact);
     }
 
     @Override
-    protected String getLocalArtifactHash(URI localArtifact) {
+    public String getLocalArtifactChecksum(URI localArtifact) {
         return calculateChecksum(new File(localArtifact), "sha1");
     }
 

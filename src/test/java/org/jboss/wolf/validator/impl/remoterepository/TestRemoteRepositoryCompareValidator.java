@@ -18,7 +18,7 @@ public class TestRemoteRepositoryCompareValidator extends AbstractTest {
 
         @Bean
         public RemoteRepositoryCompareValidator remoteRepositoryCompareValidator() {
-            return new RemoteRepositoryCompareValidator("http://repository.jboss.org/nexus/content/groups/public/", new RemoteRepositoryCompareStrategyNexus());
+            return new RemoteRepositoryCompareValidator("http://repository.jboss.org/nexus/content/groups/public/", new ChecksumProviderNexus());
         }
         
     }
@@ -29,8 +29,8 @@ public class TestRemoteRepositoryCompareValidator extends AbstractTest {
         
         validationExecutor.execute(ctx);
         
-        assertExpectedException(RemoteRepositoryCompareException.class, "Remote repository doesn't contains artifact http://repository.jboss.org/nexus/content/groups/public/com/acme/foo/1.0/foo-1.0.pom");
-        assertExpectedException(RemoteRepositoryCompareException.class, "Remote repository doesn't contains artifact http://repository.jboss.org/nexus/content/groups/public/com/acme/foo/1.0/foo-1.0.jar");
+        assertExpectedException(RemoteRepositoryCompareException.class, "Remote repository [http://repository.jboss.org/nexus/content/groups/public/] doesn't contains artifact http://repository.jboss.org/nexus/content/groups/public/com/acme/foo/1.0/foo-1.0.pom");
+        assertExpectedException(RemoteRepositoryCompareException.class, "Remote repository [http://repository.jboss.org/nexus/content/groups/public/] doesn't contains artifact http://repository.jboss.org/nexus/content/groups/public/com/acme/foo/1.0/foo-1.0.jar");
     }
     
     @Test
@@ -39,8 +39,8 @@ public class TestRemoteRepositoryCompareValidator extends AbstractTest {
         
         validationExecutor.execute(ctx);
         
-        assertExpectedException(RemoteRepositoryCompareException.class, "Remote repository contains different binary data for artifact http://repository.jboss.org/nexus/content/groups/public/org/hibernate/hibernate-core/4.3.6.Final/hibernate-core-4.3.6.Final.pom");
-        assertExpectedException(RemoteRepositoryCompareException.class, "Remote repository contains different binary data for artifact http://repository.jboss.org/nexus/content/groups/public/org/hibernate/hibernate-core/4.3.6.Final/hibernate-core-4.3.6.Final.jar");
+        assertExpectedException(RemoteRepositoryCompareException.class, "Remote repository [http://repository.jboss.org/nexus/content/groups/public/] contains different binary data for artifact http://repository.jboss.org/nexus/content/groups/public/org/hibernate/hibernate-core/4.3.6.Final/hibernate-core-4.3.6.Final.pom");
+        assertExpectedException(RemoteRepositoryCompareException.class, "Remote repository [http://repository.jboss.org/nexus/content/groups/public/] contains different binary data for artifact http://repository.jboss.org/nexus/content/groups/public/org/hibernate/hibernate-core/4.3.6.Final/hibernate-core-4.3.6.Final.jar");
     }    
     
 }
