@@ -17,12 +17,14 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.jboss.wolf.validator.impl.DefaultReporter;
+import org.jboss.wolf.validator.impl.bestpractices.BestPracticesValidator;
 import org.jboss.wolf.validator.impl.checksum.ChecksumNotExistException;
 import org.jboss.wolf.validator.impl.version.VersionPatternException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.core.annotation.Order;
 
 public class TestAppRunner {
@@ -160,6 +162,25 @@ public class TestAppRunner {
             };
         };
         appRunner.run("--config", getClass().getResource("/TestAppRunner-stubValidatorAdditionally.xml").getFile());
+    }
+    
+    @Test
+    public void shouldUseStubValidatorOverride() {
+        appRunner = new AppRunner() {
+            @Override
+            protected void runValidation() {
+                Object v = appCtx.getBean("bestPracticesValidator");
+                assertTrue(v instanceof StubValidator);
+
+                try {
+                    appCtx.getBean(BestPracticesValidator.class);
+                    fail();
+                } catch (NoSuchBeanDefinitionException e) {
+                    // noop
+                }
+            };
+        };
+        appRunner.run("--config", getClass().getResource("/TestAppRunner-stubValidatorOverride.xml").getFile());
     }
     
     @Test

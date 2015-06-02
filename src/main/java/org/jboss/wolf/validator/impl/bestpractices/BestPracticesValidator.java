@@ -10,7 +10,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.ModelBuildingResult;
 import org.jboss.wolf.validator.Validator;
 import org.jboss.wolf.validator.ValidatorContext;
@@ -29,6 +31,18 @@ public class BestPracticesValidator implements Validator {
     private IOFileFilter fileFilter;
     @Inject
     private ValidatorSupport validatorSupport;
+    
+    private final String[] allowedRepositoriesUrl;
+    private final String[] allowedPluginRepositoriesUrl;
+    
+    public BestPracticesValidator() {
+        this(null, null);
+    }
+    
+    public BestPracticesValidator(String[] allowedRepositoriesUrl, String[] allowedPluginRepositoriesUrl) {
+        this.allowedRepositoriesUrl = allowedRepositoriesUrl;
+        this.allowedPluginRepositoriesUrl = allowedPluginRepositoriesUrl;
+    }
 
     @Override
     public void validate(ValidatorContext ctx) {
@@ -47,12 +61,9 @@ public class BestPracticesValidator implements Validator {
     }
 
     private void validateBestPractices(ValidatorContext ctx, Model rawModel, Model effectiveModel) {
-        if (!isEmpty(rawModel.getRepositories())) {
-            error(ctx, effectiveModel, "contains <repositories> configuration");
-        }
-        if (!isEmpty(rawModel.getPluginRepositories())) {
-            error(ctx, effectiveModel, "contains <pluginRepositories> configuration");
-        }
+        validateRepositories(ctx, rawModel, effectiveModel);
+        validatePluginRepositories(ctx, rawModel, effectiveModel);
+        
         if (isEmpty(effectiveModel.getModelVersion())) {
             warning(ctx, effectiveModel, "doesn't contain <modelVersion>");
         }
@@ -89,6 +100,44 @@ public class BestPracticesValidator implements Validator {
             }
             if (isEmpty(effectiveModel.getScm().getConnection())) {
                 warning(ctx, effectiveModel, "doesn't contain <scm><connection>");
+            }
+        }
+    }
+
+    private void validateRepositories(ValidatorContext ctx, Model rawModel, Model effectiveModel) {
+        if (!isEmpty(rawModel.getRepositories())) {
+            if (allowedRepositoriesUrl != null) {
+                for (Repository r : effectiveModel.getRepositories()) {
+                    if (r.getId() != null && r.getId().equals("central")) {
+                        continue;
+                    }
+                    if (ArrayUtils.contains(allowedRepositoriesUrl, r.getUrl())) {
+                        continue;
+                    }
+                    error(ctx, effectiveModel, "contains <repository> configuration with unallowed url " + r.getUrl());
+                }
+            }
+            else {
+                error(ctx, effectiveModel, "contains <repositories> configuration");
+            }
+        }
+    }
+
+    private void validatePluginRepositories(ValidatorContext ctx, Model rawModel, Model effectiveModel) {
+        if (!isEmpty(rawModel.getPluginRepositories())) {
+            if( allowedPluginRepositoriesUrl != null ) {
+                for( Repository r : effectiveModel.getPluginRepositories()) {
+                    if (r.getId() != null && r.getId().equals("central")) {
+                        continue;
+                    }
+                    if (ArrayUtils.contains(allowedPluginRepositoriesUrl, r.getUrl())) {
+                        continue;
+                    }
+                    error(ctx, effectiveModel, "contains <pluginRepository> configuration with unallowed url " + r.getUrl());
+                }
+            }
+            else {
+                error(ctx, effectiveModel, "contains <pluginRepositories> configuration");
             }
         }
     }
