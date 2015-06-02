@@ -9,8 +9,10 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore("Repository at https://maven.repository.redhat.com/techpreview/all/ is not served by Akamai anymore")
 public class TestChecksumProviderAkamai {
     
     @Test
