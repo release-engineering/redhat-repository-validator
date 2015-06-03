@@ -61,7 +61,7 @@ Validators
 - `VersionAmbiguityValidator` try to find artifacts, which have multiple versions in repository
 - `VersionOverlapValidator` try to find artifacts, which overlap with others remote repositories
 - `VersionPatternValidator` try to find artifacts, which version doesn't match regex pattern (eg. -redhat-x postfix)
-- `JarSourcesValidator` try to find artifacts, which do not contain sources within them(verify if *-sources.jar exists)
+- `JarSourcesValidator` try to find artifacts, which do not contain sources within them(verify if _*-sources.jar_ exists)
 - `XmlFileValidator` try to find xml files and then verify if they are valid
 - `DistributionValidator` try to validate artifacts in distribution against validated repository
 - `OsgiVersionValidator` try to find artifacts, which version doesn't match OSGI pattern (by default disabled, via filter configuration)
