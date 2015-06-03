@@ -37,11 +37,11 @@ public class RemoteRepositoryCompareValidator extends RemoteRepositoryAbstractVa
                 String localArtifactHash = checksumProvider.getLocalArtifactChecksum(localArtifact);
 
                 if (!equalsIgnoreCase(remoteArtifactHash, localArtifactHash)) {
-                    throw new RemoteRepositoryCompareException("Remote repository [" + remoteRepositoryUrl + "] contains different binary data for artifact " + remoteArtifact);
+                    throw new RemoteRepositoryCollisionException("Remote repository [" + remoteRepositoryUrl + "] contains different binary data for artifact " + remoteArtifact);
                 }
 
             } else if (httpStatusCode == HttpStatus.SC_NOT_FOUND) {
-                throw new RemoteRepositoryCompareException("Remote repository [" + remoteRepositoryUrl + "] doesn't contains artifact " + remoteArtifact);
+                throw new RemoteRepositoryCompareException("Remote repository [" + remoteRepositoryUrl + "] doesn't contain artifact " + remoteArtifact);
             } else {
                 throw new RemoteRepositoryCompareException("Remote repository [" + remoteRepositoryUrl + "] returned " + httpResponse.getStatusLine().toString() + " for artifact " + remoteArtifact);
             }
