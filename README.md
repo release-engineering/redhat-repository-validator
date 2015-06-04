@@ -184,3 +184,20 @@ from the artifact matching the validated-artifact regex.
 ...
 ```
 Please consult the sample `wolf-validator-config.xml` for more examples of the `(bom-)dependency-not-found` filters.
+
+
+#### How to add custom RemoteRepositoryCollisionValidator
+
+If you want to check that artifact is not already published in some other remote repository, 
+for example RedHat techpreview repository (https://maven.repository.redhat.com/techpreview), 
+you have to add folowing configuration into `wolf-validator-config.xml`.
+
+```xml
+<bean id="redhatTechpreviewCollisionValidator" class="org.jboss.wolf.validator.impl.remoterepository.RemoteRepositoryCollisionValidator">
+    <constructor-arg name="remoteRepositoryUrl" value="https://maven.repository.redhat.com/techpreview" />
+    <constructor-arg name="checksumProvider" ref="nexusChecksumProvider" />
+</bean>
+<bean id="nexusChecksumProvider" class="org.jboss.wolf.validator.impl.remoterepository.ChecksumProviderNexus" />    
+```
+
+
