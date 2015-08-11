@@ -200,4 +200,17 @@ you have to add folowing configuration into `wolf-validator-config.xml`.
 <bean id="nexusChecksumProvider" class="org.jboss.wolf.validator.impl.remoterepository.ChecksumProviderNexus" />    
 ```
 
+#### How to add custom BOM filter
+
+There is no way how to reliably recognize BOMs. 
+The default implementation of `BomFilter` check if the artifact name or group contains "bom" string. 
+If it is not sufficient, you can provide your own implementation, or you can provide some hint in form of regular expression, which is use against GAV, see example bellow.
+
+```xml
+<bean id="bomFilter" class="org.jboss.wolf.validator.impl.bom.BomFilterSimple">
+    <constructor-arg name="bomGavRegex" value=".*:myBillOfMaterials:pom:.*" />
+</bean>
+``` 
+
+
 
