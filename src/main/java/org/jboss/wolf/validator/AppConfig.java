@@ -348,6 +348,14 @@ public class AppConfig {
         registry.add(new DefaultArtifactType("zip", "zip", "", ""));
         registry.add(new DefaultArtifactType("aar", "aar", "", "java"));
         registry.add(new DefaultArtifactType("apklib", "apklib", "", "java"));
+        registry.add(new DefaultArtifactType("eclipse-plugin", "jar", "", "java"));
+        registry.add(new DefaultArtifactType("eclipse-test-plugin", "jar", "", "java"));
+        registry.add(new DefaultArtifactType("eclipse-feature", "jar", "", "java", false, false));
+        registry.add(new DefaultArtifactType("eclipse-update-site", "zip", "", "java", false, false));
+        registry.add(new DefaultArtifactType("eclipse-application", "zip", "", "java", false, false));
+        registry.add(new DefaultArtifactType("eclipse-repository", "zip", "", "java", false, false));
+        registry.add(new DefaultArtifactType("eclipse-target-definition", "target", "", "java", false, false));
+        registry.add(new DefaultArtifactType("p2-installable-unit", "zip", "", "java", false, false));
         return registry;
     }
 
