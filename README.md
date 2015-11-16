@@ -1,35 +1,35 @@
-wolf-validator
-==============
+redhat-repository-validator
+===========================
 
-[![Build Status](https://travis-ci.org/thradec/wolf-validator.png)](https://travis-ci.org/thradec/wolf-validator)
+[![Build Status](https://travis-ci.org/thradec/redhat-repository-validator.png)](https://travis-ci.org/thradec/redhat-repository-validator)
 
 
-Wolf-validator is a tool used to validate the internal consistency of a maven artifact repository. It can also be used for validation of the associated distribution directory.
+redhat-repository-validator is a tool used to validate the internal consistency of a maven artifact repository. It can also be used for validation of the associated distribution directory.
 
 
 Building
 --------
 
 - prerequisites: Java, Maven and Git
-- clone project from github `$ git clone git@github.com:thradec/wolf-validator.git`
-- go into the newly created directory `$ cd wolf-validator`
+- clone project from github `$ git clone git@github.com:thradec/redhat-repository-validator.git`
+- go into the newly created directory `$ cd redhat-repository-validator`
 - and run maven build `$ mvn clean package`
-- executable distribution is available in `target/wolf-validator-$VERSION` directory or zip file
+- executable distribution is available in `target/redhat-repository-validator-$VERSION` directory or zip file
 
 
 Usage
 -----
 
-This tool can be run from command line via `wolf-validator` script. The only prerequisite is Java 1.6 or greater on path.
+This tool can be run from command line via `redhat-repository-validator` script. The only prerequisite is Java 1.6 or greater on path.
 
 Here is help output: 
 
 
-    Wolf-validator is a tool used to validate the internal consistency of a maven artifact repository.
+    redhat-repository-validator is a tool used to validate the internal consistency of a maven artifact repository.
     
-    Usage: wolf-validator [-c <file>] [-h] [-lr <dir>] [-rr <url>] [-vr <dir>] [-vd <dir>]
+    Usage: redhat-repository-validator [-c <file>] [-h] [-lr <dir>] [-rr <url>] [-vr <dir>] [-vd <dir>]
         -c,--config <file>                 use given configuration file,
-                                           default value is `wolf-validator-config.xml`
+                                           default value is `redhat-repository-validator-config.xml`
         -h,--help                          print help and exit
         -lr,--local-repository <dir>       use given local repository,
                                            default value is `workspace/local-repository`
@@ -42,7 +42,7 @@ Here is help output:
     
     Example: 
         to run against a given validated repository directory, use: 
-        $ wolf-validator -vr ~/myrepository
+        $ redhat-repository-validator -vr ~/myrepository
 
 
 Validators
@@ -81,8 +81,8 @@ How to
 
 #### How to change configuration ?
 
-Logging configuration can be changed in `wolf-validator-logback.xml` file, default logger output is console and file log.txt, located in workspace subdirectory.
-Tool configuration can be changed in `wolf-validator-config.xml` file and it contains some examples already.
+Logging configuration can be changed in `redhat-repository-validator-logback.xml` file, default logger output is console and file log.txt, located in workspace subdirectory.
+Tool configuration can be changed in `redhat-repository-validator-config.xml` file and it contains some examples already.
 
 
 #### How to add whitelist/filter ?
@@ -94,28 +94,28 @@ These filter beans can be redefined in external configuration file, see examples
 
 #### How to add remote repository ?
 
-Remote repository can be added via command line options `-rr`, for example `$ wolf-validator -rr file://foo-repository`. 
+Remote repository can be added via command line options `-rr`, for example `$ redhat-repository-validator -rr file://foo-repository`. 
 Or permanently added in configuration file, see `fooRepository` snippet, where is variant with user authentication.
 
 
 #### How to add custom validation/report ?
 
-Validators/reporters have to implement interface `org.jboss.wolf.validator.Validator/Reporter`, 
+Validators/reporters have to implement interface `com.redhat.repository.validator.Validator/Reporter`, 
 for simple example take a look at `ChecksumValidator` implementation. 
 Jar file with the new validator/reporter needs to be added into `lib` subdirectory, so it will automatically end up 
 on classpath.
-As a last step new bean has to be configured in `wolf-validator-config.xml`, see an example with `fooValidator`.        
+As a last step new bean has to be configured in `redhat-repository-validator-config.xml`, see an example with `fooValidator`.        
 
 
 #### How to execute only specified validators ?
 
 By default all validators on classpath are gathered and executed. There might be cases where running all of them is not practical.
-The class that executes the validators is an ordinary bean. That means it can be redefined in the `wolf-validator-config.xml`.
+The class that executes the validators is an ordinary bean. That means it can be redefined in the `redhat-repository-validator-config.xml`.
 Using the example below will result in execution of only `JarSourcesValidator` and `JarSignatureValidator`.
 
 ```xml
 ...
-<bean id="validationExecutor" class="org.jboss.wolf.validator.ValidationExecutor">
+<bean id="validationExecutor" class="com.redhat.repository.validator.ValidationExecutor">
     <constructor-arg>
         <list>
             <ref bean="jarSourcesValidator"/>
@@ -130,12 +130,12 @@ Using the example below will result in execution of only `JarSourcesValidator` a
 #### How to execute only specified reporters ?
 
 Similarly as with validators, there might be cases where running all of reporters is not practical.
-The class that executes the reporters is also an ordinary bean and can be redefined in the `wolf-validator-config.xml`.
+The class that executes the reporters is also an ordinary bean and can be redefined in the `redhat-repository-validator-config.xml`.
 Using the example below will result in execution of only the `SurefireXmlReporter`.
 
 ```xml
 ...
-<bean id="reportingExecutor" class="org.jboss.wolf.validator.ReportingExecutor">
+<bean id="reportingExecutor" class="com.redhat.repository.validator.ReportingExecutor">
     <constructor-arg>
         <list>
             <ref bean="surefireXmlReporter"/>
@@ -148,8 +148,8 @@ Using the example below will result in execution of only the `SurefireXmlReporte
 
 #### How to filter out (ignore) specified exceptions ?
 
-Wolf-validator allows filtering (ignoring) of the exceptions using one of the following configuration options. The
-configuration is XML based and needs to be added into the `wolf-validator-config.xml`. Such filtered exceptions will not
+redhat-repository-validator allows filtering (ignoring) of the exceptions using one of the following configuration options. The
+configuration is XML based and needs to be added into the `redhat-repository-validator-config.xml`. Such filtered exceptions will not
 be passed to the reporters.
 
 ##### Filtering exceptions based on filename and filepath regex
@@ -169,7 +169,7 @@ Following example shows filtering of the `SuspiciousFileException` with `foobar`
 ...
 ```
 
-Please consult the sample `wolf-validator-config.xml` for more examples of the filename based filters.
+Please consult the sample `redhat-repository-validator-config.xml` for more examples of the filename based filters.
 
 ##### Filtering (bom) dependency not found exceptions
 `DependencyNotFoundException`s and `BomDependencyNotFoundException`s can be filterd out based on the information about
@@ -183,21 +183,21 @@ from the artifact matching the validated-artifact regex.
 <filter:dependency-not-found missing-artifact="com.acme:finance:.*:jar" validated-artifact="com.acme:parent:.*:pom" />
 ...
 ```
-Please consult the sample `wolf-validator-config.xml` for more examples of the `(bom-)dependency-not-found` filters.
+Please consult the sample `redhat-repository-validator-config.xml` for more examples of the `(bom-)dependency-not-found` filters.
 
 
 #### How to add custom RemoteRepositoryCollisionValidator
 
 If you want to check that artifact is not already published in some other remote repository, 
 for example RedHat techpreview repository (https://maven.repository.redhat.com/techpreview), 
-you have to add folowing configuration into `wolf-validator-config.xml`.
+you have to add folowing configuration into `redhat-repository-validator-config.xml`.
 
 ```xml
-<bean id="redhatTechpreviewCollisionValidator" class="org.jboss.wolf.validator.impl.remoterepository.RemoteRepositoryCollisionValidator">
+<bean id="redhatTechpreviewCollisionValidator" class="com.redhat.repository.validator.impl.remoterepository.RemoteRepositoryCollisionValidator">
     <constructor-arg name="remoteRepositoryUrl" value="https://maven.repository.redhat.com/techpreview" />
     <constructor-arg name="checksumProvider" ref="nexusChecksumProvider" />
 </bean>
-<bean id="nexusChecksumProvider" class="org.jboss.wolf.validator.impl.remoterepository.ChecksumProviderNexus" />    
+<bean id="nexusChecksumProvider" class="com.redhat.repository.validator.impl.remoterepository.ChecksumProviderNexus" />    
 ```
 
 #### How to add custom BOM filter
@@ -207,7 +207,7 @@ The default implementation of `BomFilter` check if the artifact name or group co
 If it is not sufficient, you can provide your own implementation, or you can provide some hint in form of regular expression, which is use against GAV, see example bellow.
 
 ```xml
-<bean id="bomFilter" class="org.jboss.wolf.validator.impl.bom.BomFilterSimple">
+<bean id="bomFilter" class="com.redhat.repository.validator.impl.bom.BomFilterSimple">
     <constructor-arg name="bomGavRegex" value=".*:myBillOfMaterials:pom:.*" />
 </bean>
 ``` 

@@ -6,7 +6,7 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
     <context:annotation-config />
-    <bean id="testConfiguration" class="org.jboss.wolf.validator.impl.AbstractTest$TestConfiguration" />
+    <bean id="testConfiguration" class="com.redhat.repository.validator.impl.AbstractTest$TestConfiguration" />
 
     <lang:groovy id="suspiciousFileValidatorFilter" init-method="init">
         <lang:inline-script>

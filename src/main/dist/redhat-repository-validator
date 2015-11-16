@@ -1,0 +1,16 @@
+#! /bin/sh
+
+# Setup the JVM
+if [ "x$JAVA" = "x" ]; then
+    if [ "x$JAVA_HOME" != "x" ]; then
+        JAVA="$JAVA_HOME/bin/java"
+    else
+        JAVA="java"
+    fi
+fi
+
+echo "Running redhat-repository-validator with this java environment:"
+echo "JAVA="${JAVA}
+echo "JAVA_HOME="${JAVA_HOME}
+
+"$JAVA" -Xmx1024m -Dlogback.configurationFile=redhat-repository-validator-logback.xml -classpath "redhat-repository-validator.jar:lib/*" com.redhat.repository.validator.AppRunner "$@"

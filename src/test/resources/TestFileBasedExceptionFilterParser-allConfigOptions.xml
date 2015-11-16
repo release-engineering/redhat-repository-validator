@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:filter="http://wolf-validator.org/schema/exception-filters"
+       xmlns:filter="http://redhat-repository-validator.org/schema/exception-filters"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://wolf-validator.org/schema/exception-filters http://wolf-validator.org/schema/exception-filters.xsd">
+        http://redhat-repository-validator.org/schema/exception-filters http://redhat-repository-validator.org/schema/exception-filters.xsd">
 
     <filter:file name-regex="regex-only-.*\.jar"/>
 
@@ -15,14 +15,14 @@
     <filter:file name-regex="regex-and-list-of-exceptions-.*\.jar">
         <filter:exceptions>
             <filter:exception>SuspiciousFileException</filter:exception>
-            <filter:exception exception-msg-regex="msg-regex">org.jboss.wolf.validator.filter.internal.TestingException</filter:exception>
+            <filter:exception exception-msg-regex="msg-regex">com.redhat.repository.validator.filter.internal.TestingException</filter:exception>
         </filter:exceptions>
     </filter:file>
 
     <filter:file path-regex="/path/regex/and/list/of/exceptions/.*\.jar" exception-msg-regex="msg-regex1">
         <filter:exceptions>
             <filter:exception>SuspiciousFileException</filter:exception>
-            <filter:exception exception-msg-regex="msg-regex2">org.jboss.wolf.validator.filter.internal.TestingException</filter:exception>
+            <filter:exception exception-msg-regex="msg-regex2">com.redhat.repository.validator.filter.internal.TestingException</filter:exception>
         </filter:exceptions>
     </filter:file>
 </beans>

@@ -15,10 +15,10 @@
         <file>
             <source>${project.build.directory}/${project.build.finalName}.jar</source>
             <outputDirectory>/</outputDirectory>
-            <destName>wolf-validator.jar</destName>
+            <destName>redhat-repository-validator.jar</destName>
         </file>
         <file>
-            <source>${project.basedir}/src/main/dist/wolf-validator</source>
+            <source>${project.basedir}/src/main/dist/redhat-repository-validator</source>
             <outputDirectory>/</outputDirectory>
             <fileMode>750</fileMode>
         </file>
@@ -37,8 +37,8 @@
             <outputDirectory>/</outputDirectory>
             <filtered>true</filtered>
             <includes>
-                <include>wolf-validator-config.xml</include>
-                <include>wolf-validator-logback.xml</include>
+                <include>redhat-repository-validator-config.xml</include>
+                <include>redhat-repository-validator-logback.xml</include>
             </includes>
         </fileSet>
     </fileSets>

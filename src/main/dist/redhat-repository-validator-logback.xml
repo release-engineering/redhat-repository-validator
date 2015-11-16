@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <logger name="org.springframework" level="warn" />
+    <logger name="org.apache.http" level="warn" />
+    <logger name="com.redhat.repository.validator.internal.LogTransferListener" level="error" />
+    <logger name="com.redhat.repository.validator.internal.LogRepositoryListener" level="error" />
+    <logger name="org.apache.http.client.protocol.ResponseProcessCookies" level="error" />
+
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss} %-5level %logger{0} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="file" class="ch.qos.logback.core.FileAppender">
+        <file>workspace/log.txt</file>
+        <encoder>
+            <pattern>%date %-5level %logger{0} %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="trace">
+        <appender-ref ref="stdout" />
+        <appender-ref ref="file" />
+    </root>
+
+</configuration>

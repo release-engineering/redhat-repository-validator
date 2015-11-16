@@ -3,8 +3,8 @@
 
     <logger name="org.springframework" level="warn" />
     <logger name="org.apache.http" level="warn" />
-    <logger name="org.jboss.wolf.validator.internal.LogTransferListener" level="error" />
-    <logger name="org.jboss.wolf.validator.internal.LogRepositoryListener" level="error" />
+    <logger name="com.redhat.repository.validator.internal.LogTransferListener" level="error" />
+    <logger name="com.redhat.repository.validator.internal.LogRepositoryListener" level="error" />
     <logger name="org.apache.http.client.protocol.ResponseProcessCookies" level="error" />
 
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">

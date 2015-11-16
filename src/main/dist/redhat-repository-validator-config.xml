@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util" xmlns:lang="http://www.springframework.org/schema/lang"
+       xmlns:filter="http://redhat-repository-validator.org/schema/exception-filters"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+           http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang.xsd
+           http://redhat-repository-validator.org/schema/exception-filters http://redhat-repository-validator.org/schema/exception-filters.xsd">
+
+<!-- LOCAL REPOSITORY -->
+<!--
+    <bean id="localRepository" class="org.eclipse.aether.repository.LocalRepository">
+        <constructor-arg value="TODO-local-repository-path" />
+    </bean>
+-->
+
+
+<!-- REMOTE REPOSITORY WITH AUTHENTICATION -->
+<!--
+    <util:list id="remoteRepositories">
+        <bean factory-bean="fooRepository" factory-method="build" />
+    </util:list>
+    <bean id="fooRepository" class="org.eclipse.aether.repository.RemoteRepository.Builder">
+        <constructor-arg name="id" value="fooRepository" />
+        <constructor-arg name="type" value="default" />
+        <constructor-arg name="url" value="TODO-remote-repository-url" />
+        <property name="authentication" value="#{fooAuthentication.addUsername('TODO-username').addPassword('TODO-password').build()}" />
+    </bean>
+    <bean id="fooAuthentication" class="org.eclipse.aether.util.repository.AuthenticationBuilder" />
+-->
+
+
+<!-- CUSTOM VALIDATOR -->
+<!--
+    <bean id="fooValidator" class="foo.FooValidator" />
+-->
+
+
+<!-- CUSTOM FILTER IN XML -->
+<!--
+    <bean id="fooValidatorFilter" class="org.apache.commons.io.filefilter.AndFileFilter">
+        <constructor-arg>
+            <list>
+                <bean class="org.apache.commons.io.filefilter.NotFileFilter">
+                    <constructor-arg index="0" ref="expectedRootFilesFilter" />
+                </bean>
+                <bean class="org.apache.commons.io.filefilter.NotFileFilter">
+                    <constructor-arg>
+                        <bean class="org.apache.commons.io.filefilter.NameFileFilter">
+                            <constructor-arg index="0" value="expected-file.xml" />
+                        </bean>
+                    </constructor-arg>
+                </bean>
+            </list>
+        </constructor-arg>
+    </bean>
+-->
+
+
+<!-- CUSTOM FILTER IN GROOVY -->
+<!--
+    <lang:groovy id="fooValidatorFilter" init-method="init">
+        <lang:inline-script>
+            import static org.apache.commons.io.filefilter.FileFilterUtils.nameFileFilter;
+            import static org.apache.commons.io.filefilter.FileFilterUtils.notFileFilter;
+            import org.apache.commons.io.filefilter.AndFileFilter;
+            import org.apache.commons.io.filefilter.IOFileFilter;
+
+            class FooValidatorFilter extends AndFileFilter {
+
+                IOFileFilter expectedRootFilesFilter;
+
+                void init() {
+                    addFileFilter(notFileFilter(expectedRootFilesFilter));
+                    addFileFilter(notFileFilter(nameFileFilter("expected-file.groovy")));
+                }
+
+            }
+        </lang:inline-script>
+        <lang:property name="expectedRootFilesFilter" ref="expectedRootFilesFilter" />
+    </lang:groovy>
+-->
+
+
+<!-- FILTER (IGNORE) SPECIFIED FAILURES -->
+<!--
+    <filter:file name-regex="file-prefix.*\.jar"/>
+
+    <filter:file name-regex="file-prefix.*\.jar" exception="SuspiciousFileException" />
+
+    <filter:file path-regex=".*/modules/system/layers/base/.*\.jar" exception="DistributionRedundantFileException" />
+
+    <filter:file path-regex=".*/modules/system/layers/base/.*\.jar" exception="DistributionRedundantFileException" exception-msg-regex=".*foobar.*"/>
+
+    <filter:file name-regex="file-prefix.*\.jar">
+        <filter:exceptions>
+            <filter:exception>SuspiciousFileException</filter:exception>
+            <filter:exception exception-msg-regex=".*foobar.*">DistributionRedundantFileException</filter:exception>
+        </filter:exceptions>
+    </filter:file>
+
+    <filter:dependency-not-found missing-artifact="groupId:artifactId:jar:.*" />
+
+    <filter:dependency-not-found missing-artifact="groupId:artifactId:jar:.*" validated-artifact="groupId:artifactId:jar:.*"/>
+
+    <filter:dependency-not-found missing-artifact="groupId:artifactId:jar:.*">
+        <filter:validated-artifacts>
+            <filter:validated-artifact>groupId:artifactId:jar:.*</filter:validated-artifact>
+            <filter:validated-artifact>groupId:artifactId:jar:.*</filter:validated-artifact>
+        </filter:validated-artifacts>
+    </filter:dependency-not-found>
+
+    <filter:dependency-not-found validated-artifact="groupId:artifactId:jar:.*">
+        <filter:missing-artifacts>
+            <filter:missing-artifact>groupId:artifactId:jar:.*</filter:missing-artifact>
+            <filter:missing-artifact>groupId:artifactId:jar:.*</filter:missing-artifact>
+        </filter:missing-artifacts>
+    </filter:dependency-not-found>
+
+    <filter:bom-dependency-not-found missing-artifact="groupId:artifactId:jar:.*" />
+-->
+
+
+<!-- REMOTE REPOSITORY COMPARE VALIDATOR CONFIGURATION -->
+<!-- 
+    <bean id="remoteRepositoryCompareValidator" class="com.redhat.repository.validator.impl.remoterepository.RemoteRepositoryCompareValidator">
+        <constructor-arg name="remoteRepositoryUrl" value="TODO-remote-repository-url" />
+        <constructor-arg name="checksumProvider" ref="remoteRepositoryChecksumProvider" />
+    </bean>
+    <bean id="remoteRepositoryChecksumProvider" class="com.redhat.repository.validator.impl.remoterepository.ChecksumProviderNexus" />
+-->
+
+<!-- CUSTOM BOM REGEX -->
+<!--
+    <bean id="bomFilter" class="com.redhat.repository.validator.impl.bom.BomFilterSimple">
+        <constructor-arg name="bomGavRegex" value="TODO" />
+    </bean>
+-->
+
+</beans>

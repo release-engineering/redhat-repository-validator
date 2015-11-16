@@ -1,10 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.jboss</groupId>
-    <artifactId>wolf-validator</artifactId>
-    <version>0.1-SNAPSHOT</version>
-    <description>Wolf-validator is a tool used to validate the internal consistency of a maven artifact repository.</description>
+    <groupId>com.redhat</groupId>
+    <artifactId>redhat-repository-validator</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <description>redhat-repository-validator is a tool used to validate the internal consistency of a maven artifact repository.</description>
 
     <developers>
         <developer>
@@ -31,9 +31,9 @@
     </developers>
 
     <scm>
-        <url>http://github.com/thradec/wolf-validator</url>
-        <connection>scm:git:http://github.com/thradec/wolf-validator.git</connection>
-        <developerConnection>scm:git:git@github.com:thradec/wolf-validator.git</developerConnection>
+        <url>http://github.com/thradec/redhat-repository-validator</url>
+        <connection>scm:git:http://github.com/thradec/redhat-repository-validator.git</connection>
+        <developerConnection>scm:git:git@github.com:thradec/redhat-repository-validator.git</developerConnection>
     </scm>
 
     <properties>
@@ -61,7 +61,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib</classpathPrefix>
-                            <mainClass>org.jboss.wolf.validator.AppRunner</mainClass>
+                            <mainClass>com.redhat.repository.validator.AppRunner</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
