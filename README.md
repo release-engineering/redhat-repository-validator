@@ -4,7 +4,9 @@ redhat-repository-validator
 [![Build Status](https://travis-ci.org/thradec/redhat-repository-validator.png)](https://travis-ci.org/thradec/redhat-repository-validator)
 
 
-redhat-repository-validator is a tool used to validate the internal consistency of a maven artifact repository. It can also be used for validation of the associated distribution directory.
+**redhat-repository-validator** is a tool used to validate the internal consistency of a maven artifact repository. It can also be used for validation of the associated distribution directory.
+
+Released versions can be download from [Bintray](https://bintray.com/thradec/generic/redhat-repository-validator/). 
 
 
 Building
