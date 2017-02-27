@@ -334,6 +334,7 @@ public class AppConfig {
         DefaultArtifactTypeRegistry registry = new DefaultArtifactTypeRegistry();
         registry.add(new DefaultArtifactType("pom"));
         registry.add(new DefaultArtifactType("maven-plugin", "jar", "", "java"));
+        registry.add(new DefaultArtifactType("takari-maven-plugin", "jar", "", "java"));
         registry.add(new DefaultArtifactType("maven-archetype", "jar", "", "java"));
         registry.add(new DefaultArtifactType("jar", "jar", "", "java"));
         registry.add(new DefaultArtifactType("ejb", "jar", "", "java"));

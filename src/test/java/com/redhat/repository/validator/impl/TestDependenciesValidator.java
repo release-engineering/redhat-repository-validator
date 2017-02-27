@@ -354,7 +354,22 @@ public class TestDependenciesValidator extends AbstractTest {
         assertLocalRepoContains("com/acme/foo-archetype/1.0/foo-archetype-1.0.pom");
         assertLocalRepoContains("com/acme/foo-archetype/1.0/foo-archetype-1.0.jar");
     }
-    
+
+    @Test // bug WOLF-85
+    public void shouldResolveTakariMavenPluginPackaging() throws IOException {
+        Model fooArchetype = pom().artifactId("foo-takari-maven-plugin").packaging("takari-maven-plugin").create(repoFooDir);
+
+        File fooArchetypeFile = toArtifactFile(repoFooDir, fooArchetype);
+        File fooJarFile = new File(fooArchetypeFile.getParentFile(), "foo-takari-maven-plugin-1.0.jar");
+        Files.move(fooArchetypeFile, fooJarFile);
+
+        validationExecutor.execute(ctx);
+
+        assertSuccess();
+        assertLocalRepoContains("com/acme/foo-takari-maven-plugin/1.0/foo-takari-maven-plugin-1.0.pom");
+        assertLocalRepoContains("com/acme/foo-takari-maven-plugin/1.0/foo-takari-maven-plugin-1.0.jar");
+    }
+
     @Test // bug WOLF-51
     public void shouldNotThrowNPEForUnknownArtifactType() {
         pom().artifactId("foo").packaging("unknown").create(repoFooDir);
