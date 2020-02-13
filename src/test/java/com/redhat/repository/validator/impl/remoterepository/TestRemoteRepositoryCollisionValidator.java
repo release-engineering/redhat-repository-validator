@@ -24,7 +24,7 @@ public class TestRemoteRepositoryCollisionValidator extends AbstractTest {
 
         @Bean
         public RemoteRepositoryCollisionValidator collisionValidatorMavenCentral() {
-            return new RemoteRepositoryCollisionValidator("http://repo1.maven.org/maven2/", new ChecksumProviderNginx());
+            return new RemoteRepositoryCollisionValidator("https://repo1.maven.org/maven2/", new ChecksumProviderNginx());
         }
 
         @Bean
@@ -50,9 +50,9 @@ public class TestRemoteRepositoryCollisionValidator extends AbstractTest {
         validationExecutor.execute(ctx);
 
         assertExpectedException(RemoteRepositoryCollisionException.class,
-                "Remote repository [http://repo1.maven.org/maven2/] contains already artifact http://repo1.maven.org/maven2/org/hibernate/hibernate-core/4.3.6.Final/hibernate-core-4.3.6.Final.jar with different content");
+                "Remote repository [https://repo1.maven.org/maven2/] contains already artifact https://repo1.maven.org/maven2/org/hibernate/hibernate-core/4.3.6.Final/hibernate-core-4.3.6.Final.jar with different content");
         assertExpectedException(RemoteRepositoryCollisionException.class,
-                "Remote repository [http://repo1.maven.org/maven2/] contains already artifact http://repo1.maven.org/maven2/org/hibernate/hibernate-core/4.3.6.Final/hibernate-core-4.3.6.Final.pom with different content");
+                "Remote repository [https://repo1.maven.org/maven2/] contains already artifact https://repo1.maven.org/maven2/org/hibernate/hibernate-core/4.3.6.Final/hibernate-core-4.3.6.Final.pom with different content");
 
         assertExpectedException(RemoteRepositoryCollisionException.class,
                 "Remote repository [https://repository.jboss.org/nexus/content/groups/public-jboss/] contains already artifact https://repository.jboss.org/nexus/content/groups/public-jboss/org/hibernate/hibernate-core/4.3.6.Final/hibernate-core-4.3.6.Final.jar with different content");

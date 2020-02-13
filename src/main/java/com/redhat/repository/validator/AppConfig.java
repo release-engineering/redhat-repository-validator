@@ -97,7 +97,7 @@ public class AppConfig {
 
     @Bean
     public RemoteRepository centralRemoteRepository() {
-        RemoteRepository remoteRepositoryCentral = new RemoteRepository.Builder("central", "default", "http://repo1.maven.org/maven2/").build();
+        RemoteRepository remoteRepositoryCentral = new RemoteRepository.Builder("central", "default", "https://repo1.maven.org/maven2/").build();
         return remoteRepositoryCentral;
     }
 
@@ -182,7 +182,7 @@ public class AppConfig {
     
     @Bean
     public RemoteRepositoryCollisionValidator collisionValidatorMavenCentral() {
-        return new RemoteRepositoryCollisionValidator("http://repo1.maven.org/maven2/", new ChecksumProviderNginx(), collisionValidatorMavenCentralFilter(), 20);
+        return new RemoteRepositoryCollisionValidator("https://repo1.maven.org/maven2/", new ChecksumProviderNginx(), collisionValidatorMavenCentralFilter(), 20);
     }
     
     @Bean

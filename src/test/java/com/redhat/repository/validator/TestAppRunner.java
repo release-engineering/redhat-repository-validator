@@ -125,19 +125,19 @@ public class TestAppRunner {
     
     @Test
     public void shouldUseDefaultRemoteRepositories() {
-        appRunner = new AssertRemoteRepositoryRunner("http://repo1.maven.org/maven2/");
+        appRunner = new AssertRemoteRepositoryRunner("https://repo1.maven.org/maven2/");
         appRunner.run();
     }
     
     @Test
     public void shouldUseRemoteRepositoriesFromArguments() {
-        appRunner = new AssertRemoteRepositoryRunner("file://foo", "file://bar", "http://repo1.maven.org/maven2/");
+        appRunner = new AssertRemoteRepositoryRunner("file://foo", "file://bar", "https://repo1.maven.org/maven2/");
         appRunner.run("-rr", "file://foo", "-rr", "file://bar");
     }
     
     @Test
     public void shouldUseRemoteRepositoriesFromConfiguration() {
-        appRunner = new AssertRemoteRepositoryRunner("file://foo", "http://bar.com", "http://repo1.maven.org/maven2/");
+        appRunner = new AssertRemoteRepositoryRunner("file://foo", "http://bar.com", "https://repo1.maven.org/maven2/");
         appRunner.run("--config", getClass().getResource("/TestAppRunner-remoteRepositories.xml").getFile());
     }
     
