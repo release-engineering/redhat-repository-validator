@@ -19,7 +19,7 @@ public class TestChecksumProviderNginx {
     public void shouldParseHashFromHeaders() throws Exception {
         ChecksumProviderNginx providerNginx = new ChecksumProviderNginx();
         
-        URI remoteArtifact = new URI("http://repo1.maven.org/maven2/org/hibernate/hibernate-core/4.3.6.Final/hibernate-core-4.3.6.Final.pom");
+        URI remoteArtifact = new URI("https://repo1.maven.org/maven2/org/hibernate/hibernate-core/4.3.6.Final/hibernate-core-4.3.6.Final.pom");
         
         HttpClient httpClient = HttpClients.createDefault();
         HttpUriRequest httpRequest = RequestBuilder.head().setUri(remoteArtifact).build();

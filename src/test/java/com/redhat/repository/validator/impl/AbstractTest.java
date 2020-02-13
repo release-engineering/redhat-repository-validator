@@ -46,7 +46,7 @@ public abstract class AbstractTest {
     protected static final RemoteRepository remoteRepoFoo = new RemoteRepository.Builder("foo", "default", repoFooDir.toURI().toString()).build();
     protected static final RemoteRepository remoteRepoBar = new RemoteRepository.Builder("bar", "default", repoBarDir.toURI().toString()).build();
     protected static final RemoteRepository remoteRepoBaz = new RemoteRepository.Builder("baz", "default", repoBazDir.toURI().toString()).build();
-    protected static final RemoteRepository remoteRepoCentral = new RemoteRepository.Builder("central", "default", "http://repo1.maven.org/maven2/").build();
+    protected static final RemoteRepository remoteRepoCentral = new RemoteRepository.Builder("central", "default", "https://repo1.maven.org/maven2/").build();
     protected static final List<RemoteRepository> remoteRepos = Arrays.asList(remoteRepoFoo, remoteRepoBar, remoteRepoBaz, remoteRepoCentral);
     
     protected static IOFileFilter fileFilter;
